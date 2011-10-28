@@ -1,18 +1,3 @@
-class EchoPlugin < Basil::Plugin
-  class << self
-    def match(msg)
-      if msg.text =~ /^echo (.*)/
-        @@say = $1
-        return true
-      end
-
-      false
-    end
-
-    def reply
-      @@say
-    end
-  end
+Basil::Plugin.answer(/^echo .*/) do |msg|
+  msg.text.gsub(/^echo /, '')
 end
-
-Basil::Plugin.register(EchoPlugin)

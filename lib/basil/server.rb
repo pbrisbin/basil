@@ -28,9 +28,8 @@ module Basil
       return nil unless msg.to_me?
 
       Basil::Plugin.registered_plugins.each do |plugin|
-        if plugin.match(msg)
-          return plugin.reply
-        end
+        reply = plugin.reply(msg)
+        return reply if reply
       end
 
       nil

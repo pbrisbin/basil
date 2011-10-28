@@ -6,25 +6,36 @@ module Basil
   end
 
   class Plugin
-    # Must be overriden by subclass. return true if the plugin should
-    # take action on the message. if you want to use any information
-    # from the message, it should be stored in class variables at this
-    # point.
-    def self.match(msg); false end
-
-    # Must be overriden be overriden by subclass. return a text reply
-    # that should be send if match returns true.
-    def self.reply; end
-
-    @registered_plugins = []
-
-
-    def self.register(klass)
-      registered_plugins << klass
+    def initialize(regex, &block)
+      @matcher = lambda { |msg| msg.text =~ regex }
+      @block   = block
     end
 
+    def reply(msg)
+      if @matcher.call(msg)
+        return @block.call(msg)
+      end
+
+      nil
+    end
+
+    private_class_method :new
+
+    def self.answer(regex, &block)
+      p = new(regex, &block)
+      Plugin.register(p)
+    end
+
+    @@registered_plugins = []
+
     def self.registered_plugins
-      @registered_plugins ||= []
+      @@registered_plugins ||= []
+    end
+
+    private
+
+    def self.register(instance)
+      registered_plugins << instance
     end
   end
 end

@@ -24,19 +24,8 @@ via a prompt so no client is needed.
 
 ### Plugins
 
-A basil plugin looks at a message and possibly acts on it, often 
-providing a reply. A plugin is created by subclassing `Basil::Plugin` 
-and defining two methods: `match` and `reply`.
-
-`match` will be given a `Basil::Message` and should return `true` if the 
-plugin wishes to act on that message. In that case, `reply` will be 
-called and the text returned will be sent directly to the server's 
-`puts` method.
-
-Note that `match` is the only point when your plugin actually sees the 
-message, so if you wish to use any of its information in your reply, 
-store it in a class variable during the check (see `./plugins/echo.rb` 
-for an example).
+A basil plugin answers messages. See `./plugins` for two simple 
+examples.
 
 Basil as it stands is not feature-rich. I've been hacking on it for all 
 of about 45 minutes. However, the premise has been proven -- I have a 

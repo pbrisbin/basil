@@ -1,13 +1,3 @@
-class TestPlugin < Basil::Plugin
-  class << self
-    def match(msg)
-      msg.text =~ /^test$/
-    end
-
-    def reply
-      'Hello World!'
-    end
-  end
+Basil::Plugin.answer(/^test$/) do |msg|
+  'Hello World!'
 end
-
-Basil::Plugin.register(TestPlugin)
