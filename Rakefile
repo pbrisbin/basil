@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "basil"
   gem.homepage = "http://github.com/pbrisbin/basil"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{basil is a simple bot}
+  gem.description = %Q{basil is a simple bot}
   gem.email = "pbrisbin@gmail.com"
   gem.authors = ["patrick brisbin"]
   # dependencies defined in Gemfile
