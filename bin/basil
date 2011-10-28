@@ -6,5 +6,4 @@ require 'basil/server'
 require 'basil/plugins'
 require 'basil/config'
 
-Basil.load_plugins
 Basil.run

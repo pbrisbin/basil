@@ -1,5 +1,8 @@
 module Basil
   def self.run
+    load_plugins
+
+    # any object that responds to listen and puts can be used
     server = Basil::Config.server
 
     while true
@@ -14,17 +17,6 @@ module Basil
     end
   end
 
-  class Server
-    # Must be overriden by subclass. Block and wait for input, return a
-    # Basil::Message when you receive one. The message will be processed
-    # and listen will be called again.
-    def self.listen; nil end
-
-    # Must be overriden by subclass. When a reply is triggered, this
-    # method will be called with it as its first and only argument.
-    def self.puts; end
-  end
-
   class Message
     attr_reader :to, :from, :time, :text
 
@@ -37,21 +29,18 @@ module Basil
       to == Basil::Config.me
     end
   end
-end
 
-# A good server for local development; an interactive prompt.
-class CliServer < Basil::Server
-  class << self
+  module Servers
+    class Cli
+      def listen
+        print '> '
+        str = $stdin.gets.chomp
+        str != '' ? Basil::Message.new('basil', 'me', str) : nil
+      end
 
-    def listen
-      print '> '
-      str = $stdin.gets.chomp
-      str != '' ? Basil::Message.new('basil', 'me', str) : nil
+      def puts(msg)
+        Kernel.puts msg
+      end
     end
-
-    def puts(msg)
-      Kernel.puts msg
-    end
-
   end
 end
