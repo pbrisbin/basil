@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby -w
+
+$LOAD_PATH << './lib' # while developing
+
+require 'basil/server'
+require 'basil/plugins'
+require 'basil/config'
+
+Basil.load_plugins
+Basil::Server.run
