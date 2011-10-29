@@ -5,17 +5,17 @@ module Basil
 
       # nick used to identify messages to me
       def me
-        'basil'
+        @@me ||= 'basil'
       end
 
       # instance of server to run
       def server
-        Basil::Server::Cli.new
+        @@server ||= Basil::Server::Cli.new
       end
 
       # directory holding plugin files
       def plugins_directory
-        './plugins'
+        @@plugins_directory ||= './plugins'
       end
 
 ################################################################################
