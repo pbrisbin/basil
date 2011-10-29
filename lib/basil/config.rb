@@ -10,7 +10,12 @@ module Basil
 
       # instance of server to run
       def server
-        Basil::Servers::Cli.new
+        Basil::Server::Cli.new
+      end
+
+      # directory holding plugin files
+      def plugins_directory
+        './plugins'
       end
 
 ################################################################################

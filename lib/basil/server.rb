@@ -5,16 +5,23 @@ module Basil
     # any object that responds to listen and puts can be used
     server = Basil::Config.server
 
-    while true
-      msg = server.listen
+    @@running = true
 
-      if msg && msg.to_me?
-        Basil::Plugin.registered_plugins.each do |plugin|
-          reply = plugin.reply(msg)
-          server.puts reply if reply
-        end
-      end
+    while @@running
+      msg = plugin = reply = nil
+
+      msg    = server.listen
+      plugin = Basil::Plugin.plugin_for(msg) if msg
+      reply  = plugin.act_on(msg)            if plugin
+      server.puts reply                      if reply
     end
+
+    exit 0
+  end
+
+  def self.shutdown
+    # todo, any cleanup?
+    @@running = false
   end
 
   class Message
@@ -30,16 +37,19 @@ module Basil
     end
   end
 
-  module Servers
+  module Server
     class Cli
       def listen
         print '> '
         str = $stdin.gets.chomp
-        str != '' ? Basil::Message.new('basil', 'me', str) : nil
+
+        Basil.shutdown if str == 'quit'
+
+        str != '' ? Basil::Message.new(Basil::Config.me, 'user', str) : nil
       end
 
       def puts(msg)
-        Kernel.puts msg
+        Kernel.puts msg.text
       end
     end
   end
