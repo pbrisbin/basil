@@ -11,9 +11,9 @@ module Basil
       msg = plugin = reply = nil
 
       msg    = server.listen
-      plugin = Basil::Plugin.plugin_for(msg) if msg
-      reply  = plugin.act_on(msg)            if plugin
-      server.puts reply                      if reply
+      plugin = Basil::Plugin.plugin_for(msg)
+      reply  = plugin.execute rescue nil
+      server.puts reply if reply
     end
 
     exit 0

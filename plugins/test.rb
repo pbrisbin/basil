@@ -1,8 +1,7 @@
-Basil::Plugin.respond_to(/^test$/) do |p|
+Basil::Plugin.respond_to(/^test$/) do
   #
-  # Inside this block, p has a method msg which contains the
-  # Basil::Message you're processing (time, to, from, and text). p
-  # itself also provides the helper methods say, reply, and forward
+  # this block becomes the execute method on the plugin so you have
+  # access to all of its instance variables and helper methods
   #
-  p.replies "Hello from #{p.inspect}!"
+  replies "Hello from #{self.inspect}!"
 end
