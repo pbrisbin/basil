@@ -45,7 +45,7 @@ module Basil
 
         Basil.shutdown if str == 'quit'
 
-        str != '' ? Basil::Message.new(Basil::Config.me, 'user', str) : nil
+        (str && str != '') ? Basil::Message.new(Basil::Config.me, 'user', str) : nil
       end
 
       def puts(msg)
