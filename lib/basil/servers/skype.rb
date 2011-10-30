@@ -10,12 +10,10 @@ module Basil
     class SkypeBot
       include Basil
 
-      def initialize
+      def run
         # https://github.com/nfelger/skype
         require 'skype'
-      end
 
-      def run
         Skype.on(:chatmessage_received) do |chatmessage|
           chatmessage.chat do |chat|
             chatmessage.body do |body|
@@ -26,7 +24,7 @@ module Basil
                 reply = dispatch(msg)
                 chat.send_message(reply.text) if reply
               rescue Exception => e
-                chat.send_message(e.message)
+                chat.send_message("error: #{e.message}")
               end
             end
           end
