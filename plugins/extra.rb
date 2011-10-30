@@ -1,3 +1,15 @@
+#
+# Simple echo
+#
+Basil::Plugin.respond_to(/^echo (.*)/) {
+
+  says @match_data[1]
+
+}.description = "echos what it's told"
+
+#
+# Google for something
+#
 Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
 
   require 'cgi'
