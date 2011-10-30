@@ -18,4 +18,4 @@ Basil::Plugin.respond_to(/^albumbler$/) {
 
   says `#{@match_data[0]} 2>&1`
 
-}.description = "controls the server's music stream"
+}.description = 'chooses an album to play based on historical use data'
