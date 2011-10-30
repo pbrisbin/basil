@@ -35,7 +35,7 @@ Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
     replies "Nothing found."
   else
     result = results.first
-    replies "#{result['url']} - #{result['title']}"
+    replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
   end
 
 }.description 'googles for some phrase'
