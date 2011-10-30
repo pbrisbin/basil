@@ -1,5 +1,6 @@
 module Basil
   class Config
+    include Basil
     class << self
 ################################################################################
 
@@ -10,7 +11,8 @@ module Basil
 
       # instance of server to run
       def server
-        @@server ||= Basil::Server::Cli.new
+        #@@server ||= Server::Cli.new
+        @@server ||= Server::SkypeBot.new
       end
 
       # directory holding plugin files

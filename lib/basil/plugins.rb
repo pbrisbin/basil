@@ -1,88 +1,80 @@
 module Basil
-  def self.load_plugins
-    dir = Basil::Config.plugins_directory
+  def dispatch(msg)
+    return nil unless msg && msg != ''
 
-    if Dir.exists?(dir)
-      Dir.glob(dir + '/*').each do |f|
-        begin require f
-        rescue => e
-          $stderr.puts "#{f}: error: #{e.message}.", "Skipping..."
-          next
-        end
+    if msg.to_me?
+      Plugin.responders.each do |p|
+        reply = p.triggered(msg)
+        return reply if reply
       end
     end
+
+    Plugin.watchers.each do |p|
+      reply = p.triggered(msg)
+      return reply if reply
+    end
+
+    nil
   end
 
   class Plugin
-    attr_reader :type
-    attr_writer :regex
+    include Basil
 
-    def initialize(type)
-      @type = type
+    attr_reader :regex
+    attr_accessor :description
+
+    def initialize(type, regex)
+      @type, @regex = type, regex
+      @description  = nil
     end
 
-    def triggers_on?(msg)
+    def triggered(msg)
       if msg.text =~ @regex
         @msg = msg
         @match_data = $~
 
-        return true
+        return execute
       end
 
-      false
+      nil
+    end
+
+    def register!
+      case @type
+      when :responder; Plugin.responders << self
+      when :watcher  ; Plugin.watchers   << self
+      end; self
     end
 
     # create a message to no one from me from txt
     def says(txt)
-      Basil::Message.new(nil, Basil::Config.me, txt)
+      Message.new(nil, Config.me, txt)
     end
 
     # create a message to the sender of the message i'm currently
     # processing from me from txt
     def replies(txt)
-      Basil::Message.new(@msg.from, Basil::Config.me, txt)
+      Message.new(@msg.from, Config.me, txt)
     end
 
     # forward the message i'm currently processing to new_to
     def forwards(new_to)
-      Basil::Message.new(new_to, Basil::Config.me, @msg.text)
+      Message.new(new_to, Config.me, @msg.text)
     end
 
     private_class_method :new
 
     def self.respond_to(regex, &block)
-      p = new(:responder)
-      p.regex  = regex
+      p = new(:responder, regex)
       p.define_singleton_method(:execute, &block)
-
-      Plugin.register(p)
+      p.register!
     end
 
     def self.watch_for(regex, &block)
-      p = new(:watcher)
-      p.regex  = regex
+      p = new(:watcher, regex)
       p.define_singleton_method(:execute, &block)
-
-      Plugin.register(p)
+      p.register!
     end
-
-    def self.plugin_for(msg)
-      return nil unless msg
-
-      if msg.to_me?
-        responders.each do |p|
-          return p if p.triggers_on?(msg)
-        end
-      end
-
-      watchers.each do |p|
-        return p if p.triggers_on?(msg)
-      end
-
-      nil
-    end
-    
-    private
 
     def self.responders
       @responders ||= []
@@ -92,11 +84,23 @@ module Basil
       @@watchers ||= []
     end
 
-    def self.register(p)
-      case p.type
-      when :responder; responders << p
-      when :watcher  ; watchers   << p
-      end; p
+    def self.load!(reload = false)
+      dir = Config.plugins_directory
+
+      if reload
+        @@responders = []
+        @@watchers   = []
+      end
+
+      if Dir.exists?(dir)
+        Dir.glob(dir + '/*').sort.each do |f|
+          begin load(f)
+          rescue => e
+            $stderr.puts "error loading #{f}: #{e.message}."
+            next
+          end
+        end
+      end
     end
   end
 end

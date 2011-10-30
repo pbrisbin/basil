@@ -2,8 +2,5 @@
 
 $LOAD_PATH << './lib' # while developing
 
-require 'basil/server'
-require 'basil/plugins'
-require 'basil/config'
-
+require 'basil'
 Basil.run
