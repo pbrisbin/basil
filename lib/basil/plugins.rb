@@ -84,13 +84,8 @@ module Basil
       @@watchers ||= []
     end
 
-    def self.load!(reload = false)
+    def self.load!
       dir = Config.plugins_directory
-
-      if reload
-        @@responders = []
-        @@watchers   = []
-      end
 
       if Dir.exists?(dir)
         Dir.glob(dir + '/*').sort.each do |f|
