@@ -1,48 +1,68 @@
 # Basil
 
-A modular bot design with three main components:
+A skype bot who hopes to be as cool as phrik or hubot.
+
+## Why?
+
+We use skype at work the way I've always used IRC for FOSS projects. 
+It's a place for support, meetings, fire-drills, and just hanging out.
+
+I've always wanted phrik (#archlinux's bot) there, he's so useful -- So 
+I got the idea to try and write Basil.
+
+It started as a simple command line REPL which aimed to make life as 
+easy as possible for potential plugin writers.
+
+After seeing that my fantasy of skype integration was actually possible 
+and not all that hard, I've tweaked the design to cater to that 
+use-case.
+
+Shockingly, it works.
+
+## Installation
+
+For now, it's just hacking so clone the repo and run the binary. You'll 
+want to adjust `lib/basil/config.rb` to specify `Server::Cli.new` at 
+first since the skype setup is slightly more involved (but not much).
+
+To use `Server::Skype` you'll need to do the following:
+
+1. Install skype
+2. Setup a profile for your bot to run as
+3. Start skype
+4. Install and verify that nfelger's [skype gem][] is working
+5. Start basil!
+
+[skype gem]: https://github.com/nfelger/skype
+
+From another skype profile/session you should add basil as a contact and 
+IM with him exactly as in the `Cli` server.
+
+## Extending
+
+Extending basil's feature set in a modular way is the ultimate goal. 
+There are two components that can be swapped out or added to to change 
+basil's behavior: Servers and Plugins.
 
 ### Server
 
-A basil server is implemented by writing a class under `Basil::Server` 
-and defining two methods: `listen` and `puts`.
-
-`listen` should block while waiting for a message through its 
-implementation-specific channels and translate any messages into an 
-instance of `Basil::Message` which it returns.
-
-`puts` should be how your server handles an outgoing `Message`. Basil 
-will wait for `listen` to return, process the `Message` through any 
-registered `Plugins` and, if a reply is triggered, it is passed to 
-`puts`.
-
-### Client
-
-A basil client is a translation layer. It should shuttle messages from 
-something (think, irc channel) to your server and shuttle back any 
-replies. This layer is not always needed. As an example, the `CliServer` 
-interfaces directly with the user via a prompt so no client is needed.
+`Server::Cli` and `Server::Skype` should be good enough examples of 
+what's required. Just define a `run` that does whatever you need.
 
 ### Plugins
 
-A basil plugin answers messages. See `./plugins` for examples.
+Plugins should be super simple to write. You can checkout `./plugins` 
+for examples. Here's a pretty fun one:
 
-Basil as it stands is not feature-rich. I've been hacking on it for all 
-of about 45 minutes. However, the premise has been proven -- I have a 
-`CliServer` which I can interact with and two plugins that work. 
-Extending basil is simple, just take a look in `./plugins`.
+~~~ { .ruby }
+Basil::Plugin.respond_to(/^(you are|you're)(.*)$/) {
 
-The goal at this point is to write other `Basil::Server` classes and 
-`Basil::Plugin` instances. I think I've made it easy.
+  replies "no, YOU are#{@match_data[2]}!"
 
-Expect more documentation to come as this project matures.
+}.description = 'turns it around on you'
+~~~
 
-### Development Installation
+Your block is defined as a method on `Plugin` so you can access all its 
+instance variables and methods.
 
-For now:
-
-    git clone ...
-    cd ./basil
-    ./bin/basil
-
-Contribute!
+Here's hoping this grows into something useful...
