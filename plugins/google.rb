@@ -1,18 +1,20 @@
 Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
 
-  require 'nokogiri'
-  require 'open-uri'
+  require 'cgi'
+  require 'json'
+  require 'net/http'
 
-  url = "http://www.google.com/search?q=#{@match_data[2]}"
-  doc = Nokogiri::HTML(open(url))
+  url  = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{CGI::escape(@match_data[2])}"
+  resp = Net::HTTP.get_response(URI.parse(url))
+  json = JSON.parse(resp.body)
 
-  links = doc.css('h3.r a.l')
-  
-  if links.empty?
+  results = json['responseData']['results'] rescue []
+
+  if results.empty?
     replies "Nothing found."
   else
-    link = links.first
-    replies "#{link['href']} - #{link.content}"
+    result = results.first
+    replies "#{result['url']} - #{result['title']}"
   end
 
 }.description 'googles for some phrase'
