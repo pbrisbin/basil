@@ -8,6 +8,15 @@ Basil::Plugin.respond_to(/^echo (.*)/) {
 }.description = "echos what it's told"
 
 #
+# Todo: provide an "alias" helper for times like these
+#
+Basil::Plugin.respond_to(/^say (.*)/) {
+
+  says @match_data[1]
+
+}.description = "says what it's told"
+
+#
 # Google for something
 #
 Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
