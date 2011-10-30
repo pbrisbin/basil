@@ -23,53 +23,19 @@ module Basil
     attr_reader :regex
     attr_accessor :description
 
-    def initialize(type, regex)
-      @type, @regex = type, regex
-      @description  = nil
-    end
-
-    def triggered(msg)
-      if msg.text =~ @regex
-        @msg = msg
-        @match_data = $~
-
-        return execute
-      end
-
-      nil
-    end
-
-    def register!
-      case @type
-      when :responder; Plugin.responders << self
-      when :watcher  ; Plugin.watchers   << self
-      end; self
-    end
-
-    # create a message to no one from me from txt
-    def says(txt)
-      Message.new(nil, Config.me, txt)
-    end
-
-    # create a message to the sender of the message i'm currently
-    # processing from me from txt
-    def replies(txt)
-      Message.new(@msg.from, Config.me, txt)
-    end
-
-    # forward the message i'm currently processing to new_to
-    def forwards(new_to)
-      Message.new(new_to, Config.me, @msg.text)
-    end
-
+    # respond_to and watch_for are the only ways to instantiate a Plugin
     private_class_method :new
 
+    # if a message is "to me" and contains regex, block will be executed
+    # to form a reply Message to send
     def self.respond_to(regex, &block)
       p = new(:responder, regex)
       p.define_singleton_method(:execute, &block)
       p.register!
     end
 
+    # if regex is seen in any message in the chat, block will be
+    # executed to form a Message to send
     def self.watch_for(regex, &block)
       p = new(:watcher, regex)
       p.define_singleton_method(:execute, &block)
@@ -96,6 +62,49 @@ module Basil
           end
         end
       end
+    end
+
+    def initialize(type, regex)
+      @type, @regex = type, regex
+      @description  = nil
+    end
+
+    # if a plugin wants to act on msg, this method will return the reply
+    # Message; otherwise, nil
+    def triggered(msg)
+      if msg.text =~ @regex
+        @msg = msg
+        @match_data = $~
+
+        return execute
+      end
+
+      nil
+    end
+
+    # a plugin can register itself as a responder or watcher, it will be
+    # consulted for a reply (first-come-first-server) on any messages
+    def register!
+      case @type
+      when :responder; Plugin.responders << self
+      when :watcher  ; Plugin.watchers   << self
+      end; self
+    end
+
+    # create a message to no one from me from txt
+    def says(txt)
+      Message.new(nil, Config.me, txt)
+    end
+
+    # create a message to the sender of the message i'm currently
+    # processing from me from txt
+    def replies(txt)
+      Message.new(@msg.from, Config.me, txt)
+    end
+
+    # forward the message i'm currently processing to new_to
+    def forwards_to(new_to)
+      Message.new(new_to, Config.me, @msg.text)
     end
   end
 end
