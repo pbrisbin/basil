@@ -2,9 +2,9 @@
 # basil, you're a bread compartment
 # => no, YOU are a bread compartment
 #
-Basil::Plugin.respond_to(/^(you are|you're)(.*)$/) {
+Basil::Plugin.respond_to(/^you(.*)$/) {
 
-  replies "no, YOU are#{@match_data[2]}!"
+  replies "no, YOU#{@match_data[1]}!"
 
 }
 
