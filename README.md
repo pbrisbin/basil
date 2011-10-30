@@ -2,6 +2,8 @@
 
 A skype bot who hopes to be as cool as phrik or hubot.
 
+![Basil Test](http://pbrisbin.com/static/fileshare/basil_test.png)
+
 ## Why?
 
 We use skype at work the way I've always used IRC for FOSS projects. 
