@@ -18,8 +18,6 @@ module Basil
       def run
         Skype.on(:chatmessage_received) do |chatmessage|
           chatmessage.chat do |chat|
-            puts chat.inspect  
-
             chatmessage.body do |body|
               to, text = parse_body(body)
               msg = Message.new(to, nil, text)
@@ -27,7 +25,7 @@ module Basil
               begin
                 reply = dispatch(msg)
                 chat.send_message(reply.text) if reply
-              rescue => e
+              rescue Exception => e
                 chat.send_message(e.message)
               end
             end
