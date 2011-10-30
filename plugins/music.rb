@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to(/^mpc.*$/) {
+Basil::Plugin.respond_to(/^mpc.*/) {
 
   out = `#{@match_data[0]} 2>&1`
   msg = '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
@@ -14,7 +14,7 @@ Basil::Plugin.respond_to(/^mpc.*$/) {
 #
 # http://kmkeen.com/albumbler/
 #
-Basil::Plugin.respond_to(/^albumbler$/) {
+Basil::Plugin.respond_to(/^albumbler.*/) {
 
   says `#{@match_data[0]} 2>&1`
 
