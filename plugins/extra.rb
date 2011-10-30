@@ -14,7 +14,7 @@ Basil::Plugin.respond_to(/^say (.*)/) {
 
   says @match_data[1]
 
-}.description = "says what it's told"
+}.description = 'an alias for echo'
 
 #
 # Google for something
