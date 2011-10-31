@@ -11,7 +11,7 @@ Basil::Plugin.respond_to(/^mpc.*/) {
     end
   end
   
-}.description = "controls the server's music stream"
+}
 
 #
 # http://kmkeen.com/albumbler/
@@ -20,4 +20,4 @@ Basil::Plugin.respond_to('albumbler') {
 
   says `#{@match_data[0]} 2>&1`
 
-}.description = 'chooses an album to play based on historical use data'
+}

@@ -59,4 +59,4 @@ Basil::Plugin.respond_to(/^eval (.*)/) {
 
   says "=> #{retval.inspect}"
 
-}.description = nil
+}.description = 'evaluates ruby expressions'

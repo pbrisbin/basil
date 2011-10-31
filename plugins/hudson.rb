@@ -84,4 +84,4 @@ Basil::Plugin.respond_to(/^hudson(.*)/) {
 
   says out
 
-}.description = 'interacts with hudson builds'
+}.description = 'gives current hudson build status'
