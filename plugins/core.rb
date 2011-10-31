@@ -8,6 +8,15 @@ Basil::Plugin.respond_to(/^test$/) {
 }.description = 'tests that the bot is working'
 
 #
+# Show a link to my source
+#
+Basil::Plugin.respond_to(/^source$/) {
+
+  replies "https://github.com/pbrisbin/basil"
+
+}
+
+#
 # Lists out regex/description for everythign basil will respond to / is
 # watching for in the chat
 #
