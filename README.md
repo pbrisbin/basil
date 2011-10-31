@@ -34,32 +34,32 @@ This way, all my coworkers can tinker with him too.
 
 * It's not a very big wheel to reinvent
 
-The heart of basil minus the skype-specific logic and his plugins is 
-around 150 sloc. That skype-specific logic and his (current) set of 
-plugins (which I'd add to a hubot fork/clone anyway) weigh in at ~200 
-and growing.
+The heart of basil is tiny (~150 sloc). The bulk of the project is the 
+skype server and plugins -- both of which would need to be written from 
+scratch anyway.
 
 * Aside from the github-workflow-specific plugins, hubot doesn't have 
   much
 
-All the my-work-specific plugins would need to be written *somewhere* 
-anyway.
+All the my-workflow-specific plugins would need to be written *somewhere* 
+anyway. And writing plugins is so easy (I hope) that reproducing 
+anything hubot offers shouldn't be difficult.
 
 All this combined with the fact that I found this project interesting 
 and fun to do from scratch and, well, there you go.
 
 ## Installation
 
-Requires ruby 1.9 (`define_singleton_method`) and the Skype setup is 
-linux-only.
+*requires ruby 1.9 and the Skype setup is linux-only*
+
+1. Clone the repo and adjust `lib/basil/config.rb` to specify the type 
+   of server you want to use
+2. Continue with server-specific instructions
 
 ### Cli
 
-1. Clone the repo
-2. Adjust `lib/basil/config.rb` to use `Server::Cli.new`
-3. `./bin/basil`
-4. Add plugins
-5. tell basil to `reload` to test without restarting
+1. Start `basil`
+2. Type messages
 
 ### Skype
 
@@ -67,15 +67,10 @@ linux-only.
 2. Setup a profile for your bot to run as
 3. Start skype
 4. Install and verify that nfelger's [skype gem][] is working
-5. Follow the Cli instructions skipping step #2
+5. Start `basil`
+6. Prefix messages with `basil, ` or `! `
 
 [skype gem]: https://github.com/nfelger/skype
-
-From another skype profile/session you can now IM with him exactly as in 
-the `Cli` server.
-
-Note that In skype you must prefix messages with `!`, `basil, `, `basil: 
-`, or `basil; ` for him to know you're talking to him.
 
 ## Extending
 
