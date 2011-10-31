@@ -43,7 +43,7 @@ module Basil
     end
 
     def self.responders
-      @responders ||= []
+      @@responders ||= []
     end
 
     def self.watchers
