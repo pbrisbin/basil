@@ -47,15 +47,19 @@ Basil::Plugin.respond_to('reload') {
 
 Basil::Plugin.respond_to(/^eval (.*)/) {
 
-  str = %{
-    $SAFE = 3
-    #{@match_data[1]}
-  }
-
   retval = nil
 
-  # use a thread so my $SAFE level isn't affected
-  Thread.new { retval = self.instance_eval str }.join
+  require 'timeout'
+
+  Timeout::timeout(5) do
+    Thread.new {
+      # use a thread so my $SAFE level isn't affected
+      retval = self.instance_eval %{
+        $SAFE = 3
+        #{@match_data[1]}
+      }
+    }.join
+  end
 
   says "=> #{retval.inspect}"
 
