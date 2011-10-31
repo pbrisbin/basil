@@ -1,17 +1,17 @@
 Basil::Plugin.respond_to(/^(echo|say) (.*)/) {
 
-  says @match_data[1].strip
+  says @match_data[2].strip
 
 }.description = "echos what it's told"
 
-Basil::Plugin.respond_to(/^give (\w+) (.*)$/) {
+Basil::Plugin.respond_to(/^give (\w+) (.*)/) {
 
-  cmd = Basil::Message.new(Basil::Config.me, @match_data[1], @match_data[2].strip)
+  cmd = Basil::Message.new(Basil::Config.me, @match_data[1], @match_data[1], @match_data[2].strip)
   dispatch(cmd)
 
 }.description = 'executes a plugin replying to someone else'
 
-Basil::Plugin.respond_to(/^g(oogle)? (.*)$/) {
+Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
 
   require 'cgi'
   require 'json'
