@@ -28,19 +28,19 @@ you're all set.
 
 ## Why not fork hubot?
 
-1. I wanted it to be in ruby
+* I wanted it to be in ruby
 
 This way, all my coworkers can tinker with him too.
 
-2. It's not a very big wheel to reinvent
+* It's not a very big wheel to reinvent
 
 The heart of basil minus the skype-specific logic and his plugins is 
-around 150 sloc. That skype-specific logc and his (current) set of 
+around 150 sloc. That skype-specific logic and his (current) set of 
 plugins (which I'd add to a hubot fork/clone anyway) weigh in at ~200 
 and growing.
 
-3. Aside from the github-workflow-specific plugins, hubot doesn't have 
-   much
+* Aside from the github-workflow-specific plugins, hubot doesn't have 
+  much
 
 All the my-work-specific plugins would need to be written *somewhere* 
 anyway.
