@@ -55,22 +55,22 @@ class HudsonApi
   end
 
   def self.username
-    @@username ||= '' # TODO: pull from out-of-repo file
+    @@username ||= ''
   end
 
   def self.password
-    @@password ||= '' # TODO: pull from out-of-repo file
+    @@password ||= ''
   end
 
   def self.passed?(color)
-    color == 'blue'
+    color =~ /^blue/
   end
 end
 
 #
 # The actual plugin
 #
-Basil::Plugin.respond_to(/hudson(.*)/) {
+Basil::Plugin.respond_to(/^hudson(.*)/) {
 
   require 'json'
   require 'net/http'
