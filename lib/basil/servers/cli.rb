@@ -10,8 +10,12 @@ module Basil
         while true
           print '> '; str = $stdin.gets.chomp
           msg = Message.new(Config.me, 'dave', 'Dave', str)
-          reply = dispatch(msg)
-          puts reply.text if reply
+          begin
+            reply = dispatch(msg)
+            puts reply.text if reply
+          rescue Exception => e
+            puts "error: #{e.message}"
+          end
         end
       end
     end
