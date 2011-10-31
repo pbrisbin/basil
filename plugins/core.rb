@@ -1,26 +1,16 @@
-#
-# Tests that basil is working
-#
-Basil::Plugin.respond_to(/^test$/) {
+Basil::Plugin.respond_to('test') {
 
   says "Hello world from #{self.inspect}!"
 
 }.description = 'tests that the bot is working'
 
-#
-# Show a link to my source
-#
-Basil::Plugin.respond_to(/^source$/) {
+Basil::Plugin.respond_to('source') {
 
   replies "https://github.com/pbrisbin/basil"
 
-}
+}.description = 'shows a link to my source code'
 
-#
-# Lists out regex/description for everythign basil will respond to / is
-# watching for in the chat
-#
-Basil::Plugin.respond_to(/^help$/) {
+Basil::Plugin.respond_to('help') {
 
   out = []
 
@@ -36,12 +26,9 @@ Basil::Plugin.respond_to(/^help$/) {
 
   says out.join("\n") unless out.empty?
 
-}
+}.description = 'display what I do'
 
-#
-# Convenient for adjusting/adding plugins without restarting basil
-#
-Basil::Plugin.respond_to(/^reload$/) {
+Basil::Plugin.respond_to('reload') {
 
   a = Basil::Plugin.responders.length + Basil::Plugin.watchers.length
 

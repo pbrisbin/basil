@@ -11,8 +11,8 @@ module Basil
 
       # instance of server to run
       def server
-        #@@server ||= Server::Cli.new
-        @@server ||= Server::SkypeBot.new
+        @@server ||= Server::Cli.new
+        #@@server ||= Server::SkypeBot.new
       end
 
       # directory holding plugin files

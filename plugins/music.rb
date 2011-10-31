@@ -14,7 +14,7 @@ Basil::Plugin.respond_to(/^mpc.*/) {
 #
 # http://kmkeen.com/albumbler/
 #
-Basil::Plugin.respond_to(/^albumbler.*/) {
+Basil::Plugin.respond_to('albumbler') {
 
   says `#{@match_data[0]} 2>&1`
 
