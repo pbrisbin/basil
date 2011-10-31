@@ -30,8 +30,11 @@ module Basil
 
             begin
               reply  = dispatch(msg)
-              prefix = reply.to ? "#{reply.to}, " : ''
-              chat.send_message(prefix + reply.text) if reply
+
+              if reply
+                prefix = reply.to ? "#{reply.to}, " : ''
+                chat.send_message(prefix + reply.text)
+              end
             rescue Exception => e
               chat.send_message("error: #{e.message}")
             end
