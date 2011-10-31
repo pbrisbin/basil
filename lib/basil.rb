@@ -13,11 +13,11 @@ module Basil
   class Message
     include Basil
 
-    attr_reader :to, :from, :time, :text
+    attr_reader :to, :from, :from_name, :time, :text
 
-    def initialize(to, from, text)
+    def initialize(to, from, from_name, text)
       @time = Time.now
-      @to, @from, @text = to, from, text
+      @to, @from, @from_name, @text = to, from, from_name, text
     end
 
     def to_me?
