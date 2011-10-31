@@ -44,3 +44,12 @@ Basil::Plugin.respond_to('reload') {
   says "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
 
 }.description = 'reloads all files in the plugins directory'
+
+Basil::Plugin.respond_to(/^eval (.*)/) {
+
+  require_authorization do
+    res = self.instance_eval @match_data[1]
+    says "=> #{res.inspect}"
+  end
+
+}.description = nil
