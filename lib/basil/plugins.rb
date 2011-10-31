@@ -117,7 +117,7 @@ module Basil
     def require_authorization(level = nil) # to be implemented
       authorized_users = Config.authorized_users rescue []
 
-      if authorized_users.any? { |u| u == @msg.from || u == @msg.from_name }
+      if authorized_users.include?(@msg.from)
         return yield
       else
         says "Sorry #{@msg.from_name}, I'm afraid I can't do that for you"

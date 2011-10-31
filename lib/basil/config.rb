@@ -21,7 +21,7 @@ module Basil
       end
 
       def authorized_users
-        @@authorized_users ||= ['dave']
+        @@authorized_users ||= ['dave', 'patrick.brisbin']
       end
 
 ################################################################################
