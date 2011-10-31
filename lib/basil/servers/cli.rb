@@ -9,7 +9,7 @@ module Basil
       def run
         while true
           print '> '; str = $stdin.gets.chomp
-          msg = Message.new(Config.me, 'user', str)
+          msg = Message.new(Config.me, 'dave', 'Dave', str)
           reply = dispatch(msg)
           puts reply.text if reply
         end

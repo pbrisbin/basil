@@ -26,7 +26,7 @@ module Basil
 
           chatmessage.chat do |chat|
             to, text = parse_body(body)
-            msg = Message.new(to, from, text)
+            msg = Message.new(to, from, from_name, text)
 
             begin
               reply  = dispatch(msg)

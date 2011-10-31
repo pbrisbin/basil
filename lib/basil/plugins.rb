@@ -97,18 +97,31 @@ module Basil
 
     # create a message to no one from me from txt
     def says(txt)
-      Message.new(nil, Config.me, txt)
+      Message.new(nil, Config.me, Config.me, txt)
     end
 
     # create a message to the sender of the message i'm currently
     # processing from me from txt
     def replies(txt)
-      Message.new(@msg.from, Config.me, txt)
+      Message.new(@msg.from_name, Config.me, Config.me, txt)
     end
 
     # forward the message i'm currently processing to new_to
     def forwards_to(new_to)
-      Message.new(new_to, Config.me, @msg.text)
+      Message.new(new_to, Config.me, Config.me, @msg.text)
+    end
+
+    # checks against a configured list of authorized users, only
+    # executes the block if the from or from_name of the message is
+    # authorized
+    def require_authorization(level = nil) # to be implemented
+      authorized_users = Config.authorized_users rescue []
+
+      if authorized_users.any? { |u| u == @msg.from || u == @msg.from_name }
+        return yield
+      else
+        says "Sorry #{@msg.from_name}, I'm afraid I can't do that for you"
+      end
     end
   end
 end
