@@ -1,10 +1,12 @@
 # Basil
 
-A skype bot who hopes to be as cool as phrik or hubot.
+*pronounced BAH-zil*
+
+A skype bot who hopes to be as cool as phrik and as useful as hubot.
 
 ![Basil Test](http://pbrisbin.com/static/fileshare/basil_test.png)
 
-## Why?
+## Why skype, and not IRC?
 
 We use skype at work the way I've always used IRC for FOSS projects. 
 It's a place for support, meetings, fire-drills, and just hanging out.
@@ -21,50 +23,80 @@ use-case.
 
 Shockingly, it works.
 
+That said, things are modular -- if you write `Basil::Server::Irc#run` 
+you're all set.
+
+## Why not fork hubot?
+
+1. I wanted it to be in ruby
+
+This way, all my coworkers can tinker with him too.
+
+2. It's not a very big wheel to reinvent
+
+The heart of basil minus the skype-specific logic and his plugins is 
+around 150 sloc. That skype-specific logc and his (current) set of 
+plugins (which I'd add to a hubot fork/clone anyway) weigh in at ~200 
+and growing.
+
+3. Aside from the github-workflow-specific plugins, hubot doesn't have 
+   much
+
+All the my-work-specific plugins would need to be written *somewhere* 
+anyway.
+
+All this combined with the fact that I found this project interesting 
+and fun to do from scratch and, well, there you go.
+
 ## Installation
 
-For now, it's just hacking so clone the repo and run the binary. You'll 
-want to adjust `lib/basil/config.rb` to specify `Server::Cli.new` at 
-first since the skype setup is slightly more involved (but not much).
+Requires ruby 1.9 (`define_singleton_method`) and the Skype setup is 
+linux-only.
 
-To use `Server::Skype` you'll need to do the following:
+### Cli
+
+1. Clone the repo
+2. Adjust `lib/basil/config.rb` to use `Server::Cli.new`
+3. `./bin/basil`
+4. Add plugins
+5. tell basil to `reload` to test without restarting
+
+### Skype
 
 1. Install skype
 2. Setup a profile for your bot to run as
 3. Start skype
 4. Install and verify that nfelger's [skype gem][] is working
-5. Start basil!
+5. Follow the Cli instructions skipping step #2
 
 [skype gem]: https://github.com/nfelger/skype
 
-From another skype profile/session you should add basil as a contact and 
-IM with him exactly as in the `Cli` server.
+From another skype profile/session you can now IM with him exactly as in 
+the `Cli` server.
+
+Note that In skype you must prefix messages with `!`, `basil, `, `basil: 
+`, or `basil; ` for him to know you're talking to him.
 
 ## Extending
 
-Extending basil's feature set in a modular way is the ultimate goal. 
-There are two components that can be swapped out or added to to change 
-basil's behavior: Servers and Plugins.
+The whole goal is to write plugins that do useful things. Check out 
+`./plugins` for his current set. The pattern should be fairly obvious.
 
-### Server
-
-`Server::Cli` and `Server::Skype` should be good enough examples of 
-what's required. Just define a `run` that does whatever you need.
-
-### Plugins
-
-Plugins should be super simple to write. You can checkout `./plugins` 
-for examples. Here's a pretty fun one:
+Here's a silly one as an example:
 
 ~~~ { .ruby }
-Basil::Plugin.respond_to(/^(you are|you're)(.*)$/) {
+#
+# basil, call me a taxi
+# => fine, you're a taxi.
+#
+Basil::Plugin.respond_to(/^call me a (.*)$/) {
 
-  replies "no, YOU are#{@match_data[2]}!"
+  replies "fine, you're a #{@match_data[1]}."
 
-}.description = 'turns it around on you'
+}.description = 'replies sarcastically'
 ~~~
 
-Your block is defined as a method on `Plugin` so you can access all its 
-instance variables and methods.
+Your block is defined as a singleton method on an instance of `Plugin` 
+so you can access all its instance variables and helper methods.
 
 Here's hoping this grows into something useful...
