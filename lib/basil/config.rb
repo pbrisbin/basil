@@ -20,6 +20,10 @@ module Basil
         @@plugins_directory ||= './plugins'
       end
 
+      def authorized_users
+        @@authorized_users ||= ['dave']
+      end
+
 ################################################################################
     end
   end
