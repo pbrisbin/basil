@@ -47,9 +47,16 @@ Basil::Plugin.respond_to('reload') {
 
 Basil::Plugin.respond_to(/^eval (.*)/) {
 
-  require_authorization do
-    res = self.instance_eval @match_data[1]
-    says "=> #{res.inspect}"
-  end
+  str = %{
+    $SAFE = 3
+    #{@match_data[1]}
+  }
+
+  retval = nil
+
+  # use a thread so my $SAFE level isn't affected
+  Thread.new { retval = self.instance_eval str }.join
+
+  says "=> #{retval.inspect}"
 
 }.description = nil
