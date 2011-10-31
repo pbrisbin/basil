@@ -17,9 +17,8 @@ module Basil
         Skype.on(:chatmessage_received) do |chatmessage|
           from = from_name = body = nil
 
-          # basil only works with handles for to/from; from_name is
-          # there but i haven't decided how/where to expose it for
-          # plugins to use
+          # from/from_name requires my fork of the skype gem which is
+          # not yet on github
           chatmessage.from      { |f|  from      = f  }
           chatmessage.from_name { |fn| from_name = fn }
           chatmessage.body      { |b|  body      = b  }
@@ -52,6 +51,9 @@ module Basil
         if body =~ /!(.*)/
           to   = Config.me
           text = $1
+        elsif body =~ />(.*)/
+          to   = Config.me
+          text = "eval#{$1}"
         elsif body =~ /^(\w+)[,;:] *(.*)$/
           to   = $1
           text = $2
