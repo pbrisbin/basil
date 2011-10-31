@@ -17,6 +17,16 @@ Basil::Plugin.respond_to(/^say (.*)/) {
 }.description = 'an alias for echo'
 
 #
+# Gives a reply to someone else
+#
+Basil::Plugin.respond_to(/^give (\w+) (.*)$/) {
+
+  cmd = Basil::Message.new(Basil::Config.me, @match_data[1], @match_data[2])
+  dispatch(cmd)
+
+}.description = 'executes a plugin replying to someone else'
+
+#
 # Google for something
 #
 Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
@@ -38,4 +48,4 @@ Basil::Plugin.respond_to(/^g(oogle)? *(.*)$/) {
     replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
   end
 
-}.description 'googles for some phrase'
+}.description = 'googles for some phrase'

@@ -3,7 +3,7 @@
 #
 Basil::Plugin.respond_to(/^test$/) {
 
-  replies "Hello world from #{self.inspect}!"
+  says "Hello world from #{self.inspect}!"
 
 }.description = 'tests that the bot is working'
 
@@ -54,6 +54,6 @@ Basil::Plugin.respond_to(/^reload$/) {
 
   c = Basil::Plugin.responders.length + Basil::Plugin.watchers.length
 
-  replies "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
+  says "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
 
 }.description = 'reloads all files in the plugins directory'
