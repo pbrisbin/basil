@@ -65,6 +65,10 @@ module Basil
     end
 
     def initialize(type, regex)
+      if regex.is_a? String
+        regex = Regexp.new("^#{regex}$")
+      end
+
       @type, @regex = type, regex
       @description  = nil
     end
