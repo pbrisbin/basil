@@ -17,8 +17,7 @@ module Basil
         Skype.on(:chatmessage_received) do |chatmessage|
           from = from_name = body = nil
 
-          # from/from_name requires my fork of the skype gem which is
-          # not yet on github
+          # from/from_name requires my fork of the skype gem
           chatmessage.from      { |f|  from      = f  }
           chatmessage.from_name { |fn| from_name = fn }
           chatmessage.body      { |b|  body      = b  }
@@ -28,12 +27,8 @@ module Basil
             msg = Message.new(to, from, from_name, text)
 
             begin
-              reply  = dispatch(msg)
-
-              if reply
-                prefix = reply.to ? "#{reply.to}, " : ''
-                chat.send_message(prefix + reply.text)
-              end
+              reply = dispatch(msg)
+              send_to_chat(chat, msg) if reply
             rescue Exception => e
               chat.send_message("error: #{e.message}")
             end
@@ -42,10 +37,23 @@ module Basil
 
         Skype.attach
 
+        listen_for_broadcasts do |msg|
+          Skype.chats do |chats|
+            chats.each do |chat|
+              send_to_chat(chat, msg)
+            end
+          end
+        end
+
         Thread.list.each{|t| t.join}
       end
 
       private
+
+      def send_to_chat(chat, msg)
+        prefix = "#{msg.to.split(' ').first}, " rescue ''
+        chat.send_message(prefix + msg.text)
+      end
 
       def parse_body(body)
         if body =~ /^!(.*)/

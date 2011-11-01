@@ -10,6 +10,27 @@ module Basil
     server.run
   end
 
+  def listen_for_broadcasts
+    return unless block_given?
+
+    Thread.new do
+      while true
+        begin
+          tcp ||= TCPServer.new(Config.broadcast_host, Config.broadcast_port)
+          con = tcp.accept
+          msg = con.read
+
+          if msg && msg != ''
+            yield Message.new(nil, nil, nil, msg)
+          end
+
+        rescue => e
+          $stderr.puts e.message
+        end
+      end
+    end
+  end
+
   class Message
     include Basil
 
