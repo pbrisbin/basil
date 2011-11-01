@@ -48,10 +48,10 @@ module Basil
       private
 
       def parse_body(body)
-        if body =~ /!(.*)/
+        if body =~ /^!(.*)/
           to   = Config.me
           text = $1
-        elsif body =~ />(.*)/
+        elsif body =~ /^>(.*)/
           to   = Config.me
           text = "eval#{$1}"
         elsif body =~ /^(\w+)[,;:] *(.*)$/
