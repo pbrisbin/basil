@@ -2,6 +2,14 @@ module Basil
   def dispatch(msg)
     return nil unless msg && msg != ''
 
+    if p = Plugin.conversing_with?(msg.from)
+      reply = p.instance_eval do
+        @msg = msg
+        execute
+      end
+      return reply if reply
+    end
+
     if msg.to_me?
       Plugin.responders.each do |p|
         reply = p.triggered(msg)
@@ -42,12 +50,20 @@ module Basil
       p.register!
     end
 
+    def self.conversing_with?(from)
+      conversers[from]
+    end
+
     def self.responders
       @@responders ||= []
     end
 
     def self.watchers
       @@watchers ||= []
+    end
+
+    def self.conversers
+      @@conversers ||= {}
     end
 
     def self.load!
@@ -122,6 +138,18 @@ module Basil
       else
         says "Sorry #{@msg.from_name}, I'm afraid I can't do that for you"
       end
+    end
+
+    def in_conversation?
+      Plugin.conversers[@msg.from] == self
+    end
+
+    def start_conversation
+      Plugin.conversers[@msg.from] = self
+    end
+
+    def end_conversation
+      Plugin.conversers.delete(@msg.from)
     end
   end
 end
