@@ -94,6 +94,6 @@ Basil::Plugin.respond_to(/^call me a (.*)$/) {
 
 Your block is defined as a singleton method on an instance of `Plugin` 
 so you can create/access your own instance variables and call all the 
-provided helper methods (hint: you an even re`dispatch`).
+provided helper methods (hint: you can even re`dispatch`).
 
 Here's hoping this grows into something useful...
