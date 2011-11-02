@@ -27,8 +27,12 @@ module Basil
             msg = Message.new(to, from, from_name, text)
 
             begin
+              puts "<<- " + msg.inspect
               reply = dispatch(msg)
-              send_to_chat(chat, msg) if reply
+              if reply
+                puts "->> " + reply.inspect
+                send_to_chat(chat, reply)
+              end
             rescue Exception => e
               chat.send_message("error: #{e.message}")
             end
