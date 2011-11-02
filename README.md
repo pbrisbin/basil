@@ -30,35 +30,35 @@ you're all set.
 
 * I wanted it to be in ruby
 
-This way, all my coworkers can tinker with him too.
+This way, all my coworkers can tinker with him too. It also made the 
+skype integration easy by way of nfelger's gem.
 
 * It's not a very big wheel to reinvent
 
-The heart of basil is tiny (~150 sloc). The bulk of the project is the 
-skype server and plugins -- both of which would need to be written from 
-scratch anyway.
+The heart of basil is tiny (~150 sloc). This is not including the skype 
+server and plugins which would've been written for a hubot fork anyway.
 
-* Aside from the github-workflow-specific plugins, hubot doesn't have 
-  much
+* Hubot's not that special
 
-All the my-workflow-specific plugins would need to be written *somewhere* 
-anyway. And writing plugins is so easy (I hope) that reproducing 
-anything hubot offers shouldn't be difficult.
+He's great, amazing, popular -- but he's not the first chat bot to be 
+written or the only one in wide-use today.
 
-All this combined with the fact that I found this project interesting 
-and fun to do from scratch and, well, there you go.
+Besides, I found this project interesting and fun to do from scratch.
+
+Hubot scripts and basil plugins share a simIliar structure 
+(unintentional, I swear) so porting one to the other is much simpler 
+than you'd expect.
 
 ## Installation
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 
-1. Clone the repo and adjust `lib/basil/config.rb` to specify the type 
-   of server you want to use
-2. Continue with server-specific instructions
+First, clone the repo and adjust `lib/basil/config.rb` to specify the 
+type of server you want to use.
 
 ### Cli
 
-1. Start `basil`
+1. Execute `./bin/basil`
 2. Type messages
 
 ### Skype
@@ -66,11 +66,12 @@ and fun to do from scratch and, well, there you go.
 1. Install skype
 2. Setup a profile for your bot to run as
 3. Start skype
-4. Install and verify that nfelger's [skype gem][] is working
-5. Start `basil`
-6. Prefix messages with `basil, ` or `! `
+4. Install my fork of nfelger's [skype gem][] and follow the 
+   instructions in its README to ensure it's working
+5. Execute `./bin/basil`
+6. Prefix messages with `basil, ` or `! ` (or `> ` for code evaluation)
 
-[skype gem]: https://github.com/nfelger/skype
+[skype gem]: https://github.com/pbrisbin/skype
 
 ## Extending
 
@@ -92,6 +93,7 @@ Basil::Plugin.respond_to(/^call me a (.*)$/) {
 ~~~
 
 Your block is defined as a singleton method on an instance of `Plugin` 
-so you can access all its instance variables and helper methods.
+so you can create/access your own instance variables and call all the 
+provided helper methods (hint: you an even re`dispatch`).
 
 Here's hoping this grows into something useful...
