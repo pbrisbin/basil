@@ -10,21 +10,22 @@
 #   mpc toggle
 #   mpc playlist
 #   mpc lsplaylists
-#   mpc load <file>
+#   mpc load <playlist>
 #   mpc stats
 #   mpc version
 #
 Basil::Plugin.respond_to(/^mpc load (.*)$/) {
 
-  file = @match_data[1].strip rescue nil
+  list = @match_data[1].strip rescue nil
+  available = `mpc lsplaylists`.split("\n")
 
-  if file && file != '' && File.exists?(file)
-    out = `mpc load #{file}`
+  if list && list != '' && available.include?(list)
+    out = `mpc load #{list}`
     msg = '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
 
     says [out, msg].join("\n")
   else
-    raise 'playlist file not found or not given'
+    raise 'playlist not found or not given'
   end
 
 }
@@ -32,7 +33,6 @@ Basil::Plugin.respond_to(/^mpc load (.*)$/) {
 Basil::Plugin.respond_to(/^mpc( (.*))?$/) {
 
   arg = @match_data[2].strip rescue nil
-
   valid_args = %w{ current play next prev pause toggle playlist
                    lsplaylists stats version }
 
@@ -43,7 +43,7 @@ Basil::Plugin.respond_to(/^mpc( (.*))?$/) {
     says [out, msg].join("\n")
   else
     # to match mpc help order
-    valid_args.insert(8, 'load <file>')
+    valid_args.insert(8, 'load <playlist>')
     says "usage: mpc [#{valid_args.join('|')}]"
   end
 
