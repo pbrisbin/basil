@@ -1,17 +1,17 @@
 module Basil
   class Plugin
     def hudson_config
-      @config ||= { :url      => 'hudson1.ideeli.com',
-                    :port     => 8080,
-                    :username => 'X',
-                    :password => 'X' }
+      @config ||= { :host     => Config.hudson_host,
+                    :port     => Config.hudson_port.to_i,
+                    :username => Config.hudson_user,
+                    :password => Config.hudson_password }
     end
 
     def get_hudson_api(path)
       config = hudson_config
 
       # Note: path must have a trailing slash
-      get_json(config[:url], path + 'api/json',
+      get_json(config[:host], path + 'api/json',
                config[:port], config[:username],
                config[:password])
     end

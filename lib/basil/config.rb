@@ -1,35 +1,41 @@
 module Basil
   class Config
     include Basil
-    class << self
-################################################################################
 
-      def me
-        @@me ||= 'basil'
+    @@yaml = nil
+
+    def self.method_missing(key)
+      if yaml.has_key?(key.to_s)
+        yaml[key.to_s]
+      else
+        $stderr.puts "configuration key #{key} not found."
+        nil
+      end
+    end
+
+    def self.server
+      case server_type
+      when :skype; Server::Skype.new
+      when :cli  ; Server::Cli.new
+      else raise "Invalid or missing server_type. Must be :skype or :cli."
+      end
+    end
+
+    def self.config_file
+      './config/basil.yml'
+    end
+
+    def self.yaml
+      unless @@yaml
+        require 'yaml'
+
+        fh    = File.open(config_file) 
+        @@yaml = YAML::load(fh)
       end
 
-      def server
-        #@@server ||= Server::Cli.new
-        @@server ||= Server::SkypeBot.new
-      end
-
-      def plugins_directory
-        @@plugins_directory ||= './plugins'
-      end
-
-      def authorized_users
-        @@authorized_users ||= ['dave', 'patrick.brisbin']
-      end
-
-      def broadcast_host
-        @@broadcast_host ||= '127.0.0.1'
-      end
-
-      def broadcast_port
-        @@broadcast_port ||= 1234
-      end
-
-################################################################################
+      @@yaml
+    ensure
+      fh.close if fh
     end
   end
 end

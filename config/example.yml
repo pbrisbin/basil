@@ -1,0 +1,23 @@
+me: basil
+
+server_type: :skype # or :cli
+
+plugins_directory: ./plugins
+
+authorized_users: patrick, patrick.brisbin
+
+# Broadcasts
+broadcast_host: 127.0.0.1
+broadcast_port: 1234
+
+# Hudson
+hudson_host:     hudson1.ideeli.com
+hudson_port:     8080
+hudson_user:     X
+hudson_password: X
+
+# Jira
+jira_host:     jira.ideeli.com
+jira_port:     443
+jira_user:     X
+jira_password: X
