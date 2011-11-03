@@ -1,6 +1,6 @@
 module Basil
   # Basil's dipatch method will take a valid message and ask each
-  # registered plugin (resonders than watchers) if it wishes to act on
+  # registered plugin (resonders then watchers) if it wishes to act on
   # it. The first reply received is returned, otherwise nil.
   def dispatch(msg)
     return nil unless msg && msg != ''

@@ -40,7 +40,7 @@ module Basil
 
         Skype.attach
 
-        Broadcast.on(:broadcast_recieved) do |msg|
+        Broadcast.on(:broadcast_received) do |msg|
           Skype.chats do |chats|
             chats.each do |chat|
               puts "-*->>" + msg.inspect
