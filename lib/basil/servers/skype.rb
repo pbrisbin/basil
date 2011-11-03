@@ -18,7 +18,6 @@ module Basil
         Skype.on(:chatmessage_received) do |chatmessage|
           from = from_name = body = nil
 
-          # from/from_name requires my fork of the skype gem
           chatmessage.from      { |f|  from      = f  }
           chatmessage.from_name { |fn| from_name = fn }
           chatmessage.body      { |b|  body      = b  }
@@ -26,11 +25,10 @@ module Basil
           chatmessage.chat do |chat|
             to, text = parse_body(body)
             msg = Message.new(to, from, from_name, text)
+            puts "<<- " + msg.inspect
 
             begin
-              puts "<<- " + msg.inspect
-              reply = dispatch(msg)
-              if reply
+              if reply = dispatch(msg)
                 puts "->> " + reply.inspect
                 send_to_chat(chat, reply)
               end
@@ -42,10 +40,13 @@ module Basil
 
         Skype.attach
 
-        listen_for_broadcasts do |msg|
+        Broadcast.on(:broadcast_recieved) do |msg|
           Skype.chats do |chats|
             chats.each do |chat|
-              send_to_chat(chat, msg)
+              if msg.to_chat?(chat)
+                puts "-*->>" + msg.inspect
+                send_to_chat(chat, msg)
+              end
             end
           end
         end
@@ -69,9 +70,15 @@ module Basil
                else [nil, body]
                end
 
-      rescue
+      rescue Exception
         [nil, body]
       end
+    end
+  end
+
+  class Message
+    def to_chat?(chat)
+      to == :all || to == chat.chatname
     end
   end
 end
