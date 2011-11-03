@@ -27,7 +27,7 @@ module Basil
         @stable = json['color'] =~ /^blue/
 
         # present in per-job json
-        @builds = json['builds'].map {|b| HudsonBuild.new(b) } rescue []
+        @builds = json['builds'].map { |b| HudsonBuild.new(b) } rescue []
         @health = json['healthReport'].map { |d| d['description'] } rescue []
       end
 
