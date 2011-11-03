@@ -1,87 +1,86 @@
-class HudsonApi
-  HUDSON_URL  = 'hudson1.ideeli.com'
-  HUDSON_PORT = 8080
-
-  def self.status
-    out  = []
-    json = get('')
-
-    return nil unless json
-
-    json['jobs'].each do |job|
-      name = job['name']
-      ok   = if passed?(job['color'])
-               'build is normal'
-             else
-               'last build FAILED'
-             end
-
-      out << "#{name} - #{ok}"
+module Basil
+  class Plugin
+    def hudson_config
+      @config ||= { :url      => 'hudson1.ideeli.com',
+                    :port     => 8080,
+                    :username => 'X',
+                    :password => 'X' }
     end
 
-    return out.join("\n")
+    def get_hudson_api(path)
+      config = hudson_config
+
+      # Note: path must have a trailing slash
+      get_json(config[:url], path + 'api/json',
+               config[:port], config[:username],
+               config[:password])
+    end
   end
 
-  def self.job_status(job)
-    out = []
-    json = get("/job/#{job}")
+  class HudsonJob
+    attr_reader :name, :url, :builds
 
-    return nil unless json
-
-    out << ( passed?(json['color']) ? "Build is stable" : "Last build FAILED" )
-
-    json['healthReport'].each do |report|
-      out << report['description']
+    def initialize(json)
+      @name   = json['name']
+      @url    = json['url']
+      @stable = json['color'] =~ /^blue/
+      @builds = json['builds'].map {|b| HudsonBuild.new(b) } rescue []
+      @long_description = json['healthReport'].map { |d| d['description'] }.join("\n") rescue ''
     end
 
-    return out.join("\n")
-  end
-
-  private
-
-  def self.get(path)
-    json = nil
-
-    Net::HTTP.start(HUDSON_URL, HUDSON_PORT) do |http|
-      req = Net::HTTP::Get.new("#{path}/api/json")
-      req.basic_auth username, password
-      resp = http.request(req)
-      json = JSON.parse(resp.body)
+    def stable?
+      @stable
     end
 
-    return json
-  rescue
-    raise "There was an error talking to hudson"
+    def short_description
+      if stable?
+        "#{@name} is stable"
+      else
+        "#{@name} is FAILING => #{@url}"
+      end
+    end
+
+    def long_description
+      if stable?
+        short_description
+      else
+        [short_description, @long_description].join("\n")
+      end
+    end
   end
 
-  def self.username
-    @@username ||= ''
-  end
+  # TODO:
+  class HudsonBuild
+    attr_reader :number, :url
 
-  def self.password
-    @@password ||= ''
-  end
+    def initialize(json)
+    end
 
-  def self.passed?(color)
-    color =~ /^blue/
+    def passed?
+    end
   end
 end
 
-#
-# The actual plugin
-#
-Basil::Plugin.respond_to(/^hudson(.*)/) {
+Basil::Plugin.respond_to('hudson') {
 
-  require 'json'
-  require 'net/http'
+  out = []
 
-  job = @match_data[1].strip
-  out = if job == ''
-          HudsonApi.status
-        else
-          HudsonApi.job_status(job)
-        end
+  json = get_hudson_api('/')
+  json['jobs'].each do |job|
+    hudson_job = Basil::HudsonJob.new(job)
+    out << hudson_job.short_description
+  end
 
-  says out
+  says out.join("\n") unless out.empty?
+
+}.description = 'gives current hudson status'
+
+Basil::Plugin.respond_to(/^hudson (.*)/) {
+
+  job = @match_data[1].strip rescue ''
+  json = get_hudson_api("/job/#{job}/")
+  hudson_job = Basil::HudsonJob.new(json)
+
+  says hudson_job.long_description
 
 }.description = 'gives current hudson build status'
