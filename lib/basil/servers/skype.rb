@@ -43,10 +43,8 @@ module Basil
         Broadcast.on(:broadcast_recieved) do |msg|
           Skype.chats do |chats|
             chats.each do |chat|
-              if msg.to_chat?(chat)
-                puts "-*->>" + msg.inspect
-                send_to_chat(chat, msg)
-              end
+              puts "-*->>" + msg.inspect
+              send_to_chat(chat, msg)
             end
           end
         end
@@ -73,14 +71,6 @@ module Basil
       rescue Exception
         [nil, body]
       end
-    end
-  end
-
-  class Message
-    # In the case of broadcast messages, we want to know if the
-    # broadcast is meant for this chat.
-    def to_chat?(chat)
-      to == :all || to == chat.chatname
     end
   end
 end
