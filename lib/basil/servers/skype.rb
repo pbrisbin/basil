@@ -1,9 +1,11 @@
 #
-# A legit skype bot!
+# To use:
 #
-# To use: create a profile to represent the bot, install and start skype
-# on the same machine. Make sure nfelger's skype gem and the dbus
-# connection it requires is up and running.
+#   1. Install skype
+#   2. Setup a profile for your bot
+#   3. Start skype and sign into that profile
+#   4. Install and test my fork of the skype gem
+#   5. Start basil using this server
 #
 module Basil
   module Server
@@ -11,7 +13,6 @@ module Basil
       include Basil
 
       def run
-        # https://github.com/nfelger/skype
         require 'skype'
 
         Skype.on(:chatmessage_received) do |chatmessage|
@@ -60,21 +61,16 @@ module Basil
       end
 
       def parse_body(body)
-        if body =~ /^!(.*)/
-          to   = Config.me
-          text = $1
-        elsif body =~ /^>(.*)/
-          to   = Config.me
-          text = "eval#{$1}"
-        elsif body =~ /^(\w+)[,;:] *(.*)$/
-          to   = $1
-          text = $2
-        else
-          to   = nil
-          text = body
-        end
+        return case body
+               when /^!(.*)/            ; [Config.me, $1]
+               when /^>(.*)/            ; [Config.me, "eval#{$1}"]
+               when /^@(\w+)[,;:]? (.*)/; [$1, $2]
+               when /^(\w+)[,;:] *(.*)/ ; [$1, $2]
+               else [nil, body]
+               end
 
-        [to, text]
+      rescue
+        [nil, body]
       end
     end
   end
