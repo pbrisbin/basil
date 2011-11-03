@@ -10,6 +10,9 @@ module Basil
     Plugin.load!
     server = Config.server
     server.run
+  rescue Exception => e
+    $stderr.puts e.message
+    exit 1
   end
 
   class Message
