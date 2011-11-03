@@ -31,19 +31,27 @@ module Basil
 
     #
     # get_json('http://example.com/some/path')
-    # get_json('example.com', '/some/path', 8080 [, 'user', 'pass' ])
+    # get_json('example.com', '/some/path', 443, 'user', 'pass', true)
     #
-    def get_json(host, path = nil, port = nil, username = nil, password = nil)
+    def get_json(host, path = nil, port = nil, username = nil, password = nil, secure = false)
       require 'json'
-      require 'net/http'
+
+      if secure
+        require 'net/https'
+      else
+        require 'net/http'
+      end
 
       resp = if path || port || username || password
-               Net::HTTP.start(host, port) do |http|
+               net = Net::HTTP.new(host, port)
+               net.use_ssl = secure
+               net.start do |http|
                  req = Net::HTTP::Get.new(path)
                  req.basic_auth username, password
                  http.request(req)
                end
              else
+               # TODO: support secure for simple
                Net::HTTP.get_response(URI.parse(host))
              end
 
