@@ -1,3 +1,4 @@
+require 'basil/utils'
 require 'basil/plugins'
 require 'basil/config'
 require 'basil/servers/cli'

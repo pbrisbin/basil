@@ -2,14 +2,6 @@ module Basil
   def dispatch(msg)
     return nil unless msg && msg != ''
 
-    if p = Plugin.conversing_with?(msg.from)
-      reply = p.instance_eval do
-        @msg = msg
-        execute
-      end
-      return reply if reply
-    end
-
     if msg.to_me?
       Plugin.responders.each do |p|
         reply = p.triggered(msg)
@@ -27,6 +19,7 @@ module Basil
 
   class Plugin
     include Basil
+    include Basil::Utils
 
     attr_reader :regex
     attr_accessor :description
@@ -50,20 +43,12 @@ module Basil
       p.register!
     end
 
-    def self.conversing_with?(from)
-      conversers[from]
-    end
-
     def self.responders
       @@responders ||= []
     end
 
     def self.watchers
       @@watchers ||= []
-    end
-
-    def self.conversers
-      @@conversers ||= {}
     end
 
     def self.load!
@@ -109,47 +94,6 @@ module Basil
       when :responder; Plugin.responders << self
       when :watcher  ; Plugin.watchers   << self
       end; self
-    end
-
-    # create a message to no one from me from txt
-    def says(txt)
-      Message.new(nil, Config.me, Config.me, txt)
-    end
-
-    # create a message to the sender of the message i'm currently
-    # processing from me from txt
-    def replies(txt)
-      Message.new(@msg.from_name, Config.me, Config.me, txt)
-    end
-
-    # forward the message i'm currently processing to new_to
-    def forwards_to(new_to)
-      Message.new(new_to, Config.me, Config.me, @msg.text)
-    end
-
-    # checks against a configured list of authorized users, only
-    # executes the block if the from or from_name of the message is
-    # authorized
-    def require_authorization(level = nil) # to be implemented
-      authorized_users = Config.authorized_users rescue []
-
-      if authorized_users.include?(@msg.from)
-        return yield
-      else
-        says "Sorry #{@msg.from_name}, I'm afraid I can't do that for you"
-      end
-    end
-
-    def in_conversation?
-      Plugin.conversers[@msg.from] == self
-    end
-
-    def start_conversation
-      Plugin.conversers[@msg.from] = self
-    end
-
-    def end_conversation
-      Plugin.conversers.delete(@msg.from)
     end
   end
 end

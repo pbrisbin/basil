@@ -13,21 +13,16 @@ Basil::Plugin.respond_to(/^give (\w+) (.*)/) {
 
 Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
 
-  require 'cgi'
-  require 'json'
-  require 'net/http'
+  url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{escape(@match_data[2])}"
 
-  url  = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{CGI::escape(@match_data[2].strip)}"
-  resp = Net::HTTP.get_response(URI.parse(url))
-  json = JSON.parse(resp.body)
+  if json = get_json(url)
+    result = json['responseData']['results'].first rescue nil
 
-  results = json['responseData']['results'] rescue []
-
-  if results.empty?
-    replies "Nothing found."
-  else
-    result = results.first
-    replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
+    if result
+      replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
+    else
+      replies "Nothing found."
+    end
   end
 
 }.description = 'consults the almighty google'
