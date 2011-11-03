@@ -1,8 +1,7 @@
-#
-# For light-weight development and plugin testing, a basic REPL prompt.
-#
 module Basil
   module Server
+    # A simple commandline interface. Assumes all messages are to basil
+    # from environment variable USER.
     class Cli
       include Basil
 

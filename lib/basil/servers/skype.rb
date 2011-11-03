@@ -1,14 +1,14 @@
-#
-# To use:
-#
-#   1. Install skype
-#   2. Setup a profile for your bot
-#   3. Start skype and sign into that profile
-#   4. Install and test my fork of the skype gem
-#   5. Start basil using this server
-#
 module Basil
   module Server
+    # A Skype bot implemented via a dbus connection to a running skype
+    # client on the same machine.
+    #
+    # 1. Install skype
+    # 2. Setup a profile for your bot
+    # 3. Start skype and sign into that profile
+    # 4. Install and test my fork of the skype gem
+    # 5. Start basil using this server
+    #
     class SkypeBot
       include Basil
 
@@ -77,6 +77,8 @@ module Basil
   end
 
   class Message
+    # In the case of broadcast messages, we want to know if the
+    # broadcast is meant for this chat.
     def to_chat?(chat)
       to == :all || to == chat.chatname
     end

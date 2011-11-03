@@ -1,4 +1,7 @@
 module Basil
+  # Basil's dipatch method will take a valid message and ask each
+  # registered plugin (resonders than watchers) if it wishes to act on
+  # it. The first reply received is returned, otherwise nil.
   def dispatch(msg)
     return nil unless msg && msg != ''
 
@@ -17,6 +20,9 @@ module Basil
     nil
   end
 
+  # The plugin class is used to encapsulate triggered actions. Plugin
+  # writers must use respond_to or watch_for to create an intance of
+  # Plugin with a singleton execute method.
   class Plugin
     include Basil
     include Basil::Utils
@@ -24,19 +30,18 @@ module Basil
     attr_reader :regex
     attr_accessor :description
 
-    # respond_to and watch_for are the only ways to instantiate a Plugin
     private_class_method :new
 
-    # if a message is "to me" and contains regex, block will be executed
-    # to form a reply Message to send
+    # Create an instance of Plugin which will look for regex only in
+    # messages that are to basil.
     def self.respond_to(regex, &block)
       p = new(:responder, regex)
       p.define_singleton_method(:execute, &block)
       p.register!
     end
 
-    # if regex is seen in any message in the chat, block will be
-    # executed to form a Message to send
+    # Create an instance of Plugin which will look for regex in any
+    # messages sent in the chat.
     def self.watch_for(regex, &block)
       p = new(:watcher, regex)
       p.define_singleton_method(:execute, &block)
@@ -74,8 +79,6 @@ module Basil
       @description  = nil
     end
 
-    # if a plugin wants to act on msg, this method will return the reply
-    # Message; otherwise, nil
     def triggered(msg)
       if msg.text =~ @regex
         @msg = msg
@@ -87,8 +90,6 @@ module Basil
       nil
     end
 
-    # a plugin can register itself as a responder or watcher, it will be
-    # consulted for a reply (first-come-first-server) on any messages
     def register!
       case @type
       when :responder; Plugin.responders << self
