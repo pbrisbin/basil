@@ -15,7 +15,7 @@ module Basil
 
     def self.server
       case server_type
-      when :skype; @@server ||= Server::Skype.new
+      when :skype; @@server ||= Server::SkypeBot.new
       when :cli  ; @@server ||= Server::Cli.new
       else raise "Invalid or missing server_type. Must be :skype or :cli."
       end
