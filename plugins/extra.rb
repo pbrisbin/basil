@@ -1,6 +1,6 @@
 Basil::Plugin.respond_to(/^(echo|say) (.*)/) {
 
-  says @match_data[2].strip
+  says @match_data[2].strip.sub(/^Basil\s+is\W/, 'I am')
 
 }.description = "echos what it's told"
 
