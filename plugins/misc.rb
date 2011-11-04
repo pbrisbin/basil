@@ -17,3 +17,9 @@ Basil::Plugin.respond_to(/^call me a (.*)/) {
   replies "fine, you're a #{@match_data[1]}."
 
 }
+
+Basil::Plugin.respond_to('beer') {
+
+  replies "someone wanted you to have this (beer)"
+
+}
