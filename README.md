@@ -53,8 +53,8 @@ than you'd expect.
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 
-First, clone the repo and adjust `lib/basil/config.rb` to specify the 
-type of server you want to use.
+First, clone the repo and create a `./config/basil.yml` from the 
+included example. Choose `:cli` or `:skype` for `server_type`.
 
 ### Cli
 

@@ -1,18 +1,10 @@
 module Basil
   class Plugin
-    def jira_config
-      @config ||= { :host     => Config.jira_host,
-                    :port     => Config.jira_port,
-                    :username => Config.jira_user,
-                    :password => Config.jira_password }
-    end
-
     def get_jira_json(path)
-      config = jira_config
-
-      get_json(config[:host], path,
-               config[:port], config[:username],
-               config[:password], true)
+      get_json(Config.jira_host, path,
+               Config.jira_port,
+               Config.jira_user,
+               Config.jira_password, true)
     end
   end
 

@@ -1,19 +1,11 @@
 module Basil
   class Plugin
-    def hudson_config
-      @config ||= { :host     => Config.hudson_host,
-                    :port     => Config.hudson_port.to_i,
-                    :username => Config.hudson_user,
-                    :password => Config.hudson_password }
-    end
-
     def get_hudson_api(path)
-      config = hudson_config
-
       # Note: path must have a trailing slash
-      get_json(config[:host], path + 'api/json',
-               config[:port], config[:username],
-               config[:password])
+      get_json(Config.hudson_host, path + 'api/json',
+               Config.hudson_port,
+               Config.hudson_user,
+               Config.hudson_password)
     end
   end
 
@@ -27,7 +19,7 @@ module Basil
         @stable = json['color'] =~ /^blue/
 
         # present in per-job json
-        @builds = json['builds'].map {|b| HudsonBuild.new(b) } rescue []
+        @builds = json['builds'].map { |b| HudsonBuild.new(b) } rescue []
         @health = json['healthReport'].map { |d| d['description'] } rescue []
       end
 

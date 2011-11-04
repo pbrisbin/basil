@@ -15,8 +15,8 @@ module Basil
 
     def self.server
       case server_type
-      when :skype; Server::Skype.new
-      when :cli  ; Server::Cli.new
+      when :skype; @server ||= Server::Skype.new
+      when :cli  ; @server ||= Server::Cli.new
       else raise "Invalid or missing server_type. Must be :skype or :cli."
       end
     end
@@ -29,7 +29,7 @@ module Basil
       unless @@yaml
         require 'yaml'
 
-        fh    = File.open(config_file) 
+        fh = File.open(config_file)
         @@yaml = YAML::load(fh)
       end
 

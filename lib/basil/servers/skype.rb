@@ -1,14 +1,14 @@
-#
-# To use:
-#
-#   1. Install skype
-#   2. Setup a profile for your bot
-#   3. Start skype and sign into that profile
-#   4. Install and test my fork of the skype gem
-#   5. Start basil using this server
-#
 module Basil
   module Server
+    # A Skype bot implemented via a dbus connection to a running skype
+    # client on the same machine.
+    #
+    # 1. Install skype
+    # 2. Setup a profile for your bot
+    # 3. Start skype and sign into that profile
+    # 4. Install and test my fork of the skype gem
+    # 5. Start basil using this server
+    #
     class SkypeBot
       include Basil
 
@@ -18,7 +18,6 @@ module Basil
         Skype.on(:chatmessage_received) do |chatmessage|
           from = from_name = body = nil
 
-          # from/from_name requires my fork of the skype gem
           chatmessage.from      { |f|  from      = f  }
           chatmessage.from_name { |fn| from_name = fn }
           chatmessage.body      { |b|  body      = b  }
@@ -26,11 +25,10 @@ module Basil
           chatmessage.chat do |chat|
             to, text = parse_body(body)
             msg = Message.new(to, from, from_name, text)
+            puts "<<- " + msg.inspect
 
             begin
-              puts "<<- " + msg.inspect
-              reply = dispatch(msg)
-              if reply
+              if reply = dispatch(msg)
                 puts "->> " + reply.inspect
                 send_to_chat(chat, reply)
               end
@@ -42,9 +40,10 @@ module Basil
 
         Skype.attach
 
-        listen_for_broadcasts do |msg|
+        Broadcast.on(:broadcast_received) do |msg|
           Skype.chats do |chats|
             chats.each do |chat|
+              puts "-*->>" + msg.inspect
               send_to_chat(chat, msg)
             end
           end
@@ -69,7 +68,7 @@ module Basil
                else [nil, body]
                end
 
-      rescue
+      rescue Exception
         [nil, body]
       end
     end
