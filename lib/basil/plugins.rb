@@ -1,6 +1,6 @@
 module Basil
   def dispatch(msg)
-    return nil unless msg && msg != ''
+    return nil unless msg && msg.text != ''
 
     if msg.to_me?
       Plugin.responders.each do |p|
