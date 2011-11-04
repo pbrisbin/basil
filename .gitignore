@@ -5,3 +5,4 @@ doc
 .bundle
 pkg
 config/basil.yml
+.rbenv-version
