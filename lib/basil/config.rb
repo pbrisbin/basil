@@ -5,9 +5,9 @@ module Basil
   class Config
     include Basil
 
-    @@yaml       = nil
-    @@hidden     = false
-    @config_file = './config/basil.yml'
+    @@yaml        = nil
+    @@hidden      = false
+    @@config_file = './config/basil.yml'
 
     def self.method_missing(key)
       if yaml.has_key?(key.to_s)
