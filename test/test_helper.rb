@@ -14,4 +14,5 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'basil'
 
 class Test::Unit::TestCase
+  Basil::Config.config_file = './config/test.yml'
 end
