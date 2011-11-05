@@ -13,63 +13,28 @@ module Basil
       include Basil
 
       def run
-        require 'skype'
+        require 'basil/skype'
 
-        Skype.on(:chatmessage_received) do |chatmessage|
-          from = from_name = body = nil
-
-          chatmessage.from      { |f|  from      = f  }
-          chatmessage.from_name { |fn| from_name = fn }
-          chatmessage.body      { |b|  body      = b  }
-
-          chatmessage.chat do |chat|
-            to, text = parse_body(body)
-            msg = Message.new(to, from, from_name, text)
-            puts "<<- " + msg.inspect
-
-            begin
-              if reply = dispatch(msg)
-                puts "->> " + reply.inspect
-                send_to_chat(chat, reply)
-              end
-            rescue Exception => e
-              chat.send_message("error: #{e.message}")
+        SkypeProxy.on_message do |chat, msg|
+          begin
+            puts '<<- ' + msg.inspect
+            if reply = dispatch(msg)
+              puts '->> ' + reply.inspect
+              SkypeProxy.send_message(chat, reply)
             end
+          rescue Exception => e
+            chat.send_message("error: #{e.message}")
           end
         end
-
-        Skype.attach
 
         Broadcast.on(:broadcast_received) do |msg|
-          Skype.chats do |chats|
-            chats.each do |chat|
-              puts "-*->>" + msg.inspect
-              send_to_chat(chat, msg)
-            end
+          SkypeProxy.each_chat do |chat|
+            puts '-*->>' + msg.inspect
+            SkypeProxy.send_message(chat, msg)
           end
         end
 
-        Thread.list.each{|t| t.join}
-      end
-
-      private
-
-      def send_to_chat(chat, msg)
-        prefix = "#{msg.to.split(' ').first}, " rescue ''
-        chat.send_message(prefix + msg.text)
-      end
-
-      def parse_body(body)
-        return case body
-               when /^!(.*)/            ; [Config.me, $1]
-               when /^>(.*)/            ; [Config.me, "eval#{$1}"]
-               when /^@(\w+)[,;:]? (.*)/; [$1, $2]
-               when /^(\w+)[,;:] *(.*)/ ; [$1, $2]
-               else [nil, body]
-               end
-
-      rescue Exception
-        [nil, body]
+        Thread.list.each(&:join)
       end
     end
   end
