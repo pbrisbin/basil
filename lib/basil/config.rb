@@ -28,7 +28,7 @@ module Basil
     end
 
     def self.config_file
-      @@config_file ||= './config/basil.yml'
+      @@config_file
     end
 
     def self.config_file=(file)
