@@ -10,6 +10,12 @@ Basil::Plugin.respond_to('source') {
 
 }.description = 'shows a link to my source code'
 
+Basil::Plugin.respond_to('docs') {
+
+  replies "http://pbrisbin.com/static/rdocs/basil/"
+
+}.description = 'shows a link to my documentation'
+
 Basil::Plugin.respond_to('help') {
 
   out = []
