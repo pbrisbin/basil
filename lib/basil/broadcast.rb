@@ -1,9 +1,13 @@
 module Basil
+  class StopListening < StandardError; end
+
   class Broadcast
     def self.on(event, &block)
       Thread.new do
         loop do
           begin accept_message(event, &block)
+          rescue StopListening
+            break
           rescue Exception => e
             $stderr.puts e.message
           end
