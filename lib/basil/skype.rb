@@ -43,7 +43,6 @@ module Basil
     private
 
     def self.parse_body(body)
-      puts "parse_body called with #{body}"
       return case body
              when /^!(.*)/            ; [Config.me, $1]
              when /^>(.*)/            ; [Config.me, "eval#{$1}"]
