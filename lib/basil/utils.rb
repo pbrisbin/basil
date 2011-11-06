@@ -6,6 +6,20 @@ module Basil
       Message.new(nil, Config.me, Config.me, txt)
     end
 
+    # Build an array of lines (with optional first line title) then send
+    # it as a single multiline message.
+    def says_multiline(title = nil)
+      out = title.nil? ? [] : [title]
+
+      yield out
+
+      unless out.empty?
+        return Message.new(nil, Config.me, Config.me, out.join("\n"))
+      end
+
+      nil
+    end
+
     def replies(txt)
       Message.new(@msg.from_name, Config.me, Config.me, txt)
     end
