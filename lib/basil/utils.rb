@@ -13,15 +13,23 @@ module Basil
 
       yield out
 
-      unless out.empty?
-        return Message.new(nil, Config.me, Config.me, out.join("\n"))
-      end
+      return says(out.join("\n")) unless out.empty?
 
       nil
     end
 
     def replies(txt)
       Message.new(@msg.from_name, Config.me, Config.me, txt)
+    end
+
+    def replies_multiline(title = nil)
+      out = title.nil? ? [] : [title]
+
+      yield out
+
+      return replies(out.join("\n")) unless out.empty?
+
+      nil
     end
 
     def forwards_to(new_to)
