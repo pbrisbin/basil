@@ -59,4 +59,4 @@ Basil::Plugin.respond_to(/^find (.*)/i) {
     nil
   end
 
-}
+}.description 'find JIRA cards with given search term(s)'
