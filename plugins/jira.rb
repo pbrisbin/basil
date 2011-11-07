@@ -42,21 +42,28 @@ Basil::Plugin.watch_for(/\w+-\d+/i) {
 
 }
 
-Basil::Plugin.respond_to(/^find (.*)/i) {
+Basil::Plugin.respond_to(/^find (.+)/i) {
 
   begin
-    search_terms = @match_data[0]
+    search_terms = @match_data[1]
     search = "summary ~ \"#{search_terms}\" OR description ~ \"#{search_terms}\" OR comment ~ \"#{search_terms}\""
-    search.gsub!(/[^-_a-zA-Z0-9 ]/) { "%#{'%02x' % $1[0].ord}" }
-    search.gsub!(/ /, '+')
-    json = get_jira_json("/rest/api/2.0.alpha1/search?jql=#{search}")
-    json['issues'].each { |issue|
-      s = ticket_url_and_title(issue['key'])
-      say s if s
-    }
+
+    json = get_jira_json("/rest/api/2.0.alpha1/search?jql=#{escape(search)}")
+
+    replies_multiline('Search results:') do |out|
+      issues = json['issues']
+      len    = issues.length
+
+      issues[0..10].each { |issue|
+        s = ticket_url_and_title(issue['key'])
+        out << s if s
+      }
+
+      out << "plus #{len - 10} more..." if len > 10
+    end
   rescue => e
     $stderr.puts e.message
-    nil
+    replies "No results found."
   end
 
-}.description 'find JIRA cards with given search term(s)'
+}.description = 'find JIRA cards with given search term(s)'
