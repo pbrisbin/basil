@@ -21,7 +21,7 @@ module Basil
   end
 end
 
-Basil::Plugin.watch_for(/core-\d+/i) {
+Basil::Plugin.watch_for(/\w+-\d+/i) {
 
   begin
     key = @match_data[0].upcase
