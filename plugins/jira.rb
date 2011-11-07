@@ -1,40 +1,71 @@
 module Basil
-  class Plugin
-    def get_jira_json(path)
-      get_json(Config.jira_host, path,
-               Config.jira_port,
-               Config.jira_user,
-               Config.jira_password, true)
+  class JiraApi
+    include Utils
+
+    def initialize(path)
+      @path = path
+      @json = nil
     end
-  end
 
-  module Jira
-    class Ticket
-      attr_reader :url, :title
+    def method_missing(method, *args)
+      key = method.to_s
 
-      def initialize(key, json)
-        @key   = key
-        @title = json['fields']['summary']['value'] rescue nil
-        @url   = "https://#{Basil::Config.jira_host}/browse/#{@key}"
+      if json.has_key?(key)
+        json[key]
+      else
+        super
       end
     end
+
+    private
+
+    def json
+      unless @json
+        @json = get_json(Config.jira_host, '/rest/api/2.0.alpha1' + @path,
+                         Config.jira_port,
+                         Config.jira_user,
+                         Config.jira_password, true)
+      end
+
+      @json
+    end
   end
-end
 
-def ticket_url_and_title(key)
-  key = key.upcase
-  json = get_jira_json("/rest/api/2.0.alpha1/issue/#{key}")
-  ticket = Basil::Jira::Ticket.new(key, json)
+  class JiraTicket
+    def initialize(key)
+      @key  = key.upcase
+      @json = nil
+    end
 
-  # title is parsed, url is built
-  "#{ticket.url} : #{ticket.title}" if ticket.title
+    def description
+      "#{url} : #{title}"
+    end
+
+    def found?
+      !title.nil?
+    end
+
+    def url
+      @url ||= "https://#{Config.jira_host}/browse/#{@key}"
+    end
+
+    def title
+      @title ||= json.fields['summary']['value'] rescue nil
+    end
+
+    private
+
+    def json
+      @json ||= JiraApi.new("/issue/#{@key}")
+    end
+  end
 end
 
 Basil::Plugin.watch_for(/\w+-\d+/i) {
 
   begin
-    s = ticket_url_and_title(@match_data[0])
-    says s if s
+    ticket = Basil::JiraTicket.new(@match_data[0])
+    says ticket.description if ticket.found?
   rescue => e
     $stderr.puts e.message
     nil
@@ -45,18 +76,16 @@ Basil::Plugin.watch_for(/\w+-\d+/i) {
 Basil::Plugin.respond_to(/^find (.+)/i) {
 
   begin
-    search_terms = @match_data[1]
-    search = "summary ~ \"#{search_terms}\" OR description ~ \"#{search_terms}\" OR comment ~ \"#{search_terms}\""
+    jql  = escape('summary ~ "?" OR description ~ "?" OR comment ~ "?"'.gsub('?', @match_data[1].strip))
+    json = Basil::JiraApi.new("/search?jql=#{jql}")
 
-    json = get_jira_json("/rest/api/2.0.alpha1/search?jql=#{escape(search)}")
+    issues = json.issues
+    len    = issues.length
 
     replies_multiline('Search results:') do |out|
-      issues = json['issues']
-      len    = issues.length
-
       issues[0..10].each { |issue|
-        s = ticket_url_and_title(issue['key'])
-        out << s if s
+        ticket = Basil::JiraTicket.new(issue['key'])
+        out << ticket.description if ticket.found?
       }
 
       out << "plus #{len - 10} more..." if len > 10
