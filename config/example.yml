@@ -1,22 +1,38 @@
+# This will be how basil knows a message is directed to him in group
+# chats. Messages must be prefixed using "@me ", "me, " or similar.
 me: basil
 
-server_type: :skype # or :cli
+# This is the server type who's run method will be called. See
+# ./lib/basil/servers/ for their definitions. Valid values at this time
+# are :cli or :skype.
+server_type: :cli
 
+# This is the directory from which plugins are loaded. There can be one
+# or more plugins per file and additional classes/logic may be present
+# to support the contained plugins.
 plugins_directory: ./plugins
 
-authorized_users: patrick, patrick.brisbin
+# Certain commands might be restricted to specific user names or skype
+# handles. A comma separated list can be defined here.
+#authorized_users: foo, bar
 
-# Broadcasts
+# Required only on OSX and ruby 1.9 for https requests to work (JIRA).
+# Install curl-ca-bundle via ports. The get_json utility will use this
+# cert file for secure requests if the configuration option is present.
+#https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
+
+# Broadcasts are currently implemented by opening a TCP port and
+# listening for incoming text.
 broadcast_host: 127.0.0.1
 broadcast_port: 1234
 
-# Hudson
+# Constants for the Hudson API plugin.
 hudson_host:     hudson1.ideeli.com
 hudson_port:     8080
 hudson_user:     X
 hudson_password: X
 
-# Jira
+# Constants for the Jira API plugin.
 jira_host:     jira.ideeli.com
 jira_port:     443
 jira_user:     X
