@@ -66,9 +66,14 @@ module Basil
         require 'net/http'
       end
 
+      # An explicit cert file is needed if run on OSX, provided by the
+      # curl-ca-bundle cert package
+      cert_file = Config.https_cert_file rescue nil
+
       resp = if path || port || username || password
                net = Net::HTTP.new(host, port || 80)
                net.use_ssl = secure
+               net.ca_file = cert_file if cert_file
                net.start do |http|
                  req = Net::HTTP::Get.new(path)
                  req.basic_auth username, password
