@@ -22,3 +22,9 @@ Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
   end
 
 }.description = 'consults the almighty google'
+
+Basil::Plugin.respond_to('recursion') {
+
+  replies 'see !recursion'
+
+}
