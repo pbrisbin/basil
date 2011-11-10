@@ -61,7 +61,7 @@ Basil::Plugin.respond_to(/^hudson( (stable|failing))?$/) {
 
 }.description = 'interacts with hudson'
 
-Basil::Plugin.respond_to(/^hudson (.+)/) {
+Basil::Plugin.respond_to(/^hudson (\w+)/) {
 
   begin
     job = Basil::HudsonApi.new("/job/#{@match_data[1].strip}/")
@@ -79,7 +79,7 @@ Basil::Plugin.respond_to(/^hudson (.+)/) {
 
 }.description = 'retrieves info on a specific hudson job'
 
-Basil::Plugin.respond_to(/who broke (.+)/) {
+Basil::Plugin.respond_to(/who broke (\w+)/) {
 
   begin
     job = Basil::HudsonApi.new("/job/#{@match_data[1].strip}/")
@@ -87,26 +87,42 @@ Basil::Plugin.respond_to(/who broke (.+)/) {
     builds = job.builds.map { |b| b['number'].to_i }
     last_stable = job.lastStableBuild['number'].to_i rescue nil
 
-    unless last_stable
-      return says "#{job.displayName} has been broken too long to know that."
-    end
-
-    if builds.first == last_stable
+    if last_stable && builds.first == last_stable
       return says "#{job.displayName} is not broken."
     end
       
-    breaker = builds.select { |b| b > last_stable }.min
-
-    build = Basil::HudsonApi.new("/job/#{job.name}/#{breaker}/")
-
-    says_multiline("#{job.displayName} first broke in ##{breaker}:") do |out|
-      build.changeSet['items'].each do |item|
-        out << " * #{item['msg']} (#{item['user']} - r#{item['revision']})"
-      end
-
-      out << "See #{build.url} for details."
+    i = 0
+    while Basil::HudsonApi.new("/job/#{job.name}/#{builds[i]}/").building
+      i += 1
     end
-  rescue
+
+    test_report = Basil::HudsonApi.new("/job/#{job.name}/#{builds[i]}/testReport/")
+
+    says_multiline do |out|
+      test_report.suites.each do |s|
+        s['cases'].each do |c|
+          if c['status'] == 'FAILED'
+            next if c['name'] =~ /marked_as_flapping/
+
+            name  = "#{c['className']}##{c['name']}"
+            since = c['failedSince']
+
+            out << "#{name} first broke in #{since}"
+
+            breaker = Basil::HudsonApi.new("/job/#{job.name}/#{since}/")
+
+            breaker.changeSet['items'].each do |item|
+              out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
+            end
+
+            out << ""
+          end
+        end
+      end
+    end
+  rescue => e
+    $stderr.puts e.message
+
     says "Can't find info on #{@match_data[1]}"
   end
 
