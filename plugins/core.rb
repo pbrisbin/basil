@@ -57,14 +57,16 @@ Basil::Plugin.respond_to(/^eval (.*)/) {
   require 'timeout'
   Timeout::timeout(5) do
     Thread.new {
-      # use a thread so my $SAFE level isn't affected. TODO: for some
-      # reason exit is perfectly legal at this SAFE level, and it brings
-      # down basil. Perhaps use fork?
+      # use a thread so my $SAFE level isn't affected
       retval = self.instance_eval %{
         $SAFE = 3
 
-        Config.hide do
-          #{@match_data[1]}
+        begin
+          Config.hide do
+            #{@match_data[1]}
+          end
+        rescue SystemExit
+          "don't call exit you dolt"
         end
       }
     }.join
