@@ -53,8 +53,15 @@ than you'd expect.
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 
-First, clone the repo and create a `./config/basil.yml` from the 
-included example. Choose `:cli` or `:skype` for `server_type`.
+    git clone https://github.com/pbrisbin/basil
+
+    cd basil
+
+    bundle install
+
+    cp ./config/example.yml ./config/basil.yml
+
+    vim basil.yml
 
 ### Cli
 
@@ -66,12 +73,8 @@ included example. Choose `:cli` or `:skype` for `server_type`.
 1. Install skype
 2. Setup a profile for your bot to run as
 3. Start skype
-4. Install my fork of nfelger's [skype gem][] and follow the 
-   instructions in its README to ensure it's working
 5. Execute `./bin/basil`
 6. Prefix messages with `basil, ` or `! ` (or `> ` for code evaluation)
-
-[skype gem]: https://github.com/pbrisbin/skype
 
 ## Extending
 

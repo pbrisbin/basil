@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["patrick brisbin"]
-  s.date = "2011-10-28"
+  s.date = "2011-11-10"
   s.description = "basil is a simple bot"
   s.email = "pbrisbin@gmail.com"
   s.executables = ["basil"]
@@ -20,18 +20,35 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
     "README.md",
     "Rakefile",
     "VERSION",
+    "basil.gemspec",
     "bin/basil",
+    "config/example.yml",
+    "config/test.yml",
+    "lib/basil.rb",
+    "lib/basil/broadcast.rb",
     "lib/basil/config.rb",
     "lib/basil/plugins.rb",
-    "lib/basil/server.rb",
-    "plugins/echo.rb",
-    "plugins/test.rb",
-    "test/helper.rb",
-    "test/test_basil.rb"
+    "lib/basil/servers/cli.rb",
+    "lib/basil/servers/mock.rb",
+    "lib/basil/servers/skype.rb",
+    "lib/basil/skype.rb",
+    "lib/basil/utils.rb",
+    "plugins/core.rb",
+    "plugins/extra.rb",
+    "plugins/hudson.rb",
+    "plugins/jira.rb",
+    "plugins/misc.rb",
+    "plugins/music.rb",
+    "plugins/shell.rb",
+    "test/broadcast_test.rb",
+    "test/message_test.rb",
+    "test/plugin_test.rb",
+    "test/test_helper.rb"
   ]
   s.homepage = "http://github.com/pbrisbin/basil"
   s.licenses = ["MIT"]
@@ -43,17 +60,23 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
+      s.add_runtime_dependency(%q<skype>, [">= 0"])
+      s.add_development_dependency(%q<bundler>, [">= 0"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
     else
-      s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
+      s.add_dependency(%q<skype>, [">= 0"])
+      s.add_dependency(%q<bundler>, [">= 0"])
+      s.add_dependency(%q<rake>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rcov>, [">= 0"])
     end
   else
-    s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-    s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
+    s.add_dependency(%q<skype>, [">= 0"])
+    s.add_dependency(%q<bundler>, [">= 0"])
+    s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rcov>, [">= 0"])
   end
 end

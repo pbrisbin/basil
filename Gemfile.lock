@@ -1,3 +1,10 @@
+GIT
+  remote: http://github.com/pbrisbin/skype
+  revision: 971f56ee0cfea01552c9552c25ce481147bf9c86
+  specs:
+    skype (0.0.1)
+      ruby-dbus (~> 0.6.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -8,11 +15,14 @@ GEM
       rake
     rake (0.9.2.2)
     rcov (0.9.11)
+    ruby-dbus (0.6.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.0.0)
-  jeweler (~> 1.6.4)
+  bundler
+  jeweler
+  rake
   rcov
+  skype!
