@@ -13,8 +13,9 @@ module Basil
       if yaml.has_key?(key.to_s)
         yaml[key.to_s]
       else
-        $stderr.puts "configuration key #{key} not found."
-        nil
+        # requesters of optional configuration values should be prepared
+        # to rescue this at the site of use.
+        raise "configuration key #{key} not found."
       end
     end
 
