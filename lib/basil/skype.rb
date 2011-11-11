@@ -7,18 +7,24 @@ module Basil
     def self.on_message
       return unless block_given?
 
+      # for some reason, using the nested block approach seems to make
+      # things quicker and more consistent
       Skype.on(:chatmessage_received) do |chatmessage|
-        from = from_name = body = nil
-
-        chatmessage.from      { |f| from      = f }
-        chatmessage.from_name { |n| from_name = n }
-        chatmessage.body      { |b| body      = b }
-
         chatmessage.chat do |chat|
-          to, text = parse_body(body)
-          yield chat, Message.new(to, from, from_name, text)
-        end
+          Skype::Api.invoke("GET CHAT #{chat.chatname} MEMBERS") do |resp|
+            is_private = false #resp =~ /MEMBERS (.*)/ && $1.split(/ +/).length == 2
 
+            chatmessage.from do |from|
+              chatmessage.from_name do |from_name|
+                chatmessage.body do |body|
+                  to, text = parse_body(body)
+                  to = Config.me if !to && is_private
+                  yield chat, Message.new(to, from, from_name, text)
+                end
+              end
+            end
+          end
+        end
       end
 
       Skype.attach
