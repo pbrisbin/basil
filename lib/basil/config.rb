@@ -57,10 +57,10 @@ module Basil
     # the config file which I believe is fairly innocuous.
     def self.hide
       @@hidden = true
-      ret = yield
-      @@hidden = false
 
-      ret
+      return yield
+    ensure
+      @@hidden = false
     end
   end
 end
