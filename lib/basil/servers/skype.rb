@@ -17,9 +17,7 @@ module Basil
 
         SkypeProxy.on_message do |chat, msg|
           begin
-            puts '<<- ' + msg.inspect
             if reply = Basil.dispatch(msg)
-              puts '->> ' + reply.inspect
               SkypeProxy.send_message(chat, reply)
             end
           rescue Exception => e

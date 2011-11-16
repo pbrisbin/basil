@@ -19,7 +19,10 @@ module Basil
                 chatmessage.body do |body|
                   to, text = parse_body(body)
                   to = Config.me if !to && is_private
-                  yield chat, Message.new(to, from, from_name, text)
+                  msg = Message.new(to, from, from_name, text)
+                  puts '<<- ' + msg.inspect
+
+                  yield chat, msg
                 end
               end
             end
@@ -33,6 +36,7 @@ module Basil
     # Sends the message to that specific chat. Adds a prefix if there is
     # a defined to.
     def self.send_message(chat, msg)
+      puts '->> ' + msg.inspect
       prefix = "#{msg.to.split(' ').first}, " rescue ''
       chat.send_message(prefix + msg.text)
     end
