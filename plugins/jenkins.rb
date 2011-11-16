@@ -1,5 +1,5 @@
 module Basil
-  class HudsonApi
+  class JenkinsApi
     include Utils
 
     # Note: path must include the trailing slash
@@ -22,10 +22,10 @@ module Basil
 
     def json
       unless @json
-        @json = get_json(Basil::Config.hudson_host, @path + 'api/json',
-                         Basil::Config.hudson_port,
-                         Basil::Config.hudson_user,
-                         Basil::Config.hudson_password)
+        @json = get_json(Basil::Config.jenkins_host, @path + 'api/json',
+                         Basil::Config.jenkins_port,
+                         Basil::Config.jenkins_user,
+                         Basil::Config.jenkins_password)
       end
 
       @json
@@ -33,14 +33,14 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to(/^hudson( (stable|failing))?$/) {
+Basil::Plugin.respond_to(/^jenkins( (stable|failing))?$/) {
 
   begin
     status_line = lambda do |job|
       " * #{job['name']} #{job['color'] =~ /blue/ ? "is stable." : "is FAILING. See #{job['url']} for details."}"
     end
 
-    status = Basil::HudsonApi.new('/')
+    status = Basil::JenkinsApi.new('/')
 
     says_multiline do |out|
       case (@match_data[2].strip rescue nil)
@@ -56,15 +56,15 @@ Basil::Plugin.respond_to(/^hudson( (stable|failing))?$/) {
       end
     end
   rescue
-    says "There was an issue talking to hudson."
+    says "There was an issue talking to jenkins."
   end
 
-}.description = 'interacts with hudson'
+}.description = 'interacts with jenkins'
 
-Basil::Plugin.respond_to(/^hudson (\w+)/) {
+Basil::Plugin.respond_to(/^jenkins (\w+)/) {
 
   begin
-    job = Basil::HudsonApi.new("/job/#{@match_data[1].strip}/")
+    job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
 
     says_multiline("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
       job.healthReport.each do |line|
@@ -77,12 +77,12 @@ Basil::Plugin.respond_to(/^hudson (\w+)/) {
     says "Can't find info on #{@match_data[1]}"
   end
 
-}.description = 'retrieves info on a specific hudson job'
+}.description = 'retrieves info on a specific jenkins job'
 
 Basil::Plugin.respond_to(/who broke (\w+)/) {
 
   begin
-    job = Basil::HudsonApi.new("/job/#{@match_data[1].strip}/")
+    job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
 
     builds = job.builds.map { |b| b['number'].to_i }
     last_stable = job.lastStableBuild['number'].to_i rescue nil
@@ -90,13 +90,13 @@ Basil::Plugin.respond_to(/who broke (\w+)/) {
     if last_stable && builds.first == last_stable
       return says "#{job.displayName} is not broken."
     end
-      
+
     i = 0
-    while Basil::HudsonApi.new("/job/#{job.name}/#{builds[i]}/").building
+    while Basil::JenkinsApi.new("/job/#{job.name}/#{builds[i]}/").building
       i += 1
     end
 
-    test_report = Basil::HudsonApi.new("/job/#{job.name}/#{builds[i]}/testReport/")
+    test_report = Basil::JenkinsApi.new("/job/#{job.name}/#{builds[i]}/testReport/")
 
     says_multiline do |out|
       test_report.suites.each do |s|
@@ -109,7 +109,7 @@ Basil::Plugin.respond_to(/who broke (\w+)/) {
 
             out << "#{name} first broke in #{since}"
 
-            breaker = Basil::HudsonApi.new("/job/#{job.name}/#{since}/")
+            breaker = Basil::JenkinsApi.new("/job/#{job.name}/#{since}/")
 
             breaker.changeSet['items'].each do |item|
               out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"

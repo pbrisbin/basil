@@ -26,11 +26,11 @@ plugins_directory: ./plugins
 broadcast_host: 127.0.0.1
 broadcast_port: 1234
 
-# Constants for the Hudson API plugin.
-hudson_host:     hudson1.ideeli.com
-hudson_port:     8080
-hudson_user:     X
-hudson_password: X
+# Constants for the Jenkins API plugin.
+jenkins_host:     jenkins1.ideeli.com
+jenkins_port:     80
+jenkins_user:     X
+jenkins_password: X
 
 # Constants for the Jira API plugin.
 jira_host:     jira.ideeli.com
