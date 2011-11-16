@@ -1,25 +1,4 @@
 module Basil
-  # Basil's dipatch method will take a valid message and ask each
-  # registered plugin (resonders then watchers) if it wishes to act on
-  # it. The first reply received is returned, otherwise nil.
-  def dispatch(msg)
-    return nil unless msg && msg.text != ''
-
-    if msg.to_me?
-      Plugin.responders.each do |p|
-        reply = p.triggered(msg)
-        return reply if reply
-      end
-    end
-
-    Plugin.watchers.each do |p|
-      reply = p.triggered(msg)
-      return reply if reply
-    end
-
-    nil
-  end
-
   # The plugin class is used to encapsulate triggered actions. Plugin
   # writers must use respond_to or watch_for to create an intance of
   # Plugin with a singleton execute method.

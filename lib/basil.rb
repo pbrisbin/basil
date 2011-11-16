@@ -20,6 +20,27 @@ module Basil
     exit 1
   end
 
+  # Basil's dipatch method will take a valid message and ask each
+  # registered plugin (responders then watchers) if it wishes to act on
+  # it. The first reply received is returned, otherwise nil.
+  def self.dispatch(msg)
+    return nil unless msg && msg.text != ''
+
+    if msg.to_me?
+      Plugin.responders.each do |p|
+        reply = p.triggered(msg)
+        return reply if reply
+      end
+    end
+
+    Plugin.watchers.each do |p|
+      reply = p.triggered(msg)
+      return reply if reply
+    end
+
+    nil
+  end
+
   # The main basil data type: the Message. Servers should construct
   # these and pass them through dispatch which will also return a
   # Message if a response is triggered.

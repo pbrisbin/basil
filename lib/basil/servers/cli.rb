@@ -11,7 +11,7 @@ module Basil
             print '> '; str = $stdin.gets.chomp
             msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str)
             begin
-              reply = dispatch(msg)
+              reply = Basil.dispatch(msg)
               puts reply.text if reply
             rescue Exception => e
               puts "error: #{e.message}"
