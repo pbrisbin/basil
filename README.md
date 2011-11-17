@@ -45,7 +45,7 @@ written or the only one in wide-use today.
 
 Besides, I found this project interesting and fun to do from scratch.
 
-Hubot scripts and basil plugins share a simIliar structure 
+Hubot scripts and basil plugins share a similar structure 
 (unintentional, I swear) so porting one to the other is much simpler 
 than you'd expect.
 
@@ -54,18 +54,17 @@ than you'd expect.
 *requires ruby 1.9 and the Skype setup is linux-only*
 
     git clone https://github.com/pbrisbin/basil
-
     cd basil
-
-    bundle install
-
+    rake install
     cp ./config/example.yml ./config/basil.yml
-
     vim basil.yml
+
+*Note: Basil will look for `./config/basil.yml` and `./plugins/*.rb` so 
+you must run him from the project root -- this should change soon*
 
 ### Cli
 
-1. Execute `./bin/basil`
+1. Execute `basil`
 2. Type messages
 
 ### Skype
@@ -73,8 +72,13 @@ than you'd expect.
 1. Install skype
 2. Setup a profile for your bot to run as
 3. Start skype
-5. Execute `./bin/basil`
+5. Execute `basil`
 6. Prefix messages with `basil, ` or `! ` (or `> ` for code evaluation)
+
+## Development Usage
+
+    bundle install
+    bundle exec ruby -Ilib ./bin/basil
 
 ## Extending
 
