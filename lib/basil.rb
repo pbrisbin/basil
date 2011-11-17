@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'bundler/setup'
-
 require 'basil/utils'
 require 'basil/plugins'
 require 'basil/config'
