@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["patrick brisbin"]
-  s.date = "2011-11-10"
+  s.date = "2011-11-17"
   s.description = "basil is a simple bot"
   s.email = "pbrisbin@gmail.com"
   s.executables = ["basil"]
@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
     "lib/basil/utils.rb",
     "plugins/core.rb",
     "plugins/extra.rb",
-    "plugins/hudson.rb",
+    "plugins/jenkins.rb",
     "plugins/jira.rb",
     "plugins/misc.rb",
     "plugins/music.rb",
