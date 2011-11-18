@@ -35,12 +35,12 @@ Besides, I found this project interesting and fun to do from scratch.
 ## Usage
 
 Since basil relies on a skype gem only available on github, current 
-usage relies on `bundle exec`.
+usage relies on bundler and running from source.
 
     git clone https://github.com/pbrisbin/basil && cd basil
     cp config/example.yml config/basil.yml # and adjust
     bundle install
-    bundle exec ruby -Ilib bin/basil
+    ./bin/basil
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 

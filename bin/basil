@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
 
+### ease usage while the skype dep is github-only, preventing a true
+### gem install
+require 'bundler/setup'
+$LOAD_PATH << './lib'
+###
+
 require 'basil'
 Basil.run
