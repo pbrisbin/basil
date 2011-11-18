@@ -12,10 +12,6 @@ server_type: :cli
 # to support the contained plugins.
 plugins_directory: ./plugins
 
-# Certain commands might be restricted to specific user names or skype
-# handles. A comma separated list can be defined here.
-#authorized_users: foo, bar
-
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
 # Install curl-ca-bundle via ports. The get_json utility will use this
 # cert file for secure requests if the configuration option is present.

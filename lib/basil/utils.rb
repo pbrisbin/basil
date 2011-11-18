@@ -36,16 +36,6 @@ module Basil
       Message.new(new_to, Config.me, Config.me, @msg.text)
     end
 
-    def require_authorization(type = nil) # to be implemented
-      authorized_users = Config.authorized_users rescue []
-
-      if authorized_users.include?(@msg.from)
-        return yield
-      else
-        says "Sorry #{@msg.from_name}, I'm afraid I can't do that for you"
-      end
-    end
-
     def escape(str)
       require 'cgi'
       CGI::escape(str.strip)
