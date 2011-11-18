@@ -1,8 +1,8 @@
-# Basil
+# Basil - \ba-zəl\
 
-*pronounced BAH-zil*
+A skype bot hoping to be as cool as phrik and as [useful][] as hubot.
 
-A skype bot who hopes to be as cool as phrik and as useful as hubot.
+[useful]: http://en.wikipedia.org/wiki/Basil_Exposition#Basil_Exposition
 
 ![Basil Test](http://pbrisbin.com/static/fileshare/basil_test.png)
 
@@ -11,20 +11,7 @@ A skype bot who hopes to be as cool as phrik and as useful as hubot.
 We use skype at work the way I've always used IRC for FOSS projects. 
 It's a place for support, meetings, fire-drills, and just hanging out.
 
-I've always wanted phrik (#archlinux's bot) there, he's so useful -- So 
-I got the idea to try and write Basil.
-
-It started as a simple command line REPL which aimed to make life as 
-easy as possible for potential plugin writers.
-
-After seeing that my fantasy of skype integration was actually possible 
-and not all that hard, I've tweaked the design to cater to that 
-use-case.
-
-Shockingly, it works.
-
-That said, things are modular -- if you write `Basil::Server::Irc#run` 
-you're all set.
+For any bot to be useful for us, he would have to live there.
 
 ## Why not fork hubot?
 
@@ -35,8 +22,8 @@ skype integration easy by way of nfelger's gem.
 
 * It's not a very big wheel to reinvent
 
-The heart of basil is tiny (~150 sloc). This is not including the skype 
-server and plugins which would've been written for a hubot fork anyway.
+The heart of basil is tiny. This is not including the skype server and 
+plugins which would've been written for a hubot fork anyway.
 
 * Hubot's not that special
 
@@ -45,45 +32,31 @@ written or the only one in wide-use today.
 
 Besides, I found this project interesting and fun to do from scratch.
 
-Hubot scripts and basil plugins share a similar structure 
-(unintentional, I swear) so porting one to the other is much simpler 
-than you'd expect.
+## Usage
 
-## Installation
+Since basil relies on a skype gem only available on github, current 
+usage relies on `bundle exec`.
+
+    git clone https://github.com/pbrisbin/basil && cd basil
+    cp config/example.yml config/basil.yml # and adjust
+    bundle install
+    bundle exec ruby -Ilib bin/basil
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 
-    git clone https://github.com/pbrisbin/basil
-    cd basil
-    rake install
-    cp ./config/example.yml ./config/basil.yml
-    vim basil.yml
-
-*Note: Basil will look for `./config/basil.yml` and `./plugins/*.rb` so 
-you must run him from the project root -- this should change soon*
-
-### Cli
-
-1. Execute `basil`
-2. Type messages
-
 ### Skype
 
-1. Install skype
-2. Setup a profile for your bot to run as
-3. Start skype
-5. Execute `basil`
-6. Prefix messages with `basil, ` or `! ` (or `> ` for code evaluation)
+The skype client must be running under a profile to represent the bot. 
+Messages to the bot must be prefixed correctly (even in private chat, 
+for now) so he knows to respond.
 
-## Development Usage
-
-    bundle install
-    bundle exec ruby -Ilib ./bin/basil
+None of this is required when using `server_type: :cli`.
 
 ## Extending
 
-The whole goal is to write plugins that do useful things. Check out 
-`./plugins` for his current set. The pattern should be fairly obvious.
+The whole goal is to write plugins that do useful things. Checkout 
+existing plugins for an idea of the pattern; it should be fairly 
+obvious.
 
 Here's a silly one as an example:
 
@@ -92,9 +65,9 @@ Here's a silly one as an example:
 # basil, call me a taxi
 # => fine, you're a taxi.
 #
-Basil::Plugin.respond_to(/^call me a (.*)$/) {
+Basil::Plugin.respond_to(/^call me a (.+)/) {
 
-  replies "fine, you're a #{@match_data[1]}."
+  says "fine, you're a #{@match_data[1]}."
 
 }.description = 'replies sarcastically'
 ~~~
