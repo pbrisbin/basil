@@ -1,4 +1,4 @@
-# Basil - \ba-zəl\
+# Basil - */'ba-zəl/*
 
 A skype bot hoping to be as cool as phrik and as [useful][] as hubot.
 
