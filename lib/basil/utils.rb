@@ -41,43 +41,59 @@ module Basil
       CGI::escape(str.strip)
     end
 
-    # Make a simple or not-so simple request for json. Supports basic
-    # auth and SSL. Prints to stderr and returns nil in case of errors.
-    #
-    #   get_json('http://example.com/some/path')
-    #   get_json('example.com', '/some/path', 443, 'user', 'pass', true)
-    #
-    def get_json(host, path = nil, port = nil, username = nil, password = nil, secure = false)
-      require 'json'
+    def get_http(options)
+      if options.is_a? Hash
+        host     = options[:host]
+        port     = options[:port]     rescue 80
+        username = options[:user]     rescue nil
+        password = options[:password] rescue nil
+        path     = options[:path]
 
-      if secure
-        require 'net/https'
+        secure = port == 443
+
+        # An explicit cert file is needed if run on OSX, provided by the
+        # curl-ca-bundle cert package
+        cert_file = Config.https_cert_file rescue nil
+
+        require (secure ? 'net/https' : 'net/http')
+        net = Net::HTTP.new(host, port)
+
+        if secure
+          net.use_ssl = true
+          net.ca_file = cert_file if cert_file
+        end
+
+        net.start do |http|
+          req = Net::HTTP::Get.new(path)
+          req.basic_auth(username, password) if username || password
+          http.request(req)
+        end
       else
-        require 'net/http'
+        url = options
+        require (url =~ /^https/ ? 'net/https' : 'net/http')
+        Net::HTTP.get_response(URI.parse(url))
+      end
+    rescue Exception => ex
+      $stderr.puts "error getting http: #{ex}"
+      nil
+    end
+
+    def get_json(*args)
+      require 'json'
+      resp = get_http(*args)
+      JSON.parse(resp.body) if resp
+    rescue Exception => ex
+      $stderr.puts "error parsing json: #{ex}"
+      nil
+    end
+
+    def symbolize_keys(h)
+      n = {}
+      h.each do |k,v|
+        n[k.to_sym] = v
       end
 
-      # An explicit cert file is needed if run on OSX, provided by the
-      # curl-ca-bundle cert package
-      cert_file = Config.https_cert_file rescue nil
-
-      resp = if path || port || username || password
-               net = Net::HTTP.new(host, port || 80)
-               net.use_ssl = secure
-               net.ca_file = cert_file if cert_file
-               net.start do |http|
-                 req = Net::HTTP::Get.new(path)
-                 req.basic_auth username, password
-                 http.request(req)
-               end
-             else
-               Net::HTTP.get_response(URI.parse(host))
-             end
-
-      JSON.parse(resp.body)
-    rescue Exception => e
-      $stderr.puts e.message
-
-      nil
+      n
     end
   end
 end

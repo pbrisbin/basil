@@ -21,10 +21,8 @@ module Basil
 
     def json
       unless @json
-        @json = get_json(Config.jira_host, '/rest/api/2.0.alpha1' + @path,
-                         Config.jira_port,
-                         Config.jira_user,
-                         Config.jira_password, true)
+        options = symbolize_keys(Config.jira).merge(:path => '/rest/api/2.0.alpha1' + @path)
+        @json = get_json(options)
       end
 
       @json

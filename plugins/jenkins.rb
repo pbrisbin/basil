@@ -22,10 +22,8 @@ module Basil
 
     def json
       unless @json
-        @json = get_json(Basil::Config.jenkins_host, @path + 'api/json',
-                         Basil::Config.jenkins_port,
-                         Basil::Config.jenkins_user,
-                         Basil::Config.jenkins_password)
+        options = symbolize_keys(Config.jenkins).merge(:path => @path + 'api/json')
+        @json = get_json(options)
       end
 
       @json
@@ -55,7 +53,8 @@ Basil::Plugin.respond_to(/^jenkins( (stable|failing))?$/) {
         status.jobs.each { |job| out << status_line.call(job) }
       end
     end
-  rescue
+  rescue Exception => ex
+    $stderr.puts "jenkins error: #{ex}"
     says "There was an issue talking to jenkins."
   end
 
@@ -73,7 +72,8 @@ Basil::Plugin.respond_to(/^jenkins (\w+)/) {
 
       out << "See #{job.url} for details."
     end
-  rescue
+  rescue Exception => ex
+    $stderr.puts "jenkins error: #{ex}"
     says "Can't find info on #{@match_data[1]}"
   end
 
@@ -120,9 +120,8 @@ Basil::Plugin.respond_to(/who broke (\w+)/) {
         end
       end
     end
-  rescue => e
-    $stderr.puts e.message
-
+  rescue Exception => ex
+    $stderr.puts "jenkins error: #{ex}"
     says "Can't find info on #{@match_data[1]}"
   end
 
