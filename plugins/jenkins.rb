@@ -109,10 +109,14 @@ Basil::Plugin.respond_to(/who broke (\w+)/) {
 
             out << "#{name} first broke in #{since}"
 
-            breaker = Basil::JenkinsApi.new("/job/#{job.name}/#{since}/")
+            begin
+              breaker = Basil::JenkinsApi.new("/job/#{job.name}/#{since}/")
 
-            breaker.changeSet['items'].each do |item|
-              out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
+              breaker.changeSet['items'].each do |item|
+                out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
+              end
+            rescue
+              out << "    ! no info on that build"
             end
 
             out << ""
