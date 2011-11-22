@@ -23,13 +23,15 @@ broadcast_host: 127.0.0.1
 broadcast_port: 1234
 
 # Constants for the Jenkins API plugin.
-jenkins_host:     jenkins1.ideeli.com
-jenkins_port:     80
-jenkins_user:     X
-jenkins_password: X
+jenkins:
+  host:     jenkins1.ideeli.com
+  port:     80
+  user:     X
+  password: X
 
 # Constants for the Jira API plugin.
-jira_host:     jira.ideeli.com
-jira_port:     443
-jira_user:     X
-jira_password: X
+jira:
+  host:     jira.ideeli.com
+  port:     443
+  user:     X
+  password: X
