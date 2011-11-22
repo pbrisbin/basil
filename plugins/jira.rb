@@ -44,7 +44,7 @@ module Basil
     end
 
     def url
-      @url ||= "https://#{Config.jira_host}/browse/#{@key}"
+      @url ||= "https://#{Config.jira['host']}/browse/#{@key}"
     end
 
     def title
