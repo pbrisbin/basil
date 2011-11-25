@@ -79,7 +79,7 @@ Basil::Plugin.respond_to(/^jenkins (\w+)/) {
 
 }.description = 'retrieves info on a specific jenkins job'
 
-Basil::Plugin.respond_to(/who broke (\w+)/) {
+Basil::Plugin.respond_to(/^who broke (.+?)\??$/) {
 
   begin
     job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
