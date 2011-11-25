@@ -17,18 +17,10 @@ module Basil
 
         SkypeProxy.on_message do |chat, msg|
           begin
-            if reply = Basil.dispatch(msg)
-              SkypeProxy.send_message(chat, reply)
-            end
-          rescue Exception => e
-            chat.send_message("error: #{e.message}")
-          end
-        end
-
-        Broadcast.on(:broadcast_received) do |msg|
-          SkypeProxy.each_chat do |chat|
-            puts '-*->>' + msg.inspect
-            SkypeProxy.send_message(chat, msg)
+            reply = Basil.dispatch(msg)
+            SkypeProxy.send_message(chat, reply) if reply
+          rescue Exception => ex
+            chat.send_message("error: #{ex}")
           end
         end
 
