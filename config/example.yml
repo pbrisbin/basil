@@ -17,11 +17,6 @@ plugins_directory: ./plugins
 # cert file for secure requests if the configuration option is present.
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
-# Broadcasts are currently implemented by opening a TCP port and
-# listening for incoming text.
-broadcast_host: 127.0.0.1
-broadcast_port: 1234
-
 # Constants for the Jenkins API plugin.
 jenkins:
   host:     jenkins1.ideeli.com
