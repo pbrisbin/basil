@@ -12,13 +12,16 @@ module Basil
       Skype.on(:chatmessage_received) do |chatmessage|
         chatmessage.chat do |chat|
           Skype::Api.invoke("GET CHAT #{chat.chatname} MEMBERS") do |resp|
+            # TODO: test this better before enabling it, so we don't
+            # accidentially spam channels
             is_private = false #resp =~ /MEMBERS (.*)/ && $1.split(/ +/).length == 2
 
             chatmessage.from do |from|
               chatmessage.from_name do |from_name|
                 chatmessage.body do |body|
                   to, text = parse_body(body)
-                  to = Config.me if !to && is_private
+
+                  to  = Config.me if !to && is_private
                   msg = Message.new(to, from, from_name, text)
                   puts '<<- ' + msg.inspect
 
@@ -54,14 +57,14 @@ module Basil
 
     def self.parse_body(body)
       return case body
-             when /^!(.*)/            ; [Config.me, $1]
-             when /^>(.*)/            ; [Config.me, "eval#{$1}"]
-             when /^@(\w+)[,;:]? (.*)/; [$1, $2]
-             when /^(\w+)[,;:] *(.*)/ ; [$1, $2]
+             when /^! *(.*)/           ; [Config.me, $1]
+             when /^> *(.*)/           ; [Config.me, "eval #{$1}"]
+             when /^@(\w+)[,;:]? +(.*)/; [$1, $2]
+             when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
              else [nil, body]
              end
 
-    rescue Exception
+    rescue
       [nil, body]
     end
   end
