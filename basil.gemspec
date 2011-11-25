@@ -17,5 +17,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.licenses      = ["MIT"]
 
+  s.add_runtime_dependency "rack"
   s.add_runtime_dependency "skype"
 end
