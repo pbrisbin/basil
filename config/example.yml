@@ -13,7 +13,7 @@ server_type: :cli
 plugins_directory: ./plugins
 
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
-# Install curl-ca-bundle via ports. The get_json utility will use this
+# Install curl-ca-bundle via ports. The get_* utilities will use this
 # cert file for secure requests if the configuration option is present.
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
