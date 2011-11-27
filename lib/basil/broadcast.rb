@@ -4,20 +4,24 @@ require 'rack/request'
 module Basil
   class Broadcast
     class << self
-      def run
-        Thread.new do
-          Rack::Server.new(:app  => rack_app,
-                           :Port => Config.broadcast['port'].to_i,
-                           :server => 'webrick').start
-        end
+      def server
+        @@server ||= Rack::Server.new(:app    => rack_app,
+                                      :Port   => Config.broadcast['port'].to_i,
+                                      :server => 'webrick')
       end
+
+      def callbacks
+        @@callbacks ||= []
+      end
+
+      private
 
       def rack_app
         p = Proc.new do |env|
           begin
             req = Rack::Request.new(env)
             response = handle req.path_info, req.POST
-            [200, {'Content-Type' => 'text/plain'}, [response]]
+            [200, {'Content-Type' => 'text/plain'}, [response + "\n"]]
           rescue Exception => ex
             [500, {'Content-Type' => 'text/plain'}, ["error: #{ex}\n"]]
           end
@@ -38,12 +42,9 @@ module Basil
       end
 
       def handle(path, params)
-        case path
-        when '/'
-          "usage: curl --data-urlencode 'message=Some message' http://admin:secret@locahost:8080\n"
-        when '/broadcast'
-          "broadcasted #{params[:message]}\n"
-        end
+        $stderr.puts "broadcasted #{path}, #{params.inspect}"
+
+        raise 'invalid path or parameters'
       end
     end
   end
