@@ -24,6 +24,8 @@ module Basil
   def self.dispatch(msg)
     return nil unless msg && msg.text != ''
 
+    Plugin.loggers.each { |l| l.triggered(msg) }
+
     if msg.to_me?
       Plugin.responders.each do |p|
         reply = p.triggered(msg)

@@ -27,12 +27,27 @@ module Basil
       p.register!
     end
 
+    # Create an instance of Plugin whose execute method will be invoked
+    # for every single message. This plugin cannot and should not
+    # provide any sort of reply and the dispatch runs regardless of what
+    # the loggers do. This is to provide plugins an easy way to log/use
+    # their own subset of chat history.
+    def self.log(&block)
+      p = new(:logger, nil)
+      p.define_singleton_method(:execute, &block)
+      p.register!
+    end
+
     def self.responders
       @@responders ||= []
     end
 
     def self.watchers
       @@watchers ||= []
+    end
+
+    def self.loggers
+      @@loggers ||= []
     end
 
     def self.load!
@@ -59,7 +74,7 @@ module Basil
     end
 
     def triggered(msg)
-      if msg.text =~ @regex
+      if @regex.nil? || msg.text =~ @regex
         @msg = msg
         @match_data = $~
 
@@ -73,6 +88,7 @@ module Basil
       case @type
       when :responder; Plugin.responders << self
       when :watcher  ; Plugin.watchers   << self
+      when :logger   ; Plugin.loggers    << self
       end; self
     end
   end
