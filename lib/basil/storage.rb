@@ -8,6 +8,7 @@ module Basil
   module Storage
     def self.with_storage
       require "pstore"
+      result = nil
 
       @@pstore ||= ::PStore.new(pstore_file)
       @@pstore.transaction do
