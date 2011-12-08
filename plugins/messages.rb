@@ -6,7 +6,7 @@ Basil::Plugin.respond_to(/^tell ([^:]*): (.+)/) {
 
   Basil::Storage.with_storage do |store|
     store[:tell_messages] ||= []
-    store[:tell_messages] << { :to => to, :from => from, :message => msg }
+    store[:tell_messages] << { :time => Time.now, :to => to, :from => from, :message => msg }
   end
 
   replies "consider it noted."
@@ -21,9 +21,11 @@ Basil::Plugin.respond_to(/^(do i have any |any )?messages\??$/i) {
     if msgs.empty?
       replies "sorry, I have no messages for you."
     else
-      replies do |out|
+      replies("your messages:") do |out|
         msgs.each do |msg|
-          out << "#{msg[:from]} left you \"#{msg[:message]}\""
+          out << "#{msg[:time].strftime("On %D, at %r")}, #{msg[:from]} wrote:"
+          out << '> ' + msg[:message]
+          out << ''
 
           # remove the message
           store[:tell_messages].delete(msg)
