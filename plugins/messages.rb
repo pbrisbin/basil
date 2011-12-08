@@ -9,7 +9,7 @@ Basil::Plugin.respond_to(/^tell ([^:]*): (.+)/) {
     store[:tell_messages] << { :to => to, :from => from, :message => msg }
   end
 
-  replies "Consider it noted."
+  replies "consider it noted."
 
 }.description = "Leave a message for something"
 
@@ -19,7 +19,7 @@ Basil::Plugin.respond_to(/^(do i have any |any )?messages\??$/i) {
     msgs = store[:tell_messages].select { |msg| @msg.from_name =~ /#{msg[:to]}/i }
 
     if msgs.empty?
-      replies "Sorry, I have no messages for you."
+      replies "sorry, I have no messages for you."
     else
       replies do |out|
         msgs.each do |msg|
@@ -45,9 +45,9 @@ Basil::Plugin.watch_for(/.*/) {
 
     # plularize correctly
     reply = if len == 1
-              "You have #{len} message, say 'messages?' to me to see it."
+              "you have #{len} message, say 'messages?' to me to see it."
             else
-              "You have #{len} messages, say 'messages?' to me to see them."
+              "you have #{len} messages, say 'messages?' to me to see them."
             end
 
     replies reply
