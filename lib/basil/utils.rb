@@ -1,6 +1,7 @@
 module Basil
   # Utility functions that are useful across multiple plugins should
-  # reside here. They are mixed into the Plugin class.
+  # reside here. They are mixed into the Plugin class. Most functions
+  # here should print to $stderr and return nil in the case of errors.
   module Utils
     # Handles both single and multi-line statements to no one in
     # particular.
@@ -62,6 +63,14 @@ module Basil
       CGI::escape(str.strip)
     end
 
+    # Handles simple and no-so-simple HTTP requests. If options is a
+    # Hash, you must provide :host and :path. Optionally, :port, :user,
+    # and :password can be specified as well. If options is not a Hash
+    # it is expected to be a simple url (ex "http://google.com").
+    #
+    # Currently, https is used if :port is specified as 443 or a url
+    # is passed that begins with "https". Basic authentication is used
+    # if :username or :password is given.
     def get_http(options)
       if options.is_a? Hash
         host     = options[:host]
@@ -99,6 +108,8 @@ module Basil
       nil
     end
 
+    # Passes its arguments directly to get_http and simply returns the
+    # response parsed as JSON.
     def get_json(*args)
       require 'json'
       resp = get_http(*args)
