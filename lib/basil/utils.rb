@@ -2,32 +2,53 @@ module Basil
   # Utility functions that are useful across multiple plugins should
   # reside here. They are mixed into the Plugin class.
   module Utils
-    def says(txt)
-      Message.new(nil, Config.me, Config.me, txt)
-    end
+    # Handles both single and multi-line statements to no one in
+    # particular.
+    #
+    #   says "something"
+    #
+    #   says do |out|
+    #     out << "first line"
+    #     out << "second line"
+    #   end
+    #
+    # The two invocation styles can be combined to do a sort of Header
+    # and Lines thing when printing tabular data; the first argument
+    # will be the first line printed then the rest will be built from
+    # your block.
+    #
+    #   says "here's some data:" do |out|
+    #     data.each do |d|
+    #       out << d.to_s
+    #     end
+    #   end
+    #
+    def says(txt = nil, &block)
+      if block_given?
+        out = txt.nil? ? [] : [txt]
 
-    # Build an array of lines (with optional first line title) then send
-    # it as a single multiline message.
-    def says_multiline(title = nil)
-      out = title.nil? ? [] : [title]
+        yield out
 
-      yield out
-
-      return says(out.join("\n")) unless out.empty?
+        return says(out.join("\n")) unless out.empty?
+      elsif txt
+        return Message.new(nil, Config.me, Config.me, txt)
+      end
 
       nil
     end
 
-    def replies(txt)
-      Message.new(@msg.from_name, Config.me, Config.me, txt)
-    end
+    # Same usage and behavior as says but this will direct the message
+    # back to the person who sent the triggering message.
+    def replies(txt = nil, &block)
+      if block_given?
+        out = txt.nil? ? [] : [txt]
 
-    def replies_multiline(title = nil)
-      out = title.nil? ? [] : [title]
+        yield out
 
-      yield out
-
-      return replies(out.join("\n")) unless out.empty?
+        return replies(out.join("\n")) unless out.empty?
+      elsif txt
+        return Message.new(@msg.from_name, Config.me, Config.me, txt)
+      end
 
       nil
     end

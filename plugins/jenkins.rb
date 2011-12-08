@@ -40,7 +40,7 @@ Basil::Plugin.respond_to(/^jenkins( (stable|failing))?$/) {
 
     status = Basil::JenkinsApi.new('/')
 
-    says_multiline do |out|
+    says do |out|
       case (@match_data[2].strip rescue nil)
       when 'stable'
         out << "Current stable jobs:"
@@ -65,7 +65,7 @@ Basil::Plugin.respond_to(/^jenkins (\w+)/) {
   begin
     job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
 
-    says_multiline("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
+    says("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
       job.healthReport.each do |line|
         out << line['description']
       end
@@ -98,7 +98,7 @@ Basil::Plugin.respond_to(/^who broke (.+?)\??$/) {
 
     test_report = Basil::JenkinsApi.new("/job/#{job.name}/#{builds[i]}/testReport/")
 
-    says_multiline do |out|
+    says do |out|
       test_report.suites.each do |s|
         s['cases'].each do |c|
           if c['status'] == 'FAILED'

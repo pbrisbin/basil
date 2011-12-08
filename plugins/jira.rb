@@ -80,7 +80,7 @@ Basil::Plugin.respond_to(/^find (.+)/i) {
     issues = json.issues
     len    = issues.length
 
-    replies_multiline('Search results:') do |out|
+    replies('Search results:') do |out|
       issues[0..10].each { |issue|
         ticket = Basil::JiraTicket.new(issue['key'])
         out << ticket.description if ticket.found?
