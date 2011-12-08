@@ -6,15 +6,23 @@ module Basil
       include Basil
 
       def run
+        debug = Config.debug rescue false
+
         loop do
           print '> '; str = $stdin.gets.chomp
+
           msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str)
+          $stderr.puts "<<- #{msg.inspect}" if debug
+
           begin
-            reply = Basil.dispatch(msg)
-            puts reply.text if reply
+            if reply = Basil.dispatch(msg)
+              $stderr.puts "->> #{reply.inspect}" if debug
+              puts reply.text
+            end
           rescue Exception => ex
-            puts "error: #{ex}"
+            $stderr.puts "error: #{ex}"
           end
+
         end
       end
     end
