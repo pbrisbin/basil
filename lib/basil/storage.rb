@@ -1,5 +1,5 @@
 module Basil
-  # Basil's persistent storage is implmented through simple, unchecked
+  # Basil's persistent storage is implemented through simple, unchecked
   # use of a PStore file. Plugins should take care not to step on other
   # plugins' data.
   #
