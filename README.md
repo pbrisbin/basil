@@ -52,28 +52,71 @@ for now) so he knows to respond.
 
 None of this is required when using `server_type: :cli`.
 
-## Extending
+## Plugins
 
-The whole goal is to write plugins that do useful things. Checkout 
-existing plugins for an idea of the pattern; it should be fairly 
-obvious.
+Writing plugins should be both easy and powerful. Here are some examples 
+of the sorts of things plugins can do:
 
-Here's a silly one as an example:
+#### Respond to a simple command with a canned reply
 
 ~~~ { .ruby }
-#
-# basil, call me a taxi
-# => fine, you're a taxi.
-#
-Basil::Plugin.respond_to(/^call me a (.+)/) {
+# works best with 'give'
+Basil::Plugin.respond_to('beer') {
+
+  replies "someone wanted you to have this (beer)" # skype emoticon
+
+}
+~~~
+
+*Note: the String `'beer'` is interpreted as `/^beer$/` by the 
+constructor*
+
+#### Respond cleverly using the trigger's content
+
+~~~ { .ruby }
+Basil::Plugin.respond_to(/^call me a (.*)/) {
 
   says "fine, you're a #{@match_data[1]}."
 
-}.description = 'replies sarcastically'
+}
 ~~~
 
-Your block is defined as a singleton method on an instance of `Plugin` 
-so you can create/access your own instance variables and call all the 
-provided helper methods (hint: you can even re`dispatch`).
+#### Make a simple web request
 
-Here's hoping this grows into something useful...
+~~~ { .ruby }
+Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
+
+  url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{escape(@match_data[2])}"
+
+  if result = get_json(url)['responseData']['results'].first rescue nil
+    replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
+  else
+    replies "Nothing found."
+  end
+
+}.description = 'consults the almighty google'
+~~~
+
+*Note: since constructors `return self` you can easily chain a method on 
+the end, like assigning a `description` (which is used by `help`)*
+
+#### Do some not-so-simple web stuff
+
+(The rest of these are longish so I won't reproduce them here.)
+
+[plugins/jira.rb]    (https://github.com/pbrisbin/basil/blob/master/plugins/jira.rb)
+[plugins/jenkins.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/jenkins.rb)
+
+#### Persist some data for use in a later response
+
+[plugins/messages.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/messages.rb)
+[plugins/karma.rb]    (https://github.com/pbrisbin/basil/blob/master/plugins/karma.rb)
+
+#### Keep and utilize a simple chat history
+
+[plugins/quotedb.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/quotedb.rb)
+
+#### Go meta-basil: introspect and re-dispatch
+
+[plugins/help.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/help.rb)
+[plugins/give.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/give.rb)
