@@ -23,6 +23,8 @@ module Basil
 
         begin
           #{code}
+        
+        rescue SystemExit
         end
       }
 
@@ -31,7 +33,7 @@ module Basil
       [result, stdout.string]
 
     rescue SyntaxError
-    rescue SystemExit
+      [nil, nil]
     ensure
       $stdout = STDOUT
       FakeFS.deactivate!
@@ -52,9 +54,13 @@ Basil::Plugin.respond_to(/^eval (.*)/) {
     end
   end
 
-  says do |out|
-    out << stdout if stdout && stdout != ""
-    out << " => #{retval.inspect}"
+  if stdout # will be "" unless SyntaxError
+    says do |out|
+      out << stdout if stdout != ""
+      out << " => #{retval.inspect}"
+    end
+  else
+    nil
   end
 
 }.description = 'evaluates ruby expressions'
