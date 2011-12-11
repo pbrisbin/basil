@@ -71,6 +71,9 @@ Basil::Plugin.respond_to('beer') {
 *Note: the String `'beer'` is interpreted as `/^beer$/` by the 
 constructor*
 
+These types of plugins have been removed since they can be implemented 
+using the new factoid plugin.
+
 #### Respond cleverly using the trigger's content
 
 ~~~ { .ruby }
