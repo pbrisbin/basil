@@ -32,7 +32,7 @@ Basil::Plugin.respond_to(/^\w+$/) {
   if fact
     case fact[:action]
     when 'reply' then replies fact[:fact]
-    when 'says'  then says    fact[:fact]
+    when 'say'   then says    fact[:fact]
     else nil
     end
   else
