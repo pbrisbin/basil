@@ -1,15 +1,28 @@
+module Basil
+  class Plugin
+    def self.count_loaded
+      loggers.length + responders.length + watchers.length
+    end
+
+    def self.clear_loaded!
+      loggers.delete_if    { true }
+      responders.delete_if { true }
+      watchers.delete_if   { true }
+    end
+  end
+end
+
 Basil::Plugin.respond_to('reload') {
 
-  a = Basil::Plugin.responders.length + Basil::Plugin.watchers.length
+  a = Basil::Plugin.count_loaded
 
-  Basil::Plugin.responders.delete_if { true }
-  Basil::Plugin.watchers.delete_if   { true }
+  Basil::Plugin.clear_loaded!
 
-  b = Basil::Plugin.responders.length + Basil::Plugin.watchers.length
+  b = Basil::Plugin.count_loaded
 
   Basil::Plugin.load!
 
-  c = Basil::Plugin.responders.length + Basil::Plugin.watchers.length
+  c = Basil::Plugin.count_loaded
 
   says "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
 
