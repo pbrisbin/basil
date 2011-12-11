@@ -20,10 +20,10 @@ Basil::Plugin.respond_to(/^mpc load (.*)$/) {
   available = `mpc lsplaylists`.split("\n")
 
   if list && list != '' && available.include?(list)
-    out = `mpc load #{list}`
-    msg = '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
-
-    says [out, msg].join("\n")
+    says do |out|
+      out << `mpc load #{list}`
+      out << '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
+    end
   else
     raise 'playlist not found or not given'
   end
@@ -37,10 +37,10 @@ Basil::Plugin.respond_to(/^mpc( (.*))?$/) {
                    lsplaylists stats version }
 
   if !arg || arg == '' || valid_args.include?(arg)
-    out = `#{@match_data[0]}`
-    msg = '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
-
-    says [out, msg].join("\n")
+    says do |out|
+      out << `#{@match_data[0]}`
+      out << '-- listen at http://pbrisbin.com:8000/mpd.mp3 --'
+    end
   else
     # to match mpc help order
     valid_args.insert(8, 'load <playlist>')
