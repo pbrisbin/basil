@@ -9,7 +9,7 @@ module Basil
           store[KMSG] ||= []
           store[KMSG] << { :who => msg.from_name, :what => msg.text }
 
-          # semi-efficiently maintain and cap on this log
+          # semi-efficiently maintain a cap on this log
           while store[KMSG].length > 50
             store[KMSG].shift(15)
           end
