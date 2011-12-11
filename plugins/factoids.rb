@@ -1,5 +1,5 @@
 # allows canned-response plugins to be added run-time by anyone
-Basil::Plugin.respond_to(/(\w+) is <(reply|say)>(.+)/) {
+Basil::Plugin.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
 
   key    = @match_data[1]
   action = @match_data[2]
