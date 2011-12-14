@@ -7,14 +7,8 @@ module Basil
       @json = nil
     end
 
-    def method_missing(method, *args)
-      key = method.to_s
-
-      if json.has_key?(key)
-        json[key]
-      else
-        super
-      end
+    def method_missing(meth, *args)
+      json[meth.to_s] if json
     end
 
     private
@@ -59,14 +53,19 @@ module Basil
   end
 end
 
-Basil::Plugin.watch_for(/\w+-\d+/i) {
+Basil::Plugin.watch_for(/\w+-\d+/) {
 
-  begin
-    ticket = Basil::JiraTicket.new(@match_data[0])
-    says ticket.description if ticket.found?
-  rescue => e
-    $stderr.puts e.message
-    nil
+  tickets = @msg.text.scan(/\w+-\d+/)
+
+  says do |out|
+    tickets.each do |id|
+      begin
+        ticket = Basil::JiraTicket.new(id)
+        out << ticket.description if ticket.found?
+      rescue => e
+        $stderr.puts e.message
+      end
+    end
   end
 
 }
