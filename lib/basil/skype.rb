@@ -12,9 +12,7 @@ module Basil
       Skype.on(:chatmessage_received) do |chatmessage|
         chatmessage.chat do |chat|
           Skype::Api.invoke("GET CHAT #{chat.chatname} MEMBERS") do |resp|
-            # TODO: test this better before enabling it, so we don't
-            # accidentially spam channels
-            is_private = false #resp =~ /MEMBERS (.*)/ && $1.split(/ +/).length == 2
+            is_private = (resp =~ /MEMBERS (.*)/ && $1.split(/ +/).length == 2)
 
             chatmessage.from do |from|
               chatmessage.from_name do |from_name|
