@@ -56,7 +56,9 @@ module Basil
 
     # Is this message to my configured nick?
     def to_me?
-      to == Config.me
+      to.downcase == Config.me.downcase
+    rescue
+      false
     end
   end
 end
