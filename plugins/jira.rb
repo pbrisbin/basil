@@ -57,6 +57,7 @@ end
 
 Basil::Plugin.watch_for(/\w+-\d+/) {
 
+  # people might mention more than one ticket in a message
   tickets = @msg.text.scan(/\w+-\d+/)
 
   # don't spam the channel if people mention the same core ticket within
@@ -80,7 +81,26 @@ Basil::Plugin.watch_for(/\w+-\d+/) {
       tickets.each do |id|
         begin
           ticket = Basil::JiraTicket.new(id)
-          out << ticket.description if ticket.found?
+
+          if ticket.found?
+            url   = ticket.url
+            title = ticket.title
+
+            # don't spam information that's already present in the
+            # triggering message
+            url_present   = @msg.text.include?(url)
+            title_present = @msg.text.include?(title)
+
+            unless url_present && title_present
+              if url_present
+                out << "#{id} : #{title}"
+              elsif title_present
+                out << "#{url}"
+              else
+                out << "#{ticket.description}"
+              end
+            end
+          end
         rescue => e
           $stderr.puts e.message
         end
