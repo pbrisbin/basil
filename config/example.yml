@@ -30,3 +30,9 @@ jira:
   port:     443
   user:     X
   password: X
+
+# Constants for the Airbrake API
+airbrake:
+  account: ideeli
+  project: SomeNumber   # https://ideeli.airbrakeapp.com/<project>/errors
+  token:   SomeLongHash # get from Settings
