@@ -24,6 +24,8 @@ module Basil
   end
 
   class JiraTicket
+    TIMEOUT = 30 # seconds
+
     def initialize(key)
       @key  = key.upcase
       @json = nil
@@ -57,19 +59,41 @@ Basil::Plugin.watch_for(/\w+-\d+/) {
 
   tickets = @msg.text.scan(/\w+-\d+/)
 
-  says do |out|
+  # don't spam the channel if people mention the same core ticket within
+  # a specified timeout period.
+  Basil::Storage.with_storage do |store|
+    store[:jira_timeouts] ||= {}
+
     tickets.each do |id|
-      begin
-        ticket = Basil::JiraTicket.new(id)
-        out << ticket.description if ticket.found?
-      rescue => e
-        $stderr.puts e.message
+      timeout = store[:jira_timeouts][id] rescue nil
+
+      if timeout && Time.now <= timeout
+        tickets.delete(id)
+      else
+        store[:jira_timeouts][id] = Time.now + Basil::JiraTicket::TIMEOUT
       end
     end
   end
 
+  unless tickets.empty?
+    says do |out|
+      tickets.each do |id|
+        begin
+          ticket = Basil::JiraTicket.new(id)
+          out << ticket.description if ticket.found?
+        rescue => e
+          $stderr.puts e.message
+        end
+      end
+    end
+  else
+    nil
+  end
+
 }
 
+# DEPRECATION WARNING -- find foo is too general, this will be replaced
+# with something like "jira search foo" in the near future.
 Basil::Plugin.respond_to(/^find (.+)/i) {
 
   begin
