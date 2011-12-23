@@ -38,17 +38,7 @@ module Basil
     end
 
     def xml
-      unless @xml
-        http = get_http(:host => @host, :port => 443, :path => @path)
-
-        require 'faster_xml_simple'
-        @xml = FasterXmlSimple.xml_in(http.body)
-      end
-
-      @xml
-    rescue Exception => ex
-      $stderr.puts "#{ex}"
-      nil
+      @xml ||= get_xml(:host => @host, :port => 443, :path => @path)
     end
   end
 end

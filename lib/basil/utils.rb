@@ -119,6 +119,28 @@ module Basil
       nil
     end
 
+    # Passes its arguments directly to get_http and simply returns the
+    # response parsed as Xml
+    def get_xml(*args)
+      require 'faster_xml_simple'
+      resp = get_http(*args)
+      FasterXmlSimple.xml_in(resp.body) if resp
+    rescue Exception => ex
+      $stderr.puts "error parsing xml: #{ex}"
+      nil
+    end
+
+    # Passes its arguments directly to get_http and simply returns the
+    # response parse as Html by Nokogiri
+    def get_html(*args)
+      require 'nokogiri'
+      resp = get_http(*args)
+      Nokogiri::HTML.parse(resp.body) if resp
+    rescue Exception => ex
+      $stderr.puts "error parsing html: #{ex}"
+      nil
+    end
+
     def symbolize_keys(h)
       n = {}
       h.each do |k,v|

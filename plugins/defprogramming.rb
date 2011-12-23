@@ -1,15 +1,7 @@
 # https://github.com/github/hubot-scripts/blob/master/src/scripts/defprogramming.coffee
 Basil::Plugin.respond_to(/^def ?programming$/) {
 
-  begin
-    require 'nokogiri'
-    html = get_http("http://www.defprogramming.com/random")
-    doc = Nokogiri::HTML.parse(html.body)
-    quote = doc.search('cite a p')[0].children.to_s
-
-    says quote
-  rescue
-    nil
-  end
+  quote = get_html("http://www.defprogramming.com/random").search('cite a p')[0].children.to_s rescue nil
+  says quote if quote
 
 }.description = "print a random quote from defprogramming.com"
