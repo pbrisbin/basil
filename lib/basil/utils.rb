@@ -108,37 +108,29 @@ module Basil
       nil
     end
 
-    # Passes its arguments directly to get_http and simply returns the
-    # response parsed as JSON.
+    # Pass-through to get_http but yields to the block for conversion
+    # (see get_json, xml or html for uses).
+    def parse_http(*args, &block)
+      resp = get_http(*args)
+      yield resp.body if resp
+    rescue Exception => ex
+      $stderr.puts "error parsing the response body: #{ex}"
+      nil
+    end
+
     def get_json(*args)
       require 'json'
-      resp = get_http(*args)
-      JSON.parse(resp.body) if resp
-    rescue Exception => ex
-      $stderr.puts "error parsing json: #{ex}"
-      nil
+      parse_http(*args) { |b| JSON.parse(b) }
     end
 
-    # Passes its arguments directly to get_http and simply returns the
-    # response parsed as Xml
     def get_xml(*args)
       require 'faster_xml_simple'
-      resp = get_http(*args)
-      FasterXmlSimple.xml_in(resp.body) if resp
-    rescue Exception => ex
-      $stderr.puts "error parsing xml: #{ex}"
-      nil
+      parse_http(*args) { |b| FasterXmlSimple.xml_in(b) }
     end
 
-    # Passes its arguments directly to get_http and simply returns the
-    # response parse as Html by Nokogiri
     def get_html(*args)
       require 'nokogiri'
-      resp = get_http(*args)
-      Nokogiri::HTML.parse(resp.body) if resp
-    rescue Exception => ex
-      $stderr.puts "error parsing html: #{ex}"
-      nil
+      parse_http(*args) { |b| Nokogiri::HTML.parse(b) }
     end
 
     def symbolize_keys(h)
