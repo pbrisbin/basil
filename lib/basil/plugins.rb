@@ -1,6 +1,6 @@
 module Basil
   # The plugin class is used to encapsulate triggered actions. Plugin
-  # writers must use respond_to or watch_for to create an intance of
+  # writers must use respond_to or watch_for to create an instance of
   # Plugin with a singleton execute method.
   class Plugin
     include Basil
