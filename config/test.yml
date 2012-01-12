@@ -1,6 +1,3 @@
 me: basil
 server_type: :test
 plugins_directory: ./i/do/not/exist
-
-broadcast_host: 127.0.0.1
-broadcast_port: 4242

@@ -13,7 +13,6 @@ GEM
       libxml-ruby (>= 0.3.8.4)
     libxml-ruby (2.2.2)
     nokogiri (1.5.0)
-    rack (1.3.5)
     ruby-dbus (0.6.0)
 
 PLATFORMS
@@ -23,5 +22,4 @@ DEPENDENCIES
   fakefs
   faster_xml_simple
   nokogiri
-  rack
   skype!

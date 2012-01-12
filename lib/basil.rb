@@ -1,7 +1,6 @@
 require 'basil/utils'
 require 'basil/plugins'
 require 'basil/config'
-require 'basil/broadcast'
 require 'basil/storage'
 require 'basil/servers/cli'
 require 'basil/servers/skype'
