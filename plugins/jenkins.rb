@@ -101,7 +101,7 @@ Basil::Plugin.respond_to(/^who broke (.+?)\??$/) {
     says do |out|
       test_report.suites.each do |s|
         s['cases'].each do |c|
-          if c['status'] == 'FAILED'
+          if c['status'] != 'PASSED'
             next if c['name'] =~ /marked_as_flapping/
 
             name  = "#{c['className']}##{c['name']}"
