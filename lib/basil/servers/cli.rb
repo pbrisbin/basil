@@ -8,6 +8,10 @@ module Basil
       def run
         debug = Config.debug rescue false
 
+        Email.check_email(10, Email::JenkinsStrategy.new) do |msg|
+          print "\n#{msg.text}\n> "
+        end
+
         loop do
           print '> '; str = $stdin.gets.chomp
 
