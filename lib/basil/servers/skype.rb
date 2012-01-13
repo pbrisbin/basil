@@ -15,6 +15,21 @@ module Basil
       def run
         require 'basil/skype'
 
+        Email.check_email(30, Email::JenkinsStrategy.new) do |msg|
+          begin
+            SkypeProxy.each_chat do |chat|
+              SkypeProxy.get_chat_property(chat, 'topic') do |topic|
+                # todo: configuration detail?
+                if topic && topic =~ /no more broken builds/i
+                  SkypeProxy.send_message(chat, msg)
+                end
+              end
+            end
+          rescue Exception => ex
+            $stderr.puts "#{ex}"
+          end
+        end
+
         SkypeProxy.on_message do |chat, msg|
           begin
             reply = Basil.dispatch(msg)

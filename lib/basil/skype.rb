@@ -1,5 +1,4 @@
 require 'skype'
-
 module Basil
   module SkypeProxy
     # Listens for a message in chat and yields the chat object and a
@@ -11,8 +10,8 @@ module Basil
       # things quicker and more consistent
       Skype.on(:chatmessage_received) do |chatmessage|
         chatmessage.chat do |chat|
-          Skype::Api.invoke("GET CHAT #{chat.chatname} MEMBERS") do |resp|
-            is_private = (resp =~ /MEMBERS (.*)/ && $1.split(/ +/).length == 2)
+          get_chat_property(chat, 'members') do |members|
+            is_private = (members.split(/ +/).length == 2)
 
             chatmessage.from do |from|
               chatmessage.from_name do |from_name|
@@ -40,6 +39,20 @@ module Basil
       puts '->> ' + msg.inspect
       prefix = "#{msg.to.split(' ').first}, " rescue ''
       chat.send_message(prefix + msg.text)
+    end
+
+    # Gets a property of a chat that's not yet directly supported by the
+    # skype gem.
+    def self.get_chat_property(chat, property, &block)
+      return unless block_given?
+
+      prop = property.upcase
+
+      Skype::Api.invoke("GET CHAT #{chat.chatname} #{prop}") do |resp|
+        if resp =~ /#{prop} (.*)/
+          yield $1
+        end
+      end
     end
 
     # Calls block for each chat your in
