@@ -37,18 +37,20 @@ Besides, I found this project interesting and fun to do from scratch.
 Since basil relies on a skype gem only available on github, current 
 usage relies on bundler and running from source.
 
-    git clone https://github.com/pbrisbin/basil && cd basil
-    cp config/example.yml config/basil.yml # and adjust
-    bundle install
-    ./bin/basil
+~~~ { .bash }
+git clone https://github.com/pbrisbin/basil && cd basil
+cp config/example.yml config/basil.yml # and adjust
+bundle install
+./bin/basil
+~~~
 
 *requires ruby 1.9 and the Skype setup is linux-only*
 
 ### Skype
 
 The skype client must be running under a profile to represent the bot. 
-Messages to the bot must be prefixed correctly (even in private chat, 
-for now) so he knows to respond.
+Messages to the bot must be prefixed correctly (unless in private chat) 
+so he knows to respond.
 
 None of this is required when using `server_type: :cli`.
 
@@ -100,8 +102,8 @@ Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
 }.description = 'consults the almighty google'
 ~~~
 
-*Note: since constructors `return self` you can easily chain a method on 
-the end, like assigning a `description` (which is used by `help`)*
+*Note: since constructors `return self`, you can easily chain a method 
+on the end, like assigning a `description` (which is used by `help`)*
 
 #### Do some not-so-simple web stuff
 
