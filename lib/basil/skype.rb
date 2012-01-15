@@ -3,7 +3,7 @@ module Basil
   module SkypeProxy
     # Listens for a message in chat and yields the chat object and a
     # constructed Messsage to the block given.
-    def self.on_message
+    def on_message
       return unless block_given?
 
       # for some reason, using the nested block approach seems to make
@@ -35,7 +35,7 @@ module Basil
 
     # Sends the message to that specific chat. Adds a prefix if there is
     # a defined to.
-    def self.send_message(chat, msg)
+    def send_message(chat, msg)
       puts '->> ' + msg.inspect
       prefix = "#{msg.to.split(' ').first}, " rescue ''
       chat.send_message(prefix + msg.text)
@@ -43,7 +43,7 @@ module Basil
 
     # Gets a property of a chat that's not yet directly supported by the
     # skype gem.
-    def self.get_chat_property(chat, property, &block)
+    def get_chat_property(chat, property, &block)
       return unless block_given?
 
       prop = property.upcase
@@ -56,7 +56,7 @@ module Basil
     end
 
     # Calls block for each chat your in
-    def self.each_chat
+    def each_chat
       Skype.chats do |chats|
         chats.each do |chat|
           yield chat
@@ -66,7 +66,7 @@ module Basil
 
     private
 
-    def self.parse_body(body)
+    def parse_body(body)
       return case body
              when /^! *(.*)/           ; [Config.me, $1]
              when /^> *(.*)/           ; [Config.me, "eval #{$1}"]

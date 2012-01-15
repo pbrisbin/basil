@@ -1,3 +1,5 @@
+require 'basil/skype'
+
 module Basil
   module Server
     # A Skype bot implemented via a dbus connection to a running skype
@@ -11,17 +13,17 @@ module Basil
     #
     class SkypeBot
       include Basil
+      include SkypeProxy
 
       def run
-        require 'basil/skype'
 
         Email.check_email(30, Email::JenkinsStrategy.new) do |msg|
           begin
-            SkypeProxy.each_chat do |chat|
-              SkypeProxy.get_chat_property(chat, 'topic') do |topic|
+            each_chat do |chat|
+              get_chat_property(chat, 'topic') do |topic|
                 # todo: configuration detail?
                 if topic && topic =~ /no more broken builds/i
-                  SkypeProxy.send_message(chat, msg)
+                  send_message(chat, msg)
                 end
               end
             end
@@ -30,10 +32,10 @@ module Basil
           end
         end
 
-        SkypeProxy.on_message do |chat, msg|
+        on_message do |chat, msg|
           begin
             reply = Basil.dispatch(msg)
-            SkypeProxy.send_message(chat, reply) if reply
+            send_message(chat, reply) if reply
           rescue Exception => ex
             chat.send_message("error: #{ex}")
           end
