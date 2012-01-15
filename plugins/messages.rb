@@ -6,10 +6,7 @@ Basil::Plugin.respond_to(/^tell ([^:]*): (.+)/) {
 
   Basil::Storage.with_storage do |store|
     store[:tell_messages] ||= []
-    store[:tell_notified] ||= {}
-
     store[:tell_messages] << { :time => Time.now, :to => to, :from => from, :message => msg }
-    store[:tell_notified][@msg.from] = false
   end
 
   replies "consider it noted."
