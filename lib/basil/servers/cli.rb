@@ -6,21 +6,12 @@ module Basil
       include Basil
 
       def run
-        debug = Config.debug rescue false
-
-        Email.check_email(10, Email::JenkinsStrategy.new) do |msg|
-          print "\n#{msg.text}\n> "
-        end
-
         loop do
           print '> '; str = $stdin.gets.chomp
-
           msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str)
-          $stderr.puts "<<- #{msg.inspect}" if debug
 
           begin
             if reply = Basil.dispatch(msg)
-              $stderr.puts "->> #{reply.inspect}" if debug
               puts reply.text
             end
           rescue Exception => ex
