@@ -20,8 +20,8 @@ module Basil
 
         check_email(30, JenkinsStrategy.new) do |obj,msg|
           begin
-            each_chat do |chat|
-              if obj.respond_to?(:send_to_chat?)
+            if obj.respond_to?(:send_to_chat?)
+              each_chat do |chat|
                 get_chat_property(chat, 'topic') do |topic|
                   if topic && obj.send_to_chat?(topic)
                     send_message(chat, msg)
