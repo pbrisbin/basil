@@ -17,13 +17,14 @@ module Basil
 
       def run
 
-        Email.check_email(30, Email::JenkinsStrategy.new) do |msg|
+        Email.check_email(30, Email::JenkinsStrategy.new) do |obj,msg|
           begin
             each_chat do |chat|
-              get_chat_property(chat, 'topic') do |topic|
-                # todo: configuration detail?
-                if topic && topic =~ /no more broken builds/i
-                  send_message(chat, msg)
+              if obj.respond_to?(:send_to_chat?)
+                get_chat_property(chat, 'topic') do |topic|
+                  if topic && obj.send_to_chat?(topic)
+                    send_message(chat, msg)
+                  end
                 end
               end
             end

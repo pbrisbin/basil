@@ -12,9 +12,9 @@ module Basil
     # Array of objects which respond to create_message accepting a
     # Basil::Email::Mail and returning a Basil::Message (or nil).
     #
-    # When a strategy object returns a Message, it is yielded to the
-    # block which should handle the server-specific task of sending the
-    # message to chat.
+    # When a strategy object returns a Message, the strategy object and
+    # the message are yielded to the block which should handle the
+    # server-specific task of sending the message to chat.
     #
     # Note: if multiple strategy objects return Messages for the given
     # Mail, they will all be yielded.
@@ -33,7 +33,7 @@ module Basil
               strategies.each do |strategy|
                 if strategy.respond_to?(:create_message)
                   message = strategy.create_message(mail)
-                  yield message if message
+                  yield(strategy, message) if message
                 end
               end
 
@@ -113,6 +113,9 @@ module Basil
     # An example strategy. We look for subjects that identify build
     # failures and successes coming from Jenkins and format a simple
     # message to be broadcast to the appropriate chat.
+    #
+    # TODO: the subject lines we're watching for and the chats we send
+    # to should be moved to configuration.
     class JenkinsStrategy
       def create_message(mail)
         case mail['Subject'] 
@@ -126,6 +129,10 @@ module Basil
         end
 
         Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg)
+      end
+
+      def send_to_chat?(topic)
+        topic =~ /no more broken builds/i
       end
     end
   end
