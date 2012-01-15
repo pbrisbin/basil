@@ -21,7 +21,7 @@ module Basil
     #
     # Messages are always deleted from the IMAP server after processing,
     # this is to aggressively prevent duplicate processing.
-    def self.check_email(interval, strategies, &block)
+    def check_email(interval, strategies, &block)
       strategies = [strategies] unless strategies.is_a?(Array)
 
       Thread.new do
@@ -48,7 +48,7 @@ module Basil
       $stderr.puts "#{ex}"
     end
 
-    def self.with_imap(config = Config.email, &block)
+    def with_imap(config = Config.email, &block)
       imap = Net::IMAP.new(config['server'], config['port'], true)
       imap.login(config['username'], config['password'])
       imap.select(config['inbox'])
@@ -63,7 +63,7 @@ module Basil
         imap.disconnect()
       end
     end
-    private_class_method :with_imap
+    private :with_imap
 
     # This class represents a parsed email. Headers are accessed like
     # array indices and body is provided as a method. The parsing is

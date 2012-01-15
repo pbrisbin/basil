@@ -13,11 +13,12 @@ module Basil
     #
     class SkypeBot
       include Basil
+      include Email
       include SkypeProxy
 
       def run
 
-        Email.check_email(30, Email::JenkinsStrategy.new) do |obj,msg|
+        check_email(30, JenkinsStrategy.new) do |obj,msg|
           begin
             each_chat do |chat|
               if obj.respond_to?(:send_to_chat?)
