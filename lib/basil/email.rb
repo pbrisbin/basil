@@ -120,9 +120,9 @@ module Basil
       def create_message(mail)
         case mail['Subject'] 
         when /build failed in Jenkins: (\w+) #(\d+)/i
-          msg = "(*) #{$1} failed!\nPlease see http://#{Basil::Config.jenkins['host']}/job/#{$1}/#{$2}/changes"
+          msg = "(headbang) #{$1} failed!\nPlease see http://#{Basil::Config.jenkins['host']}/job/#{$1}/#{$2}/changes"
         when /jenkins build is back to normal : (\w+) #(\d+)/i
-          msg = "(y) #{$1} is back to normal"
+          msg = "(dance) #{$1} is back to normal"
         else
           $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
           return nil
