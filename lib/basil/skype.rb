@@ -1,6 +1,7 @@
-require 'skype'
+require 'rype'
+
 module Basil
-  module SkypeProxy
+  module Skype
     # Listens for a message in chat and yields the chat object and a
     # constructed Messsage to the block given.
     def on_message
@@ -8,10 +9,10 @@ module Basil
 
       # for some reason, using the nested block approach seems to make
       # things quicker and more consistent
-      Skype.on(:chatmessage_received) do |chatmessage|
+      Rype.on(:chatmessage_received) do |chatmessage|
         chatmessage.chat do |chat|
-          get_chat_property(chat, 'members') do |members|
-            is_private = (members.split(/ +/).length == 2)
+          chat.members do |members|
+            is_private = members.length == 2
 
             chatmessage.from do |from|
               chatmessage.from_name do |from_name|
@@ -30,7 +31,7 @@ module Basil
         end
       end
 
-      Skype.attach
+      Rype.attach
     end
 
     # Sends the message to that specific chat. Adds a prefix if there is
@@ -41,23 +42,9 @@ module Basil
       chat.send_message(prefix + msg.text)
     end
 
-    # Gets a property of a chat that's not yet directly supported by the
-    # skype gem.
-    def get_chat_property(chat, property, &block)
-      return unless block_given?
-
-      prop = property.upcase
-
-      Skype::Api.invoke("GET CHAT #{chat.chatname} #{prop}") do |resp|
-        if resp =~ /#{prop} (.*)/
-          yield $1
-        end
-      end
-    end
-
     # Calls block for each chat your in
     def each_chat
-      Skype.chats do |chats|
+      Rype.chats do |chats|
         chats.each do |chat|
           yield chat
         end

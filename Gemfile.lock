@@ -1,9 +1,9 @@
 GIT
-  remote: http://github.com/pbrisbin/skype
-  revision: 971f56ee0cfea01552c9552c25ce481147bf9c86
+  remote: http://github.com/nfelger/rype
+  revision: 9529e1de7394ccee306743b9bc08d2c55ca6dd8a
   specs:
-    skype (0.0.1)
-      ruby-dbus (~> 0.6.0)
+    rype (0.0.2)
+      ruby-dbus (>= 0.6)
 
 GEM
   remote: http://rubygems.org/
@@ -13,7 +13,7 @@ GEM
       libxml-ruby (>= 0.3.8.4)
     libxml-ruby (2.2.2)
     nokogiri (1.5.0)
-    ruby-dbus (0.6.0)
+    ruby-dbus (0.7.0)
 
 PLATFORMS
   ruby
@@ -22,4 +22,4 @@ DEPENDENCIES
   fakefs
   faster_xml_simple
   nokogiri
-  skype!
+  rype!

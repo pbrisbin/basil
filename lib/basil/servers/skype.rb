@@ -8,21 +8,20 @@ module Basil
     # 1. Install skype
     # 2. Setup a profile for your bot
     # 3. Start skype and sign into that profile
-    # 4. Install and test my fork of the skype gem
+    # 4. Install and test github/nfelger/rype
     # 5. Start basil using this server
     #
     class SkypeBot
       include Basil
       include Email
-      include SkypeProxy
+      include Skype
 
       def run
-
         check_email(30, JenkinsStrategy.new) do |obj,msg|
           begin
             if obj.respond_to?(:send_to_chat?)
               each_chat do |chat|
-                get_chat_property(chat, 'topic') do |topic|
+                chat.topic do |topic|
                   if topic && obj.send_to_chat?(topic)
                     send_message(chat, msg)
                   end

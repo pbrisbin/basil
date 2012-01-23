@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "fakefs"
   s.add_runtime_dependency "faster_xml_simple"
   s.add_runtime_dependency "nokogiri"
-  s.add_runtime_dependency "skype"
+  s.add_runtime_dependency "rype"
 end
