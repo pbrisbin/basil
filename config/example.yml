@@ -12,6 +12,9 @@ server_type: :cli
 # to support the contained plugins.
 plugins_directory: ./plugins
 
+# Where basil will persist data. This file is created on-demans.
+pstore_file: ./basil.pstore
+
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
 # Install curl-ca-bundle via ports. The get_* utilities will use this
 # cert file for secure requests if the configuration option is present.
