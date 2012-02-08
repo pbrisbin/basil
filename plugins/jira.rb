@@ -24,7 +24,7 @@ module Basil
   end
 
   class JiraTicket
-    TIMEOUT = 30 # seconds
+    TIMEOUT = 60 # seconds
 
     def initialize(key)
       @key  = key.upcase
@@ -57,20 +57,21 @@ end
 
 Basil::Plugin.watch_for(/\w+-\d+/) {
 
+  tickets = []
+
   # people might mention more than one ticket in a message
-  tickets = @msg.text.scan(/\w+-\d+/)
+  found = @msg.text.scan(/\w+-\d+/).uniq
 
   # don't spam the channel if people mention the same core ticket within
   # a specified timeout period.
   Basil::Storage.with_storage do |store|
     store[:jira_timeouts] ||= {}
 
-    tickets.each do |id|
+    found.each do |id|
       timeout = store[:jira_timeouts][id] rescue nil
 
-      if timeout && Time.now <= timeout
-        tickets.delete(id)
-      else
+      if !timeout || Time.now > timeout
+        tickets << id
         store[:jira_timeouts][id] = Time.now + Basil::JiraTicket::TIMEOUT
       end
     end
