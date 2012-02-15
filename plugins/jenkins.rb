@@ -32,14 +32,18 @@ module Basil
 
   class JenkinsEmailStrategy
     # Use the subject to determine the build and report a simple one
-    # line message to the chat. TODO: use the API to also print failures
-    # and committers
+    # line message to the chat.
     def create_message(mail)
       case mail['Subject']
-      when /build failed in Jenkins: (\w+) #(\d+)/i
-        msg = "(headbang) #{$1} failed!\nPlease see http://#{Basil::Config.jenkins['host']}/job/#{$1}/#{$2}/changes"
       when /jenkins build is back to normal : (\w+) #(\d+)/i
         msg = "(dance) #{$1} is back to normal"
+      when /build failed in Jenkins: (\w+) #(\d+)/i
+        build, job = $1, $2
+
+        extended = get_extended_info(build, job)
+        url      = "http://#{Basil::Config.jenkins['host']}/job/#{build}/#{job}/changes"
+
+        msg = [ "(headbang) #{$1} failed!", extended, "Please see #{url}" ].join("\n")
       else
         $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
         return nil
@@ -51,10 +55,25 @@ module Basil
     def send_to_chat?(topic)
       topic =~ /no more broken builds/i
     end
+
+    private
+
+    def get_extended_info(build,job)
+      if status = JenkinsApi.new("/job/#{build}/#{job}/")
+        failCount  = status.actions[4]["failCount"] rescue '?'
+
+        committers = []
+        status.changeSet['items'].each do |item|
+          committers << item['user']
+        end
+
+        "#{failCount} failures.\ncommits by #{committers.join(", ")}."
+      end
+    end
   end
 end
 
-Basil.check_email(JenkinsEmailStrategy.new)
+Basil.check_email(Basil::JenkinsEmailStrategy.new)
 
 Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 
