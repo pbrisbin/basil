@@ -67,7 +67,7 @@ module Basil
           committers << item['user']
         end
 
-        "#{failCount} failures.\ncommits by #{committers.join(", ")}."
+        "#{failCount} failure(s). Commits made by #{committers.join(", ")}."
       end
     end
   end
