@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to(/^fight (\S+) (\S+)/) {
+Basil.respond_to(/^fight (\S+) (\S+)/) {
 
   play = lambda do |a,b|
     score_a = (1..9001).to_a.shuffle.first

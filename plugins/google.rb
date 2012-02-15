@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
+Basil.respond_to(/^g(oogle)? (.*)/) {
 
   url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{escape(@match_data[2])}"
 

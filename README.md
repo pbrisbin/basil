@@ -63,7 +63,7 @@ of the sorts of things plugins can do:
 
 ~~~ { .ruby }
 # works best with 'give'
-Basil::Plugin.respond_to('beer') {
+Basil.respond_to('beer') {
 
   replies "someone wanted you to have this (beer)" # skype emoticon
 
@@ -79,7 +79,7 @@ using the new factoid plugin.
 #### Respond cleverly using the trigger's content
 
 ~~~ { .ruby }
-Basil::Plugin.respond_to(/^call me a (.*)/) {
+Basil.respond_to(/^call me a (.*)/) {
 
   says "fine, you're a #{@match_data[1]}."
 
@@ -89,7 +89,7 @@ Basil::Plugin.respond_to(/^call me a (.*)/) {
 #### Make a simple web request
 
 ~~~ { .ruby }
-Basil::Plugin.respond_to(/^g(oogle)? (.*)/) {
+Basil.respond_to(/^g(oogle)? (.*)/) {
 
   url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=#{escape(@match_data[2])}"
 

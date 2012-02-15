@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to('test') {
+Basil.respond_to('test') {
 
   says "Hello world from #{self.inspect}!"
 

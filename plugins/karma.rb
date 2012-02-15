@@ -1,6 +1,6 @@
 # when foo-- or foo++ is mentioned in conversation, foo's karma is
 # decremented or incremented.
-Basil::Plugin.watch_for(/(\w+)(--|\+\+)($|[!?.,:; ])/) {
+Basil.watch_for(/(\w+)(--|\+\+)($|[!?.,:; ])/) {
 
   k  = @match_data[1]
   op = @match_data[2]
@@ -19,7 +19,7 @@ Basil::Plugin.watch_for(/(\w+)(--|\+\+)($|[!?.,:; ])/) {
 
 }
 
-Basil::Plugin.respond_to(/^karma (\w+)/) {
+Basil.respond_to(/^karma (\w+)/) {
 
   k = @match_data[1]
   karma = 0

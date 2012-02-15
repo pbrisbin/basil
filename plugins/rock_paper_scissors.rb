@@ -41,7 +41,7 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to(/^(rps|rock ?paper ?scissors) (\w+) (\w+)$/) {
+Basil.respond_to(/^(rps|rock ?paper ?scissors) (\w+) (\w+)$/) {
 
   says do |out|
     Basil::RockPaperScissors.new(@match_data[2], @match_data[3]).throw_em!(out)

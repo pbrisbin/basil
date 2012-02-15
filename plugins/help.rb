@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to('help') {
+Basil.respond_to('help') {
 
   says do |out|
     Basil::Plugin.responders.each do |p|

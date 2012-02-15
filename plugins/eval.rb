@@ -41,7 +41,7 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to(/^eval (.*)/) {
+Basil.respond_to(/^eval (.*)/) {
 
   require 'timeout'
 

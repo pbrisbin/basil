@@ -1,4 +1,4 @@
-Basil::Plugin.watch_for(/(chuck norris|jack bauer)/i) {
+Basil.watch_for(/(chuck norris|jack bauer)/i) {
 
   query = @match_data[0].downcase == 'jack bauer' ?  '?firstName=Jack&lastName=Bauer' : ''
 

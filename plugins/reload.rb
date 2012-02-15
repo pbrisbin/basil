@@ -12,7 +12,7 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to('reload') {
+Basil.respond_to('reload') {
 
   a = Basil::Plugin.count_loaded
 

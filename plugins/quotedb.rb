@@ -61,21 +61,21 @@ module Basil
 end
 
 # keeps a log of the last 35-50 messages spoken in chat
-Basil::Plugin.log { Basil::QuoteDb.log_message(@msg) }
+Basil.log { Basil::QuoteDb.log_message(@msg) }
 
 # grabs the last thing the named person said and stores it
-Basil::Plugin.respond_to(/^grab (.+)/) do
+Basil.respond_to(/^grab (.+)/) do
   Basil::QuoteDb.grab(@match_data[1]) ? says("got it!") : nil
 end
 
 # replies with the last quote grabbed for the named person
-Basil::Plugin.respond_to(/^q(uote)? (.+)/) do
+Basil.respond_to(/^q(uote)? (.+)/) do
   quote = Basil::QuoteDb.quote(@match_data[2])
   quote ? says(quote) : nil
 end
 
 # replies with a random quote grabbed for the named person
-Basil::Plugin.respond_to(/^rq(uote)? (.+)/) do
+Basil.respond_to(/^rq(uote)? (.+)/) do
   quote = Basil::QuoteDb.quote(@match_data[2], true)
   quote ? says(quote) : nil
 end

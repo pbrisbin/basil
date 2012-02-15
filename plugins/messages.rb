@@ -1,4 +1,4 @@
-Basil::Plugin.respond_to(/^tell ([^:]*): (.+)/) {
+Basil.respond_to(/^tell ([^:]*): (.+)/) {
 
   to   = @match_data[1]
   from = @msg.from_name
@@ -13,7 +13,7 @@ Basil::Plugin.respond_to(/^tell ([^:]*): (.+)/) {
 
 }.description = "Leave a message for someone"
 
-Basil::Plugin.respond_to(/^(do i have any |any )?messages\??$/i) {
+Basil.respond_to(/^(do i have any |any )?messages\??$/i) {
 
   Basil::Storage.with_storage do |store|
     store[:tell_messages] ||= []
@@ -41,7 +41,7 @@ Basil::Plugin.respond_to(/^(do i have any |any )?messages\??$/i) {
 
 }.description = "See if anyone's left you a message"
 
-Basil::Plugin.watch_for(/.*/) {
+Basil.watch_for(/.*/) {
 
   msgs = notified = nil
 

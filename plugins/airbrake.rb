@@ -43,7 +43,7 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to(/^(show me )?airbrake( errors)?/i) {
+Basil.respond_to(/^(show me )?airbrake( errors)?/i) {
 
   xml = Basil::Airbrake.new
 

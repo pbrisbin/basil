@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'basil/utils'
 require 'basil/plugins'
 require 'basil/config'
@@ -7,6 +8,14 @@ require 'basil/servers/cli'
 require 'basil/servers/skype'
 
 module Basil
+  class << self
+    extend Forwardable
+
+    def_delegator Basil::Plugin, :respond_to
+    def_delegator Basil::Plugin, :watch_for
+    def_delegator Basil::Plugin, :log
+  end
+
   # Main program entry point. Loads plugins, instantiates your defined
   # server, and calls its run method which should loop forever.
   def self.run

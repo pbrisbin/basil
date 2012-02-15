@@ -1,5 +1,5 @@
 # allows canned-response plugins to be added run-time by anyone
-Basil::Plugin.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
+Basil.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
 
   key    = @match_data[1]
   action = @match_data[2]
@@ -41,7 +41,7 @@ Basil::Plugin.respond_to(/^\w+$/) {
 
 }
 
-Basil::Plugin.respond_to(/^factinfo (\w+)$/) {
+Basil.respond_to(/^factinfo (\w+)$/) {
 
   key  = @match_data[1]
   fact = nil
@@ -62,7 +62,7 @@ Basil::Plugin.respond_to(/^factinfo (\w+)$/) {
 
 }.description = 'give information about a factoid'
 
-Basil::Plugin.respond_to(/^(del|rm)factoid (\w+)$/) {
+Basil.respond_to(/^(del|rm)factoid (\w+)$/) {
 
   Basil::Storage.with_storage do |store|
     store[:factoids] ||= {}

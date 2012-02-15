@@ -14,7 +14,7 @@
 #   mpc stats
 #   mpc version
 #
-Basil::Plugin.respond_to(/^mpc load (.*)$/) {
+Basil.respond_to(/^mpc load (.*)$/) {
 
   list = @match_data[1].strip rescue nil
   available = `mpc lsplaylists`.split("\n")
@@ -30,7 +30,7 @@ Basil::Plugin.respond_to(/^mpc load (.*)$/) {
 
 }
 
-Basil::Plugin.respond_to(/^mpc( (.*))?$/) {
+Basil.respond_to(/^mpc( (.*))?$/) {
 
   arg = @match_data[2].strip rescue nil
   valid_args = %w{ current play next prev pause toggle playlist
@@ -52,7 +52,7 @@ Basil::Plugin.respond_to(/^mpc( (.*))?$/) {
 #
 # http://kmkeen.com/albumbler/
 #
-Basil::Plugin.respond_to('albumbler') {
+Basil.respond_to('albumbler') {
 
   says `#{@match_data[0]} 2>&1`
 

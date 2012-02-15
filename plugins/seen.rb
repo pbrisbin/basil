@@ -1,11 +1,11 @@
-Basil::Plugin.log do
+Basil.log do
   Basil::Storage.with_storage do |store|
     store[:last_seen] ||= {}
     store[:last_seen][@msg.from] = { :name => @msg.from_name, :when => Time.now }
   end
 end
 
-Basil::Plugin.respond_to(/^seen (.+?)\??$/) {
+Basil.respond_to(/^seen (.+?)\??$/) {
 
   seen = nil
 

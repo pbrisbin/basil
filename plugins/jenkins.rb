@@ -31,7 +31,7 @@ module Basil
   end
 end
 
-Basil::Plugin.respond_to(/^jenkins( (stable|failing))?$/) {
+Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 
   begin
     status_line = lambda do |job|
@@ -60,7 +60,7 @@ Basil::Plugin.respond_to(/^jenkins( (stable|failing))?$/) {
 
 }.description = 'interacts with jenkins'
 
-Basil::Plugin.respond_to(/^jenkins (\w+)/) {
+Basil.respond_to(/^jenkins (\w+)/) {
 
   begin
     job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
@@ -79,7 +79,7 @@ Basil::Plugin.respond_to(/^jenkins (\w+)/) {
 
 }.description = 'retrieves info on a specific jenkins job'
 
-Basil::Plugin.respond_to(/^who broke (.+?)\??$/) {
+Basil.respond_to(/^who broke (.+?)\??$/) {
 
   begin
     job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")

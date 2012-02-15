@@ -55,7 +55,7 @@ module Basil
   end
 end
 
-Basil::Plugin.watch_for(/\w+-\d+/) {
+Basil.watch_for(/\w+-\d+/) {
 
   tickets = []
 
@@ -115,7 +115,7 @@ Basil::Plugin.watch_for(/\w+-\d+/) {
 
 # DEPRECATION WARNING -- find foo is too general, this will be replaced
 # with something like "jira search foo" in the near future.
-Basil::Plugin.respond_to(/^find (.+)/i) {
+Basil.respond_to(/^find (.+)/i) {
 
   begin
     jql  = escape('summary ~ "?" OR description ~ "?" OR comment ~ "?"'.gsub('?', @match_data[1].strip))
