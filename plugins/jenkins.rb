@@ -29,7 +29,32 @@ module Basil
       @json
     end
   end
+
+  class JenkinsEmailStrategy
+    # Use the subject to determine the build and report a simple one
+    # line message to the chat. TODO: use the API to also print failures
+    # and committers
+    def create_message(mail)
+      case mail['Subject']
+      when /build failed in Jenkins: (\w+) #(\d+)/i
+        msg = "(headbang) #{$1} failed!\nPlease see http://#{Basil::Config.jenkins['host']}/job/#{$1}/#{$2}/changes"
+      when /jenkins build is back to normal : (\w+) #(\d+)/i
+        msg = "(dance) #{$1} is back to normal"
+      else
+        $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
+        return nil
+      end
+
+      Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg)
+    end
+
+    def send_to_chat?(topic)
+      topic =~ /no more broken builds/i
+    end
+  end
 end
+
+Basil.check_email(JenkinsEmailStrategy.new)
 
 Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 

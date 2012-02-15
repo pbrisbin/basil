@@ -17,7 +17,7 @@ module Basil
       include Skype
 
       def run
-        check_email(30, JenkinsStrategy.new) do |obj,msg|
+        check_email(30, Plugin.email_strategies) do |obj,msg|
           begin
             if obj.respond_to?(:send_to_chat?)
               each_chat do |chat|

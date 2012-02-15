@@ -38,6 +38,12 @@ module Basil
       p.register!
     end
 
+    # Register an object used for checking emails. See the Email
+    # module's documentation and an example in the jenkins plugin.
+    def self.check_email(obj)
+      email_strategies << obj
+    end
+
     def self.responders
       @@responders ||= []
     end
@@ -48,6 +54,10 @@ module Basil
 
     def self.loggers
       @@loggers ||= []
+    end
+
+    def self.email_strategies
+      @@email_strategies ||= []
     end
 
     def self.load!

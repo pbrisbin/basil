@@ -5,15 +5,15 @@ module Basil
   # renabled after breaking (say it ain't so!), I recommend clearing
   # the bot's inbox (manually or by running a CLI instance).
   module Email
-    # Looping it its own Thread, check the configured email address on
+    # Looping in its own Thread, check the configured email address on
     # the given interval.
     #
-    # Implementing the Strategy pattern, you should pass in one or an
-    # Array of objects which respond to create_message accepting a
-    # Basil::Email::Mail and returning a Basil::Message (or nil).
+    # You should pass in one or an Array of objects which respond to
+    # create_message accepting a Basil::Email::Mail and returning a
+    # Basil::Message (or nil).
     #
-    # When a strategy object returns a Message, the strategy object and
-    # the message are yielded to the block which should handle the
+    # When an object returns a Message, the strategy object and the
+    # message are yielded to the block which should handle the
     # server-specific task of sending the message to chat.
     #
     # Note: if multiple strategy objects return Messages for the given
@@ -107,32 +107,6 @@ module Basil
       rescue Exception => ex
         $stderr.puts "#{ex}"
         new(headers, body)
-      end
-    end
-
-    # An example strategy. We look for subjects that identify build
-    # failures and successes coming from Jenkins and format a simple
-    # message to be broadcast to the appropriate chat.
-    #
-    # TODO: the subject lines we're watching for and the chats we send
-    # to should be moved to configuration.
-    class JenkinsStrategy
-      def create_message(mail)
-        case mail['Subject'] 
-        when /build failed in Jenkins: (\w+) #(\d+)/i
-          msg = "(headbang) #{$1} failed!\nPlease see http://#{Basil::Config.jenkins['host']}/job/#{$1}/#{$2}/changes"
-        when /jenkins build is back to normal : (\w+) #(\d+)/i
-          msg = "(dance) #{$1} is back to normal"
-        else
-          $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
-          return nil
-        end
-
-        Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg)
-      end
-
-      def send_to_chat?(topic)
-        topic =~ /no more broken builds/i
       end
     end
   end

@@ -14,6 +14,7 @@ module Basil
     def_delegator Basil::Plugin, :respond_to
     def_delegator Basil::Plugin, :watch_for
     def_delegator Basil::Plugin, :log
+    def_delegator Basil::Plugin, :check_email
   end
 
   # Main program entry point. Loads plugins, instantiates your defined
