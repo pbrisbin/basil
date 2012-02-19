@@ -52,10 +52,17 @@ module Basil
     end
 
     class EmailStrategy
-      # Use the subject to determine the build and report a simple one
-      # line message to the chat.
+      def initialize(subject_regex, topic_regex)
+        @subject_regex = subject_regex
+        @topic_regex   = topic_regex
+      end
+
       def create_message(mail)
-        case mail['Subject']
+        subject = mail['Subject']
+
+        return unless subject =~ @subject_regex
+
+        case subject
         when /jenkins build is back to normal : (\w+) #(\d+)/i
           msg = "(dance) #{$1} is back to normal"
         when /build failed in Jenkins: (\w+) #(\d+)/i
@@ -66,7 +73,7 @@ module Basil
 
           msg = [ "(headbang) #{$1} failed!", extended, "Please see #{url}" ].join("\n")
         else
-          $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
+          $stderr.puts "discarding non-matching email (subject: #{subject})"
           return nil
         end
 
@@ -74,7 +81,7 @@ module Basil
       end
 
       def send_to_chat?(topic)
-        topic =~ /no more broken builds/i
+        topic =~ @topic_regex
       end
 
       private
@@ -95,7 +102,7 @@ module Basil
   end
 end
 
-Basil.check_email(Basil::Jenkins::EmailStrategy.new)
+Basil.check_email(Basil::Jenkins::EmailStrategy.new(/trunk_(unit|functionals|integration)/, /no more broken builds/i))
 
 Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 
