@@ -1,36 +1,36 @@
 require 'net/imap'
 
 module Basil
-  # Note: to prevent "catch-up" spam the first time this is enabled or
-  # renabled after breaking (say it ain't so!), I recommend clearing
-  # the bot's inbox (manually or by running a CLI instance).
   module Email
     # Looping in its own Thread, check the configured email address on
     # the given interval.
     #
-    # You should pass in one or an Array of objects which respond to
-    # create_message accepting a Basil::Email::Mail and returning a
-    # Basil::Message (or nil).
+    # Each mail found via IMAP will be turned into a  Email::Mail and
+    # handed to the create_message method on each object in the
+    # Plugin.email_strategies Array. Plugins can add objects to this
+    # Arry via Basil.check_email.
     #
-    # When an object returns a Message, the strategy object and the
-    # message are yielded to the block which should handle the
-    # server-specific task of sending the message to chat.
+    # When an object returns a Message, both the Message and triggering
+    # object will be yielded to the block which should handle the
+    # server-specific task of sending the message to chat. This gives
+    # the triggering object a chance to choose which chat the server
+    # should send to.
     #
-    # Note: if multiple strategy objects return Messages for the given
-    # Mail, they will all be yielded.
+    # Notes:
     #
-    # Messages are always deleted from the IMAP server after processing,
-    # this is to aggressively prevent duplicate processing.
-    def check_email(interval, strategies, &block)
-      strategies = [strategies] unless strategies.is_a?(Array)
-
+    # 1. If multiple strategy objects return Messages for the given
+    #    Mail, they will all be yielded
+    # 2. Messages are always deleted from the IMAP server after
+    #    processing
+    #
+    def check_email(interval, &block)
       Thread.new do
         loop do
           with_imap do |imap|
             imap.search(['NOT', 'DELETED']).each do |message_id|
               mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
-              strategies.each do |strategy|
+              Plugin.email_strategies.each do |strategy|
                 if strategy.respond_to?(:create_message)
                   message = strategy.create_message(mail)
                   yield(strategy, message) if message
