@@ -3,9 +3,9 @@ module Basil
     class Api
       include Basil::Utils
 
-      # Note: path must include the trailing slash
       def initialize(path)
-        @path = path
+        # path must include the trailing slash
+        @path = path.gsub(/[^\/]$/, '\&/')
         @json = nil
       end
 
@@ -60,7 +60,7 @@ module Basil
       private
 
       def get_extended_info(build,job)
-        if status = Api.new("/job/#{build}/#{job}/")
+        if status = Api.new("/job/#{build}/#{job}")
           failCount  = status.actions[4]["failCount"] rescue '?'
 
           committers = []
@@ -109,7 +109,7 @@ Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 Basil.respond_to(/^jenkins (\w+)/) {
 
   begin
-    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}/")
+    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
 
     says("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
       job.healthReport.each do |line|
@@ -128,7 +128,7 @@ Basil.respond_to(/^jenkins (\w+)/) {
 Basil.respond_to(/^who broke (.+?)\??$/) {
 
   begin
-    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}/")
+    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
 
     builds = job.builds.map { |b| b['number'].to_i }
     last_stable = job.lastStableBuild['number'].to_i rescue nil
@@ -138,11 +138,11 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
     end
 
     i = 0
-    while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/").building
+    while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}").building
       i += 1
     end
 
-    test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport/")
+    test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport")
 
     says do |out|
       test_report.suites.each do |s|
@@ -156,7 +156,7 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
             out << "#{name} first broke in #{since}"
 
             begin
-              breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}/")
+              breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}")
 
               breaker.changeSet['items'].each do |item|
                 out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
