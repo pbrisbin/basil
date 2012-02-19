@@ -1,5 +1,25 @@
 module Basil
   module Jenkins
+    extend Basil::Utils
+
+    def self.on_error(msg = nil, &block)
+      yield
+
+    rescue Exception => ex
+      $stderr.puts "#{ex}"
+      says(msg ? msg : "Sorry, there was some error using the Jenkins API.")
+    end
+
+    def self.short_status(job)
+      state = if job['color'] =~ /blue/
+                "is stable."
+              else
+                "is FAILING. See #{job['url']} for details."
+              end
+
+      " * #{job['name']} #{state}"
+    end
+
     class Api
       include Basil::Utils
 
@@ -79,37 +99,37 @@ Basil.check_email(Basil::Jenkins::EmailStrategy.new)
 
 Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 
-  begin
-    status_line = lambda do |job|
-      " * #{job['name']} #{job['color'] =~ /blue/ ? "is stable." : "is FAILING. See #{job['url']} for details."}"
-    end
+  Basil::Jenkins.on_error do
 
     status = Basil::Jenkins::Api.new('/')
 
-    says do |out|
-      case (@match_data[2].strip rescue nil)
-      when 'stable'
-        out << "Current stable jobs:"
-        status.jobs.select { |job| job['color'] =~ /blue/ }.each { |job| out << status_line.call(job) }
-      when 'failing'
-        out << "Current failing jobs:"
-        status.jobs.reject { |job| job['color'] =~ /blue/ }.each { |job| out << status_line.call(job) }
-      else
-        out << "Current jobs:"
-        status.jobs.each { |job| out << status_line.call(job) }
+    case (@match_data[2].strip rescue nil)
+    when 'stable'
+      title = "Current stable jobs:"
+      jobs = status.jobs.select { |job| job['color'] =~ /blue/ }
+    when 'failing'
+      title = "Current failing jobs:"
+      jobs = status.jobs.reject { |job| job['color'] =~ /blue/ }
+    else
+      title = "Current jobs:"
+      jobs = status.jobs
+    end
+
+    says(title) do |out|
+      jobs.each do |job|
+        out << Basil::Jenkins.short_status(job)
       end
     end
-  rescue Exception => ex
-    $stderr.puts "jenkins error: #{ex}"
-    says "There was an issue talking to jenkins."
   end
 
 }.description = 'interacts with jenkins'
 
 Basil.respond_to(/^jenkins (\w+)/) {
 
-  begin
-    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
+  name = @match_data[1].strip
+
+  Basil::Jenkins.on_error("Can't find info on #{name}") do
+    job = Basil::Jenkins::Api.new("/job/#{name}")
 
     says("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
       job.healthReport.each do |line|
@@ -118,17 +138,16 @@ Basil.respond_to(/^jenkins (\w+)/) {
 
       out << "See #{job.url} for details."
     end
-  rescue Exception => ex
-    $stderr.puts "jenkins error: #{ex}"
-    says "Can't find info on #{@match_data[1]}"
   end
 
 }.description = 'retrieves info on a specific jenkins job'
 
 Basil.respond_to(/^who broke (.+?)\??$/) {
 
-  begin
-    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
+  name = @match_data[1].strip
+
+  Basil::Jenkins.on_error("Can't find info on #{name}") do
+    job = Basil::Jenkins::Api.new("/job/#{name}")
 
     builds = job.builds.map { |b| b['number'].to_i }
     last_stable = job.lastStableBuild['number'].to_i rescue nil
@@ -170,9 +189,6 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
         end
       end
     end
-  rescue Exception => ex
-    $stderr.puts "jenkins error: #{ex}"
-    says "Can't find info on #{@match_data[1]}"
   end
 
 }.description = 'tells you what commits lead to the first broken build'
