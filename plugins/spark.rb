@@ -4,7 +4,7 @@
 #
 # FIXME: skype/dbus doesn't like the characters?
 #
-SPARK_TICKS = %w[▁ ▂ ▃ ▄ ▅ ▆ ▇]
+SPARK_TICKS ||= %w[▁ ▂ ▃ ▄ ▅ ▆ ▇]
 Basil.respond_to(/^spark (.+)/) {
   values = @match_data[1].split(/[, ]+/).map { |x| x.to_f }
   min, range, scale = values.min, values.max - values.min, SPARK_TICKS.length - 1

@@ -24,7 +24,7 @@ module Basil
   end
 
   class JiraTicket
-    TIMEOUT = 60 # seconds
+    TIMEOUT ||= 60 # seconds
 
     def initialize(key)
       @key  = key.upcase

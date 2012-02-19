@@ -1,5 +1,5 @@
 module Basil
-  Choices = [:rock, :paper, :scissors]
+  Choices ||= [:rock, :paper, :scissors]
 
   class RockPaperScissors
     def initialize(player_a, player_b)

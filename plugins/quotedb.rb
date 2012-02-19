@@ -1,7 +1,7 @@
 module Basil
   class QuoteDb
-    KMSG = :quotedb_messages
-    KGRB = :quotedb_grabs
+    KMSG ||= :quotedb_messages
+    KGRB ||= :quotedb_grabs
 
     class << self
       def log_message(msg)
