@@ -1,79 +1,81 @@
 module Basil
-  class JenkinsApi
-    include Utils
+  module Jenkins
+    class Api
+      include Basil::Utils
 
-    # Note: path must include the trailing slash
-    def initialize(path)
-      @path = path
-      @json = nil
-    end
-
-    def method_missing(method, *args)
-      key = method.to_s
-
-      if json.has_key?(key)
-        json[key]
-      else
-        super
-      end
-    end
-
-    private
-
-    def json
-      unless @json
-        options = symbolize_keys(Config.jenkins).merge(:path => @path + 'api/json')
-        @json = get_json(options)
+      # Note: path must include the trailing slash
+      def initialize(path)
+        @path = path
+        @json = nil
       end
 
-      @json
-    end
-  end
+      def method_missing(method, *args)
+        key = method.to_s
 
-  class JenkinsEmailStrategy
-    # Use the subject to determine the build and report a simple one
-    # line message to the chat.
-    def create_message(mail)
-      case mail['Subject']
-      when /jenkins build is back to normal : (\w+) #(\d+)/i
-        msg = "(dance) #{$1} is back to normal"
-      when /build failed in Jenkins: (\w+) #(\d+)/i
-        build, job = $1, $2
-
-        extended = get_extended_info(build, job)
-        url      = "http://#{Basil::Config.jenkins['host']}/job/#{build}/#{job}/changes"
-
-        msg = [ "(headbang) #{$1} failed!", extended, "Please see #{url}" ].join("\n")
-      else
-        $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
-        return nil
+        if json.has_key?(key)
+          json[key]
+        else
+          super
+        end
       end
 
-      Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg)
-    end
+      private
 
-    def send_to_chat?(topic)
-      topic =~ /no more broken builds/i
-    end
-
-    private
-
-    def get_extended_info(build,job)
-      if status = JenkinsApi.new("/job/#{build}/#{job}/")
-        failCount  = status.actions[4]["failCount"] rescue '?'
-
-        committers = []
-        status.changeSet['items'].each do |item|
-          committers << item['user']
+      def json
+        unless @json
+          options = symbolize_keys(Config.jenkins).merge(:path => @path + 'api/json')
+          @json = get_json(options)
         end
 
-        "#{failCount} failure(s). Commits made by #{committers.join(", ")}."
+        @json
+      end
+    end
+
+    class EmailStrategy
+      # Use the subject to determine the build and report a simple one
+      # line message to the chat.
+      def create_message(mail)
+        case mail['Subject']
+        when /jenkins build is back to normal : (\w+) #(\d+)/i
+          msg = "(dance) #{$1} is back to normal"
+        when /build failed in Jenkins: (\w+) #(\d+)/i
+          build, job = $1, $2
+
+          extended = get_extended_info(build, job)
+          url      = "http://#{Basil::Config.jenkins['host']}/job/#{build}/#{job}/changes"
+
+          msg = [ "(headbang) #{$1} failed!", extended, "Please see #{url}" ].join("\n")
+        else
+          $stderr.puts "discarding non-matching email (subject: #{mail['Subject']})"
+          return nil
+        end
+
+        Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg)
+      end
+
+      def send_to_chat?(topic)
+        topic =~ /no more broken builds/i
+      end
+
+      private
+
+      def get_extended_info(build,job)
+        if status = Api.new("/job/#{build}/#{job}/")
+          failCount  = status.actions[4]["failCount"] rescue '?'
+
+          committers = []
+          status.changeSet['items'].each do |item|
+            committers << item['user']
+          end
+
+          "#{failCount} failure(s). Commits made by #{committers.join(", ")}."
+        end
       end
     end
   end
 end
 
-Basil.check_email(Basil::JenkinsEmailStrategy.new)
+Basil.check_email(Basil::Jenkins::EmailStrategy.new)
 
 Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 
@@ -82,7 +84,7 @@ Basil.respond_to(/^jenkins( (stable|failing))?$/) {
       " * #{job['name']} #{job['color'] =~ /blue/ ? "is stable." : "is FAILING. See #{job['url']} for details."}"
     end
 
-    status = Basil::JenkinsApi.new('/')
+    status = Basil::Jenkins::Api.new('/')
 
     says do |out|
       case (@match_data[2].strip rescue nil)
@@ -107,7 +109,7 @@ Basil.respond_to(/^jenkins( (stable|failing))?$/) {
 Basil.respond_to(/^jenkins (\w+)/) {
 
   begin
-    job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
+    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}/")
 
     says("#{job.displayName} is #{job.color =~ /blue/ ? "stable" : "FAILING"}") do |out|
       job.healthReport.each do |line|
@@ -126,7 +128,7 @@ Basil.respond_to(/^jenkins (\w+)/) {
 Basil.respond_to(/^who broke (.+?)\??$/) {
 
   begin
-    job = Basil::JenkinsApi.new("/job/#{@match_data[1].strip}/")
+    job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}/")
 
     builds = job.builds.map { |b| b['number'].to_i }
     last_stable = job.lastStableBuild['number'].to_i rescue nil
@@ -136,11 +138,11 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
     end
 
     i = 0
-    while Basil::JenkinsApi.new("/job/#{job.name}/#{builds[i]}/").building
+    while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/").building
       i += 1
     end
 
-    test_report = Basil::JenkinsApi.new("/job/#{job.name}/#{builds[i]}/testReport/")
+    test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport/")
 
     says do |out|
       test_report.suites.each do |s|
@@ -154,7 +156,7 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
             out << "#{name} first broke in #{since}"
 
             begin
-              breaker = Basil::JenkinsApi.new("/job/#{job.name}/#{since}/")
+              breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}/")
 
               breaker.changeSet['items'].each do |item|
                 out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
