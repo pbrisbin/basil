@@ -30,13 +30,7 @@ module Basil
       end
 
       def method_missing(method, *args)
-        key = method.to_s
-
-        if json.has_key?(key)
-          json[key]
-        else
-          super
-        end
+        json[method.to_s] if json
       end
 
       private
@@ -86,7 +80,7 @@ module Basil
 
       private
 
-      def get_extended_info(build,job)
+      def get_extended_info(build, job)
         if status = Api.new("/job/#{build}/#{job}")
           failCount  = status.actions[4]["failCount"] rescue '?'
 
