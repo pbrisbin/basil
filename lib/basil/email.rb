@@ -32,8 +32,12 @@ module Basil
 
               Plugin.email_strategies.each do |strategy|
                 if strategy.respond_to?(:create_message)
-                  message = strategy.create_message(mail)
-                  yield(strategy, message) if message
+                  begin
+                    message = strategy.create_message(mail)
+                    yield(strategy, message) if message
+                  rescue Exception => ex
+                    $stderr.puts "Error processing mail #{mail['Subject']}, #{ex}"
+                  end
                 end
               end
 
