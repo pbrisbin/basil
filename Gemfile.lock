@@ -1,8 +1,8 @@
 GIT
   remote: http://github.com/nfelger/rype
-  revision: 9529e1de7394ccee306743b9bc08d2c55ca6dd8a
+  revision: 0b482ce817f6147b9e2338957f0efdde2753e8cb
   specs:
-    rype (0.0.2)
+    rype (0.0.4)
       ruby-dbus (>= 0.6)
 
 GEM
