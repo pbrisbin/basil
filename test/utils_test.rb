@@ -22,7 +22,7 @@ class TestUtils< Test::Unit::TestCase
     [:says, :replies].each do |meth|
       a_message = "some message text"
 
-      msg = replies(a_message)
+      msg = send(meth, a_message)
 
       assert_equal a_message, msg.text
     end
@@ -41,7 +41,7 @@ class TestUtils< Test::Unit::TestCase
 
   def test_says_and_replies_use_block_with_title
     [:says, :replies].each do |meth|
-      msg = says("title") do |out|
+      msg = send(meth, "title") do |out|
         out << "line 1"
         out << "line 2"
       end
