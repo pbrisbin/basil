@@ -112,13 +112,14 @@ on the end, like assigning a `description` (which is used by `help`)*
 [plugins/jira.rb]    (https://github.com/pbrisbin/basil/blob/master/plugins/jira.rb)
 [plugins/jenkins.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/jenkins.rb)
 
-#### Persist some data for use in a later response
+#### Utilize storage
 
 [plugins/messages.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/messages.rb)
 [plugins/karma.rb]    (https://github.com/pbrisbin/basil/blob/master/plugins/karma.rb)
 
-#### Keep and utilize a simple chat history
+#### Utilize chat history
 
+[plugins/seen.rb]    (https://github.com/pbrisbin/basil/blob/master/plugins/seen.rb)
 [plugins/quotedb.rb] (https://github.com/pbrisbin/basil/blob/master/plugins/quotedb.rb)
 
 #### Go meta-basil: introspect and re-dispatch
