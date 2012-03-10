@@ -8,7 +8,9 @@ module Basil
       def run
         loop do
           print '> '; str = $stdin.gets.chomp
-          msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str)
+          msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
+
+          ChatHistory.store_message(msg)
 
           begin
             if reply = Basil.dispatch(msg)

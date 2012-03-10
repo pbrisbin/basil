@@ -5,6 +5,7 @@ module Basil
   class Plugin
     include Basil
     include Basil::Utils
+    include Basil::ChatHistory
 
     attr_reader :regex
     attr_accessor :description

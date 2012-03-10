@@ -1,9 +1,10 @@
 require 'forwardable'
-require 'basil/utils'
-require 'basil/plugins'
 require 'basil/config'
 require 'basil/storage'
+require 'basil/utils'
 require 'basil/email'
+require 'basil/chat_history'
+require 'basil/plugins'
 require 'basil/servers/cli'
 require 'basil/servers/skype'
 
