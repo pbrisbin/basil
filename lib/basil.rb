@@ -14,7 +14,6 @@ module Basil
 
     def_delegator Basil::Plugin, :respond_to
     def_delegator Basil::Plugin, :watch_for
-    def_delegator Basil::Plugin, :log
     def_delegator Basil::Plugin, :check_email
   end
 
@@ -34,8 +33,6 @@ module Basil
   # it. The first reply received is returned, otherwise nil.
   def self.dispatch(msg)
     return nil unless msg && msg.text != ''
-
-    Plugin.loggers.each { |l| l.triggered(msg) }
 
     if msg.to_me?
       Plugin.responders.each do |p|

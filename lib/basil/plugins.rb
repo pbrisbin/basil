@@ -28,17 +28,6 @@ module Basil
       p.register!
     end
 
-    # Create an instance of Plugin whose execute method will be invoked
-    # for every single message. This plugin cannot and should not
-    # provide any sort of reply and the dispatch runs regardless of what
-    # the loggers do. This is to provide plugins an easy way to log/use
-    # their own subset of chat history.
-    def self.log(&block)
-      p = new(:logger, nil)
-      p.define_singleton_method(:execute, &block)
-      p.register!
-    end
-
     # Register an object used for checking emails. See the Email
     # module's documentation and an example in the jenkins plugin.
     def self.check_email(obj)
@@ -51,10 +40,6 @@ module Basil
 
     def self.watchers
       @@watchers ||= []
-    end
-
-    def self.loggers
-      @@loggers ||= []
     end
 
     def self.email_strategies
@@ -99,7 +84,6 @@ module Basil
       case @type
       when :responder; Plugin.responders << self
       when :watcher  ; Plugin.watchers   << self
-      when :logger   ; Plugin.loggers    << self
       end; self
     end
   end
