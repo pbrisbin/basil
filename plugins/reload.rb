@@ -1,11 +1,10 @@
 module Basil
   class Plugin
     def self.count_loaded
-      loggers.length + responders.length + watchers.length + email_strategies.length
+      responders.length + watchers.length + email_strategies.length
     end
 
     def self.clear_loaded!
-      loggers.delete_if          { true }
       responders.delete_if       { true }
       watchers.delete_if         { true }
       email_strategies.delete_if { true }
