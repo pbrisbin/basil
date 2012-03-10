@@ -20,7 +20,9 @@ module Basil
                   to, text = parse_body(body)
 
                   to  = Config.me if !to && is_private
-                  msg = Message.new(to, from, from_name, text)
+                  msg = Message.new(to, from, from_name, text, chat.chatname)
+
+                  ChatHistory.store_message(msg)
                   puts '<<- ' + msg.inspect
 
                   yield chat, msg
