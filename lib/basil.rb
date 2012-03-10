@@ -57,11 +57,11 @@ module Basil
   class Message
     include Basil
 
-    attr_reader :to, :from, :from_name, :time, :text
+    attr_reader :to, :from, :from_name, :time, :text, :chat
 
-    def initialize(to, from, from_name, text)
+    def initialize(to, from, from_name, text, chat = nil)
       @time = Time.now
-      @to, @from, @from_name, @text = to, from, from_name, text
+      @chat, @to, @from, @from_name, @text = chat, to, from, from_name, text
     end
 
     # Is this message to my configured nick?
