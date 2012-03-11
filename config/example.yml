@@ -47,3 +47,10 @@ email:
   username: X
   password: X
   inbox:    INBOX
+
+# Constants for the twitter plugin
+twitter:
+  consumer_key:       xxx
+  consumer_secret:    xxx
+  oauth_token:        xxx
+  oauth_token_secret: xxx
