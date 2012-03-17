@@ -8,17 +8,8 @@ Basil.respond_to(/\|/) {
   commands = @msg.text.split('|').map(&:strip)
 
   while command = commands.shift
-    if reply
-      from      = reply.from
-      from_name = reply.from_name
-      text      = "#{command} #{reply.text}"
-    else
-      from      = @msg.from
-      from_name = @msg.from_name
-      text      = command
-    end
-
-    reply = Basil.dispatch(Basil::Message.new(Basil::Config.me, from, from_name, text))
+    text  = reply ? "#{command} #{reply.text}" : command
+    reply = Basil.dispatch(Basil::Message.new(Basil::Config.me, @msg.from, @msg.from_name, text, @msg.chat))
   end
 
   reply if reply
