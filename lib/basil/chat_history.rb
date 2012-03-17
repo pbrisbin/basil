@@ -17,14 +17,14 @@ module Basil
       end
     end
 
+    # Get an array of messages representing this chat's history.
+    # Messages are returned most recent first. Valid option keys are
+    # :chat, :from and :to which limit the results accordingly.
     def chat_history(options = {})
       history = []
 
       Storage.with_storage do |store|
-        if options.has_key?(:all)
-          # history across all chats
-          history = store[KEY].values.flatten
-        elsif options.has_key?(:chat)
+        if options.has_key?(:chat)
           # history for some other chat
           history = store[KEY][options[:chat]]
         else
