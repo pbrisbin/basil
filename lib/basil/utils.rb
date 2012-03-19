@@ -64,9 +64,9 @@ module Basil
     end
 
     # Handles simple and no-so-simple HTTP requests. If options is a
-    # Hash, you must provide :host and :path. Optionally, :port, :user,
-    # and :password can be specified as well. If options is not a Hash
-    # it is expected to be a simple url (ex "http://google.com").
+    # Hash, you must provide :host. Optionally, :path, :port, :user, and
+    # :password can be specified. If options is not a Hash it is
+    # expected to be a simple url (ex "http://google.com").
     #
     # Currently, https is used if :port is specified as 443 or a url
     # is passed that begins with "https". Basic authentication is used
@@ -74,10 +74,10 @@ module Basil
     def get_http(options)
       if options.is_a? Hash
         host     = options[:host]
-        port     = options[:port]     rescue 80
-        username = options[:user]     rescue nil
-        password = options[:password] rescue nil
-        path     = options[:path]
+        port     = options[:port] || 80
+        path     = options[:path] || '/'
+        username = options[:user]     # may be nil
+        password = options[:password] # may be nil
 
         secure = port == 443
 
