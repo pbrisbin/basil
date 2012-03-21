@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestUtils< Test::Unit::TestCase
   include Basil
-  include Basil::Utils
+  include Utils
 
   def setup
     @msg = Message.new(Config.me, "Someone", "Some one", "some message text")

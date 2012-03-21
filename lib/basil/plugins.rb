@@ -4,8 +4,8 @@ module Basil
   # Plugin with a singleton execute method.
   class Plugin
     include Basil
-    include Basil::Utils
-    include Basil::ChatHistory
+    include Utils
+    include ChatHistory
 
     attr_reader :regex
     attr_accessor :description
