@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestChatHistory< Test::Unit::TestCase
   include Basil
-  include Basil::ChatHistory
+  include ChatHistory
 
   def setup
     # makes it as if we're in the 'testing' chat
@@ -26,14 +26,11 @@ class TestChatHistory< Test::Unit::TestCase
     assert_equal 2, chat_history.length,
       "2 chats should be logged for this chat"
 
-    assert_equal 3, chat_history(:all => true).length,
-      "3 chats should be logged for all chats"
-
     assert_equal 1, chat_history(:to => 'to_c').length,
       "1 chat should be logged to 'to_c'"
 
-    assert_equal 1, chat_history(:all => true, :from => 'from_name_b').length,
-      "1 chat should be logged from 'from_name_b' in all chats"
+    assert_equal 1, chat_history(:chat => 'NOT testing', :from => 'from_name_b').length,
+      "1 chat should be logged from 'from_name_b' in the other chat"
 
     assert_equal 0, chat_history(:from => 'from_name_b').length,
       "No chats should be logged from 'from_name_b' in this chat"
