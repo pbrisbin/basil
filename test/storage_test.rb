@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class TestStorage < Test::Unit::TestCase
-  include Basil
-
   def setup
     @pstore_file = '/tmp/basil.pstore'
   end

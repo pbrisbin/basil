@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class TestMessage < Test::Unit::TestCase
-  include Basil
-
   def test_message
     msg = Message.new('To', 'From', 'From Name', 'Some text', 'A chat')
 

@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class TestConfig < Test::Unit::TestCase
-  include Basil
-
   def test_hide
     [:me, :server_type, :plugins_directory].each do |meth|
       # make sure these things are there to be hidden first

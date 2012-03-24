@@ -15,5 +15,12 @@ require 'basil'
 require 'mocha'
 
 class Test::Unit::TestCase
-  Basil::Config.config_file = './config/test.yml'
+  include Basil
+
+  Config.config_file = './config/test.yml'
+
+  def clear_plugins!
+    Plugin.responders.delete_if { true }
+    Plugin.watchers.delete_if { true }
+  end
 end

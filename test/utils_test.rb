@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TestUtils< Test::Unit::TestCase
-  include Basil
   include Utils
 
   def setup

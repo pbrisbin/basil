@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class TestChatHistory< Test::Unit::TestCase
-  include Basil
   include ChatHistory
 
   def setup

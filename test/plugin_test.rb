@@ -1,11 +1,12 @@
 require 'test_helper'
 
 class TestPlugins < Test::Unit::TestCase
-  include Basil
+  def setup
+    clear_plugins!
+  end
 
   def teardown
-    Plugin.responders.delete_if { true }
-    Plugin.watchers.delete_if { true }
+    clear_plugins!
   end
 
   def test_register_responder
