@@ -6,8 +6,14 @@ module Basil
 
       end
 
-      def process(text, to = Config.me)
-        msg = Message.new(to, 'test-user', 'Test User', text, 'test')
+      def process(text, options = {})
+        options = { :from      => 'test-user',
+                    :from_name => 'Test User',
+                    :to        => Config.me,
+                    :chat      => 'test-session' }.merge(options)
+
+
+        msg = Message.new(options[:to], options[:from], options[:from_name], text, options[:chat])
 
         ChatHistory.store_message(msg)
 
