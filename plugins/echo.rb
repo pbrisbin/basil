@@ -11,11 +11,14 @@ Basil.respond_to(/^echo (.*)/) {
   msg = @match_data[1].strip
 
   # neat part is it'll do it recursively.
-  while msg =~ /(.*)\$\((.*)\)(.*)/
-    prefix = $1
-    suffix = $3
-    result = Basil.dispatch(Basil::Message.new(Basil::Config.me, nil, nil, $2)).text
-    msg    = "#{prefix}#{result}#{suffix}"
+  while m = /(.*)\$\((.*)\)(.*)/.match(msg)
+    pref, sub, suf = m.captures
+
+    if reply = Basil.dispatch(Basil::Message.new(Basil::Config.me, @msg.from, @msg.from_name, sub))
+      msg = "#{pref}#{reply.text}#{suf}"
+    else
+      msg = "I'm sorry, `#{sub}' is invalid."
+    end
   end
 
   says msg
