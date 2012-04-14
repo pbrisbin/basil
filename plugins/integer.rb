@@ -6,7 +6,6 @@ Basil.respond_to(/^(\d+)\.([^\s\(]+)( (.*)|\((.*)\))?/) {
 
   args = args.map { |arg| arg =~ /^('|")(.*)\1$/ ? $2 : arg     }
   args = args.map { |arg| arg.to_i.to_s == arg ? arg.to_i : arg }
-  args = args.map { |arg| arg.to_i.to_s == arg ? arg.to_i : arg }
 
   says "#{int.send(meth, *args)}"
 
