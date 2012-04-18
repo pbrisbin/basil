@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# runs the basil binary as a service. redirects all output to a log file
+# and creates a pid-file. still runs in fg, so use & if you mean to
+# start him as a daemon.
+#
+###
+logfile='./tmp/basil.log'
+pidfile='./tmp/basil.pid'
+
+case $1 in
+  start)
+    echo $$ > "$pidfile"
+    exec ./bin/basil &> "$logfile"
+    ;;
+  stop)
+    kill $(cat "$pidfile")
+    ;;
+  restart)
+    $0 stop
+    sleep 3
+    $0 start
+    ;;
+esac
