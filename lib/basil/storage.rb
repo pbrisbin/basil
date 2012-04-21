@@ -10,9 +10,9 @@ module Basil
       require "pstore"
       result = nil
 
-      @@pstore ||= ::PStore.new(pstore_file)
-      @@pstore.transaction do
-        result = yield @@pstore
+      @pstore ||= ::PStore.new(pstore_file)
+      @pstore.transaction do
+        result = yield @pstore
       end
 
       result
@@ -21,7 +21,7 @@ module Basil
     private
 
     def self.pstore_file
-      @@pstore_file ||= Config.pstore_file rescue '/tmp/basil.pstore'
+      @pstore_file ||= Config.pstore_file rescue '/tmp/basil.pstore'
     end
   end
 end

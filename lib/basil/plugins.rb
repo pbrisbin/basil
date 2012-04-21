@@ -35,15 +35,15 @@ module Basil
     end
 
     def self.responders
-      @@responders ||= []
+      @responders ||= []
     end
 
     def self.watchers
-      @@watchers ||= []
+      @watchers ||= []
     end
 
     def self.email_strategies
-      @@email_strategies ||= []
+      @email_strategies ||= []
     end
 
     def self.load!
