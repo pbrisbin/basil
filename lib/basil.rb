@@ -59,7 +59,7 @@ module Basil
 
     def initialize(to, from, from_name, text, chat = nil)
       @time = Time.now
-      @chat, @to, @from, @from_name, @text = chat, to, from, from_name, text
+      @to, @from, @from_name, @text, @chat = to, from, from_name, text, chat
     end
 
     # Is this message to my configured nick?
