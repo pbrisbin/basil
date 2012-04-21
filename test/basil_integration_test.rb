@@ -6,7 +6,7 @@ class TestBasil < Test::Unit::TestCase
     @server = Config.server
 
     Plugin.load!
-    File.unlink('/tmp/basil.pstore')
+    File.unlink('/tmp/basil.pstore') if File.exists?('/tmp/basil.pstore')
   end
 
   def teardown
