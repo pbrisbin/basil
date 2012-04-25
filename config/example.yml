@@ -34,6 +34,13 @@ jira:
   user:     X
   password: X
 
+# Constants for the Confluence API plugin.
+confluence:
+  host:     confluence.ideeli.com
+  port:     443
+  user:     X
+  password: X
+
 # Constants for the Airbrake API
 airbrake:
   account: ideeli
