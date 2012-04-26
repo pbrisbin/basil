@@ -47,11 +47,18 @@ module Basil
         end
       end
 
-      history
+      history || []
 
     rescue Exception => ex
       $stderr.puts "Exception getting chat history. options: #{options.inspect}; exception: #{ex}."
       return []
+    end
+
+    def purge_history!(chat = @msg.chat)
+      Storage.with_storage do |store|
+        store[KEY].delete(chat)
+      end
+    rescue
     end
   end
 end
