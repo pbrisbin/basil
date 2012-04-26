@@ -24,7 +24,7 @@ module Basil
 
         on_message do |chat, msg|
           begin
-            reply = Basil.dispatch(msg)
+            reply = dispatch(msg)
             send_message(chat, reply) if reply
           rescue Exception => ex
             chat.send_message("error: #{ex}")
@@ -32,6 +32,14 @@ module Basil
         end
 
         Thread.list.each(&:join)
+      end
+
+      def dispatch(msg)
+        if (Config.extended_readline rescue false)
+          Readline.dispatch(msg)
+        else
+          Basil.dispatch(msg)
+        end
       end
     end
   end
