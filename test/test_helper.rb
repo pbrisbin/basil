@@ -23,4 +23,10 @@ class Test::Unit::TestCase
     Plugin.responders.delete_if { true }
     Plugin.watchers.delete_if { true }
   end
+
+  def clear_storage!
+    file = Storage.pstore_file
+
+    File.unlink(file) if File.exists?(file)
+  end
 end
