@@ -2,27 +2,25 @@ require 'test_helper'
 
 class TestStorage < Test::Unit::TestCase
   def setup
-    @pstore_file = '/tmp/basil.pstore'
+    clear_storage!
   end
 
   def teardown
-    File.unlink(@pstore_file)
+    clear_storage!
   end
 
-  def test_uses_default_file
-    assert !File.exist?(@pstore_file)
-
-    Storage.with_storage do |store|
-      store[:key] = :val
-    end
-
-    assert File.exist?(@pstore_file)
+  def test_default_file
+    assert_equal '/tmp/basil.pstore', Storage.pstore_file
   end
 
   def test_storage_works
+    assert !File.exist?(Storage.pstore_file)
+
     Storage.with_storage do |store|
       store[:foo] = :bar
     end
+
+    assert File.exist?(Storage.pstore_file)
 
     Storage.with_storage do |store|
       assert_equal :bar, store[:foo], "Storage should contain :foo"
