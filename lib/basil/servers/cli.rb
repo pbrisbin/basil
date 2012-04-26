@@ -13,13 +13,21 @@ module Basil
           ChatHistory.store_message(msg)
 
           begin
-            if reply = Basil.dispatch(msg)
+            if reply = dispatch(msg)
               puts reply.text
             end
           rescue Exception => ex
             $stderr.puts "error: #{ex}"
           end
 
+        end
+      end
+
+      def dispatch(msg)
+        if (Config.extended_readline rescue false)
+          Readline.dispatch(msg)
+        else
+          Basil.dispatch(msg)
         end
       end
     end

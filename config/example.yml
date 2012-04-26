@@ -20,6 +20,10 @@ pstore_file: ./basil.pstore
 # cert file for secure requests if the configuration option is present.
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
+# Choose to enable extended readline support for command substitution
+# and pipelining.
+extended_readline: false
+
 # Constants for the Jenkins API plugin.
 jenkins:
   host:     jenkins1.ideeli.com
