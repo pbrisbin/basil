@@ -1,10 +1,17 @@
 require 'bundler/gem_tasks'
+require 'rdoc/task'
 
 require 'rake/testtask'
 Rake::TestTask.new do |t|
   t.libs << "test"
   t.test_files = FileList['test/*_test.rb']
   t.verbose = true
+end
+
+Rake::RDocTask.new do |rd|
+  rd.title = 'Basil'
+  rd.rdoc_dir = './doc'
+  rd.rdoc_files.include("README.md", "lib/**/*.rb")
 end
 
 # it's getting tedious to manually modify the config away from skype
