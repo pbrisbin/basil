@@ -4,7 +4,7 @@ A skype bot hoping to be as cool as phrik and as [useful][] as hubot.
 
 [useful]: http://en.wikipedia.org/wiki/Basil_Exposition#Basil_Exposition
 
-![Basil Test](http://pbrisbin.com/static/fileshare/basil_test.png)
+![Basil Test](http://files.pbrisbin.com/screenshots/basil_test.png)
 
 ## Why skype, and not IRC?
 
