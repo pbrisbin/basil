@@ -73,6 +73,9 @@ module Basil
     # if :username or :password is given.
     def get_http(options)
       if options.is_a? Hash
+        # symbolize keys
+        options = options.map {|k,v| { k.to_sym => v }}
+
         host     = options[:host]
         port     = options[:port] || 80
         path     = options[:path] || '/'
@@ -131,15 +134,6 @@ module Basil
     def get_html(*args)
       require 'nokogiri'
       parse_http(*args) { |b| Nokogiri::HTML.parse(b) }
-    end
-
-    def symbolize_keys(h)
-      n = {}
-      h.each do |k,v|
-        n[k.to_sym] = v
-      end
-
-      n
     end
   end
 end

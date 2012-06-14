@@ -59,7 +59,7 @@ module Basil
             begin
               with_imap do |imap|
                 imap.search(['NOT', 'DELETED']).each do |message_id|
-                  handle_message_id(message_id)
+                  handle_message_id(imap, message_id)
                 end
               end
 
@@ -67,14 +67,14 @@ module Basil
               $stderr.puts "Error checking email: #{ex}"
             end
 
-            sleep Config.email_interval
+            sleep (Config.email['interval'] || 30)
           end
         end
       end
 
       private
 
-      def handle_message_id(message_id)
+      def handle_message_id(imap, message_id)
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
         Plugin.email_strategies.each do |strategy|

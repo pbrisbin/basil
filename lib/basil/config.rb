@@ -8,22 +8,19 @@ module Basil
   class Config
     include Singleton
 
-    # delegate to our instance
     def self.method_missing(meth, *args, &block)
       self.instance.send(meth, *args, &block)
     end
 
-    # delegate to our config file
     def method_missing(key)
       yaml[key.to_s] if yaml
     end
 
-    # lazy-load a server object
-    def server(*args)
+    def server(delegate)
       unless @server
         case server_type
-        when :cli  ; @server = Cli.new(*args)
-        when :skype; @server = Skype.new(*args)
+        when :cli  ; @server = Cli.new(delegate)
+        when :skype; @server = Skype.new(delegate)
         else raise 'Invalid or missing server_type. Must be :skype or :cli.'
         end
       end
@@ -31,12 +28,11 @@ module Basil
       @server
     end
 
-    # lazy-load a dispatcher object
-    def dispatcher(*args)
+    def dispatcher
       unless @dispatcher
         case dispatcher_type
-        when :simple  ; @dispatcher = DispatcherSimple.new(*args)
-        when :extended; @dispatcher = DispatcherExtended.new(*args)
+        when :simple  ; @dispatcher = SimpleDispatch
+        when :extended; @dispatcher = ExtendedDispatch
         else raise 'Invalid or missing dispatcher_type. Must be :simple or :extended.'
         end
       end
@@ -45,6 +41,8 @@ module Basil
     end
 
     def yaml
+      return {} if @hidden
+
       @yaml ||= YAML::load(File.read('config/basil.yml'))
     end
 
@@ -55,7 +53,8 @@ module Basil
     def self.hide(&block)
       @hidden = true
 
-      return yield
+      yield
+
     ensure
       @hidden = false
     end

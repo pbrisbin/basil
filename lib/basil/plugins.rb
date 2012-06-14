@@ -79,6 +79,11 @@ module Basil
       end
 
       nil
+
+    rescue Exception => ex
+      # TODO: how to handle this? let other plugins take a swing or
+      # reply with the error?
+      nil
     end
 
     def register!

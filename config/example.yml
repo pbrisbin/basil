@@ -1,18 +1,18 @@
-# This will be how basil knows a message is directed to him in group
+# Basil's identity; how he knows a message is directed to him in group
 # chats. Messages must be prefixed using "@me ", "me, " or similar.
 me: basil
 
-# This is the server type who's run method will be called. See
-# ./lib/basil/servers/ for their definitions. Valid values at this time
-# are :cli or :skype.
+# Cli or Skype?
 server_type: :cli
 
-# This is the directory from which plugins are loaded. There can be one
-# or more plugins per file and additional classes/logic may be present
-# to support the contained plugins.
+# Should dispatch messages as simple strings or enable extended readline
+# support (pipelines and substitutions)?
+dispatcher_type: :simple
+
+# The directory from which plugins are loaded.
 plugins_directory: ./plugins
 
-# Where basil will persist data. This file is created on-demans.
+# Where basil will persist data. Created on-demand.
 pstore_file: ./basil.pstore
 
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
@@ -20,46 +20,41 @@ pstore_file: ./basil.pstore
 # cert file for secure requests if the configuration option is present.
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
-# Choose to enable extended readline support for command substitution
-# and pipelining.
-extended_readline: false
+#########################################################################
+# Additional configuration specific to plugins.
+#########################################################################
 
-# Constants for the Jenkins API plugin.
 jenkins:
-  host:     jenkins1.ideeli.com
+  host:     jenkins1.example.com
   port:     80
   user:     X
   password: X
 
-# Constants for the Jira API plugin.
 jira:
-  host:     jira.ideeli.com
+  host:     jira.example.com
   port:     443
   user:     X
   password: X
 
-# Constants for the Confluence API plugin.
 confluence:
-  host:     confluence.ideeli.com
+  host:     confluence.example.com
   port:     443
   user:     X
   password: X
 
-# Constants for the Airbrake API
 airbrake:
   account: ideeli
   project: SomeNumber   # https://ideeli.airbrakeapp.com/<project>/errors
   token:   SomeLongHash # get from Settings
 
-# Constants for email checking
 email:
+  interval: 30 # seconds
   server:   imap.gmail.com
   port:     993
   username: X
   password: X
   inbox:    INBOX
 
-# Constants for the twitter plugin
 twitter:
   consumer_key:       xxx
   consumer_secret:    xxx

@@ -1,19 +1,18 @@
-# libs
 require 'forwardable'
 
 # mixins
 require 'basil/chat_history'
-require 'basil/email'
 require 'basil/utils'
 
 # classes
 require 'basil/server'
 require 'basil/cli'
-require 'basil/skype'
 require 'basil/config'
 require 'basil/dispatch'
+require 'basil/email'
 require 'basil/message'
 require 'basil/plugins'
+require 'basil/skype'
 require 'basil/storage'
 
 module Basil
@@ -26,37 +25,38 @@ module Basil
   end
 
   class Main
-    attr_reader :server, :dispatcher
+    class << self
+      def run!(args)
+        @server     = Config.server(self)
+        @dispatcher = Config.dispatcher
 
-    def initialize(*args)
-      @server     = Config.server(self)
-      @dispatcher = Config.dispatcher(self)
-    end
+        Plugin.load!
+        Email.check(@server)
 
-    def run
-      Plugin.load!
+        @server.start
 
-      Email.check(server)
+        Thread.list.each(&:join)
 
-      server.start
+      rescue Exception => ex
+        $stderr.puts "#{ex}"
+        $stderr.puts "#{ex.backtrace.join("\n")}"
 
-      Thread.list.each(&:join)
+        exit 1
+      end
 
-    rescue Exception => ex
-      $stderr.puts "#{ex}"
-      $stderr.puts "#{ex.backtrace.join("\n")}"
+      # called when the server has recieved and incoming message.
+      # returns a reply (which the server should send) or nil.
+      def dispatch_message(msg)
+        ChatHistory.store_message(msg)
 
-      exit 1
-    end
+        @dispatcher.dispatch(msg)
+      end
 
-    def dispatch_message(msg)
-      ChatHistory.store_message(msg)
+      # called when the server is about to send any message for any
+      # reason. return value doesn't matter.
+      def sending_message(msg)
 
-      dispatcher.dispatch(msg)
-    end
-
-    def sending_message(msg)
-
+      end
     end
   end
 end

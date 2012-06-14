@@ -1,11 +1,11 @@
 require 'bundler/gem_tasks'
 require 'rdoc/task'
+require 'rspec/core/rake_task'
 
-require 'rake/testtask'
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/*_test.rb']
-  t.verbose = true
+RSpec::Core::RakeTask.new do |t|
+  t.pattern    = "./spec/**/*_spec.rb"
+  t.rspec_opts = '-c'
+  t.verbose    = false
 end
 
 Rake::RDocTask.new do |rd|
@@ -52,4 +52,4 @@ task :cli do
   end.new.run! # nifty!
 end
 
-task :default => :test
+task :default => :spec
