@@ -6,7 +6,7 @@ module Basil
         msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
 
         if reply = delegate.dispatch_message(msg)
-          delegate.sending_message(msg)
+          delegate.sending_message(reply)
           puts reply.text
         end
       end

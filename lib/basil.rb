@@ -44,8 +44,8 @@ module Basil
         exit 1
       end
 
-      # called when the server has recieved and incoming message.
-      # returns a reply (which the server should send) or nil.
+      # called when the server has received an incoming message. returns
+      # a reply (which the server should send) or nil.
       def dispatch_message(msg)
         ChatHistory.store_message(msg)
 
@@ -53,7 +53,7 @@ module Basil
 
       rescue Exception => ex
         # TODO: how to handle, send the error to channel? log and return
-        # nil (letting other plugins have a chance?
+        # nil (letting other plugins have a chance)?
         $stderr.puts "Error dispatching #{msg.text}: #{ex}"
 
         nil
