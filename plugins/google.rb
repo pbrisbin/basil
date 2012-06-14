@@ -5,7 +5,7 @@ Basil.respond_to(/^g(oogle)? (.*)/) {
   if result = get_json(url)['responseData']['results'].first rescue nil
     replies "#{result['titleNoFormatting']}: #{result['unescapedUrl']}"
   else
-    replies "Nothing found."
+    replies "nothing found."
   end
 
 }.description = 'consults the almighty google'

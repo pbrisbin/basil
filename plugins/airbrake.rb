@@ -1,6 +1,6 @@
 module Basil
   class Airbrake
-    include Basil::Utils
+    include Utils
 
     def self.pretty_print(group, out = [])
       most_recent_at = group["most-recent-notice-at"]["__content__"]
@@ -24,7 +24,7 @@ module Basil
 
       # we assume we only care about one environment and it's specified
       # in the config file as project.
-      project = Config.airbrake['project'].to_s
+      project = Config.airbrake['project']
 
       if project and !project.empty?
         @path = "/projects/#{project}/errors.xml?auth_token=#{Config.airbrake['token']}"
@@ -38,7 +38,7 @@ module Basil
     end
 
     def xml
-      @xml ||= get_xml(:host => @host, :port => 443, :path => @path)
+      @xml ||= get_xml('host' => @host, 'port' => 443, 'path' => @path)
     end
   end
 end

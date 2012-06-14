@@ -2,7 +2,6 @@
 #
 #  https://github.com/jondot/moxy/blob/master/lib/moxy/sandbox_eval.rb
 #
-
 require 'fakefs/safe'
 require 'stringio'
 require 'timeout'

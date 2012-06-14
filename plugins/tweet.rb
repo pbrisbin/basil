@@ -11,21 +11,16 @@ end
 
 Basil.respond_to(/tweet (.+)/) {
 
-  begin
-    message = @match_data[1]
+  message = @match_data[1]
 
-    if message == 'that'
-      if msg = chat_history.first
-        message = msg.text
-      end
+  if message == 'that'
+    if msg = chat_history.first
+      message = msg.text
     end
-
-    Twitter.update(message)
-
-    says "successfully twittereded!"
-  rescue Exception => ex
-    $stderr.puts "#{ex}"
-    says "sorry, there was some problem talking to twitter"
   end
+
+  Twitter.update(message)
+
+  says "successfully twittereded!"
 
 }.description = 'sends tweets as @basilthebot'

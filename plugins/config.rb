@@ -5,7 +5,6 @@ module Basil
       [ 'me',
         'plugins_directory',
         'pstore_file',
-        'extended_readline'
       ].include?(key)
     end
 
