@@ -16,11 +16,11 @@ module Basil
       yaml[key.to_s] if yaml
     end
 
-    def server(delegate)
+    def server
       unless @server
         case server_type
-        when :cli  ; @server = Cli.new(delegate)
-        when :skype; @server = Skype.new(delegate)
+        when :cli  ; @server = Cli.new
+        when :skype; @server = Skype.new
         else raise 'Invalid or missing server_type. Must be :skype or :cli.'
         end
       end

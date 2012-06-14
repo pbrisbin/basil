@@ -46,13 +46,11 @@ module Basil
     class << self
       # Check for email on the configured interval, if a mail is found
       # it is run through each of the email strategy plugins. Any
-      # replies returned will be handed to the delegate's broadcast_mail
+      # replies returned will be handed to the server's broadcast_mail
       # method.
-      def check(delegate)
-        # if the delegate doesn't support us, we just do nothing.
-        return unless delegate.respond_to?(:broadcast_message)
-
-        @delegate = delegate
+      def check
+        # if the server doesn't support us, we just do nothing.
+        return unless Config.server.respond_to?(:broadcast_message)
 
         Thread.new do
           loop do
@@ -80,7 +78,7 @@ module Basil
 
         Plugin.email_strategies.each do |strategy|
           if msg = strategy.create_message(mail)
-            @delegate.broadcast_message(msg)
+            Config.server.broadcast_message(msg)
           end
         end
 
