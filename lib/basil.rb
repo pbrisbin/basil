@@ -54,6 +54,8 @@ module Basil
       rescue Exception => ex
         # TODO: how to handle, send the error to channel? log and return
         # nil (letting other plugins have a chance?
+        $stderr.puts "Error dispatching #{msg.text}: #{ex}"
+
         nil
       end
 
