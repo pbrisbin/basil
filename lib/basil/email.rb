@@ -83,7 +83,7 @@ module Basil
     def do_check(&block)
       with_imap do |imap|
         imap.search(['NOT', 'DELETED']).each do |message_id|
-          handle_message_id(message_id, &block)
+          handle_message_id(imap, message_id, &block)
         end
       end
 
@@ -91,7 +91,7 @@ module Basil
       $stderr.puts "Error checking email: #{ex}"
     end
 
-    def handle_message_id(message_id, &block)
+    def handle_message_id(imap, message_id, &block)
       mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
       Plugin.email_strategies.each do |strategy|
@@ -102,7 +102,7 @@ module Basil
       end
 
     rescue Exception => ex
-      $stderr.log "Error handling message id #{message_id}: #{ex}"
+      $stderr.puts "Error handling message id #{message_id}: #{ex}"
     ensure
       # we always, always delete the message. this stops malformed mails
       # from causing recurring problems and prevents any duplicate
@@ -118,7 +118,7 @@ module Basil
       yield imap
 
     rescue Exception => ex
-      $stderr.puts "#{ex}"
+      $stderr.puts "Error connecting to IMAP: #{ex}"
     ensure
       if imap
         imap.logout()
