@@ -43,7 +43,7 @@ task :cli do
         end
       end
 
-      system('./bin/basil')
+      system('bundle exec bin/basil')
     ensure
       if File.exists?(backup)
         mv backup, config
