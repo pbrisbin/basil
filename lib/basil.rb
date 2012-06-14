@@ -27,13 +27,12 @@ module Basil
   class Main
     class << self
       def run!(args)
-        @server     = Config.server(self)
-        @dispatcher = Config.dispatcher
+        server = Config.server(self)
 
         Plugin.load!
-        Email.check(@server)
+        Email.check(server)
 
-        @server.start
+        server.start
 
         Thread.list.each(&:join)
 
@@ -49,7 +48,11 @@ module Basil
       def dispatch_message(msg)
         ChatHistory.store_message(msg)
 
-        @dispatcher.dispatch(msg)
+        if Config.dispatcher_type == :extended
+          Dispatch.extended(msg)
+        else
+          Dispatch.simple(msg)
+        end
 
       rescue Exception => ex
         # TODO: how to handle, send the error to channel? log and return

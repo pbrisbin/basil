@@ -28,18 +28,6 @@ module Basil
       @server
     end
 
-    def dispatcher
-      unless @dispatcher
-        case dispatcher_type
-        when :simple  ; @dispatcher = SimpleDispatch
-        when :extended; @dispatcher = ExtendedDispatch
-        else raise 'Invalid or missing dispatcher_type. Must be :simple or :extended.'
-        end
-      end
-
-      @dispatcher
-    end
-
     def yaml
       return {} if @hidden
 
