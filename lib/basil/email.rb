@@ -50,7 +50,7 @@ module Basil
       # method.
       def check(delegate)
         # if the delegate doesn't support us, we just do nothing.
-        return unless delegate.respond_to?(:broadcast_mail)
+        return unless delegate.respond_to?(:broadcast_message)
 
         @delegate = delegate
 

@@ -32,7 +32,7 @@ module Basil
       Rype.attach
     end
     
-    def broadcast_mail(msg)
+    def broadcast_message(msg)
       Rype.chats do |chats|
         chats.each do |chat|
           if [chat.topic, chat.chatname].include?(msg.chat)

@@ -9,7 +9,7 @@ pidfile='./tmp/basil.pid'
 
 case $1 in
   start)
-    ./bin/basil &> "$logfile" &
+    bundle exec bin/basil &> "$logfile" &
     echo $! > "$pidfile"
 
     if ps $! &>/dev/null; then

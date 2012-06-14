@@ -37,8 +37,8 @@ module Basil
     end
 
     class EmailStrategy
-      SUBJECT_REGEX = /trunk_(unit|functionals|integration)/
-      CHAT_TITLE    = 'Dev/Arch + No more broken builds'
+      SUBJECT_REGEX ||= /trunk_(unit|functionals|integration)/
+      CHAT_TITLE    ||= 'Dev/Arch + No more broken builds'
 
       def self.create_message(mail)
         subject = mail['Subject']
@@ -81,15 +81,16 @@ end
 
 Basil.check_email(Basil::Jenkins::EmailStrategy)
 
-Basil.respond_to(/^jenkins$/) {
+# TODO: not working anymore?
+#Basil.respond_to(/^jenkins$/) {
 
-  says("build status") do |out|
-    Basil::Jenkins::Api.new('/').jobs.each do |job|
-      out << Basil::Jenkins.short_status(job)
-    end
-  end
+  #says("build status") do |out|
+    #Basil::Jenkins::Api.new('/').jobs.each do |job|
+      #out << Basil::Jenkins.short_status(job)
+    #end
+  #end
 
-}.description = 'interacts with jenkins'
+#}.description = 'interacts with jenkins'
 
 Basil.respond_to(/^jenkins (\w+)/) {
 
@@ -107,47 +108,48 @@ Basil.respond_to(/^jenkins (\w+)/) {
 
 }.description = 'retrieves info on a specific jenkins job'
 
-Basil.respond_to(/^who broke (.+?)\??$/) {
+# TODO: not working anymore?
+#Basil.respond_to(/^who broke (.+?)\??$/) {
 
-  job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
+  #job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
 
-  builds = job.builds.map { |b| b['number'].to_i }
-  last_stable = job.lastStableBuild['number'].to_i rescue nil
+  #builds = job.builds.map { |b| b['number'].to_i }
+  #last_stable = job.lastStableBuild['number'].to_i rescue nil
 
-  if last_stable && builds.first == last_stable
-    return says "#{job.displayName} is not broken."
-  end
+  #if last_stable && builds.first == last_stable
+    #return says "#{job.displayName} is not broken."
+  #end
 
-  i = 0
-  while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}").building
-    i += 1
-  end
+  #i = 0
+  #while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}").building
+    #i += 1
+  #end
 
-  test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport")
+  #test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport")
 
-  says do |out|
-    test_report.suites.each do |s|
-      s['cases'].each do |c|
-        if c['status'] != 'PASSED'
-          name  = "#{c['className']}##{c['name']}"
-          since = c['failedSince']
+  #says do |out|
+    #test_report.suites.each do |s|
+      #s['cases'].each do |c|
+        #if c['status'] != 'PASSED'
+          #name  = "#{c['className']}##{c['name']}"
+          #since = c['failedSince']
 
-          out << "#{name} first broke in #{since}"
+          #out << "#{name} first broke in #{since}"
 
-          begin
-            breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}")
+          #begin
+            #breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}")
 
-            breaker.changeSet['items'].each do |item|
-              out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
-            end
-          rescue
-            out << "    ! no info on that build"
-          end
+            #breaker.changeSet['items'].each do |item|
+              #out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
+            #end
+          #rescue
+            #out << "    ! no info on that build"
+          #end
 
-          out << ""
-        end
-      end
-    end
-  end
+          #out << ""
+        #end
+      #end
+    #end
+  #end
 
-}.description = 'tells you what commits lead to the first broken build'
+#}.description = 'tells you what commits lead to the first broken build'
