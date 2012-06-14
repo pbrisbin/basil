@@ -5,19 +5,19 @@ me: basil
 # Cli or Skype?
 server_type: :cli
 
-# Should dispatch messages as simple strings or enable extended readline
-# support (pipelines and substitutions)?
+# Simple or Extended?
 dispatcher_type: :simple
 
 # The directory from which plugins are loaded.
 plugins_directory: ./plugins
 
-# Where basil will persist data. Created on-demand.
+# Where basil will persist his data.
 pstore_file: ./basil.pstore
 
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
 # Install curl-ca-bundle via ports. The get_* utilities will use this
 # cert file for secure requests if the configuration option is present.
+# This may not be a requirement forever, so try without first.
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
 #########################################################################
