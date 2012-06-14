@@ -52,8 +52,8 @@ module Basil
         if Dir.exists?(dir)
           Dir.glob(dir + '/*').sort.each do |f|
             begin load(f)
-            rescue => e
-              $stderr.puts "error loading #{f}: #{e.message}."
+            rescue Exception => ex
+              $stderr.puts "Error loading #{f}: #{ex}."
               next
             end
           end
@@ -70,20 +70,14 @@ module Basil
       @description  = nil
     end
 
-    def triggered(msg)
+    def triggered?(msg)
       if @regex.nil? || msg.text =~ @regex
-        @msg = msg
-        @match_data = $~
+        @msg, @match_data = msg, $~
 
-        return execute
+        execute
+      else
+        nil
       end
-
-      nil
-
-    rescue Exception => ex
-      # TODO: how to handle this? let other plugins take a swing or
-      # reply with the error?
-      nil
     end
 
     def register!

@@ -50,6 +50,11 @@ module Basil
         ChatHistory.store_message(msg)
 
         @dispatcher.dispatch(msg)
+
+      rescue Exception => ex
+        # TODO: how to handle, send the error to channel? log and return
+        # nil (letting other plugins have a chance?
+        nil
       end
 
       # called when the server is about to send any message for any

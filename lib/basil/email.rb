@@ -64,6 +64,7 @@ module Basil
               end
 
             rescue Exception => ex
+              # rescue any per-message error so we continue to check
               $stderr.puts "Error checking email: #{ex}"
             end
 
@@ -84,6 +85,7 @@ module Basil
         end
 
       rescue Exception => ex
+        # rescue any process error so the message is still deleted
         $stderr.puts "Error handling message id #{message_id}: #{ex}"
       ensure
         # we always, always delete the message. this stops malformed mails
@@ -99,8 +101,6 @@ module Basil
 
         yield imap
 
-      rescue Exception => ex
-        $stderr.puts "Error connecting to IMAP: #{ex}"
       ensure
         if imap
           imap.logout()

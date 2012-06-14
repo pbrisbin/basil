@@ -8,13 +8,13 @@ module Basil
 
       if msg.to_me?
         Plugin.responders.each do |p|
-          reply = p.triggered(msg)
+          reply = p.triggered?(msg)
           return reply if reply
         end
       end
 
       Plugin.watchers.each do |p|
-        reply = p.triggered(msg)
+        reply = p.triggered?(msg)
         return reply if reply
       end
 

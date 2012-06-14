@@ -36,31 +36,25 @@ module Basil
         if options.has_key?(:from)
           # messages from someone
           history = history.select do |msg|
-            msg.from_name =~ /#{options[:from]}/i rescue false
+            msg.from_name =~ /#{options[:from]}/i
           end
         end
 
         if options.has_key?(:to)
           # messages to someone
           history = history.select do |msg|
-            msg.to =~ /#{options[:to]}/i rescue false
+            msg.to =~ /#{options[:to]}/i
           end
         end
       end
 
       history || []
-
-    rescue Exception => ex
-      $stderr.puts "Error getting chat history: #{ex}"
-      return []
     end
 
     def purge_history!(chat = @msg.chat)
       Storage.with_storage do |store|
         store[KEY].delete(chat)
       end
-    rescue Exception => ex
-      $stderr.puts "Error purging chat history: #{ex}"
     end
   end
 end

@@ -46,7 +46,7 @@ module Basil
     private
 
     def send_message(chat, msg)
-      prefix = "#{msg.to.split(' ').first}, " rescue ''
+      prefix = msg.to ? "#{msg.to.split(' ').first}, " : ''
       chat.send_message(prefix + msg.text)
     end
 
@@ -58,9 +58,6 @@ module Basil
       when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
       else [nil, body]
       end
-
-    rescue
-      [nil, body]
     end
   end
 end
