@@ -35,9 +35,11 @@ module Basil
     def broadcast_message(msg)
       Rype.chats do |chats|
         chats.each do |chat|
-          if [chat.topic, chat.chatname].include?(msg.chat)
-            delegate.sending_message(msg)
-            send_message(chat, msg)
+          chat.topic do |topic|
+            if [topic, chat.chatname].include?(msg.chat)
+              delegate.sending_message(msg)
+              send_message(chat, msg)
+            end
           end
         end
       end
