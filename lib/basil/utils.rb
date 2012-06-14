@@ -73,24 +73,22 @@ module Basil
     # if :username or :password is given.
     def get_http(options)
       if options.is_a? Hash
-        host     = options[:host]
-        port     = options[:port] || 80
-        path     = options[:path] || '/'
-        username = options[:user]     # may be nil
-        password = options[:password] # may be nil
-
-        secure = port == 443
-
-        # An explicit cert file is needed if run on OSX, provided by the
-        # curl-ca-bundle cert package
-        cert_file = Config.https_cert_file rescue nil
+        host     = options['host']
+        port     = options['port'] || 80
+        path     = options['path'] || '/'
+        username = options['user']     # may be nil
+        password = options['password'] # may be nil
+        secure   = port == 443
 
         require (secure ? 'net/https' : 'net/http')
         net = Net::HTTP.new(host, port)
 
         if secure
           net.use_ssl = true
-          net.ca_file = cert_file if cert_file
+
+          # An explicit cert file is needed if run on OSX, provided by the
+          # curl-ca-bundle cert package. value might be nil
+          net.ca_file = Config.https_cert_file #if Config.https_cert_file
         end
 
         net.start do |http|
@@ -103,9 +101,6 @@ module Basil
         require (url =~ /^https/ ? 'net/https' : 'net/http')
         Net::HTTP.get_response(URI.parse(url))
       end
-    rescue Exception => ex
-      $stderr.puts "error getting http: #{ex}"
-      nil
     end
 
     # Pass-through to get_http but yields to the block for conversion
@@ -113,9 +108,6 @@ module Basil
     def parse_http(*args, &block)
       resp = get_http(*args)
       yield resp.body if resp
-    rescue Exception => ex
-      $stderr.puts "error parsing the response body: #{ex}"
-      nil
     end
 
     def get_json(*args)
@@ -131,15 +123,6 @@ module Basil
     def get_html(*args)
       require 'nokogiri'
       parse_http(*args) { |b| Nokogiri::HTML.parse(b) }
-    end
-
-    def symbolize_keys(h)
-      n = {}
-      h.each do |k,v|
-        n[k.to_sym] = v
-      end
-
-      n
     end
   end
 end

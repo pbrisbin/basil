@@ -62,7 +62,7 @@ Basil.respond_to(/^factinfo (\w+)$/) {
 
 }.description = 'give information about a factoid'
 
-Basil.respond_to(/^(del|rm)factoid (\w+)$/) {
+Basil.respond_to(/^(del|rm) ?factoid (\w+)$/) {
 
   Basil::Storage.with_storage do |store|
     store[:factoids] ||= {}

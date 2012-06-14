@@ -1,10 +1,11 @@
 module Basil
+  # The ChatHistory module allows for accessing up to +LIM+ previous
+  # messages in the current chat. It should be mixed into Plugin as it
+  # relies on an +@msg+ instance variable.
   module ChatHistory
     KEY = :chat_history
     LIM = 100 # number of message to kep per chat
 
-    # All servers should call this with messages as they receive them so
-    # they can be added to the chat history.
     def self.store_message(message)
       Storage.with_storage do |store|
         store[KEY]               ||= {}
@@ -35,30 +36,25 @@ module Basil
         if options.has_key?(:from)
           # messages from someone
           history = history.select do |msg|
-            msg.from_name =~ /#{options[:from]}/i rescue false
+            msg.from_name =~ /#{options[:from]}/i
           end
         end
 
         if options.has_key?(:to)
           # messages to someone
           history = history.select do |msg|
-            msg.to =~ /#{options[:to]}/i rescue false
+            msg.to =~ /#{options[:to]}/i
           end
         end
       end
 
       history || []
-
-    rescue Exception => ex
-      $stderr.puts "Exception getting chat history. options: #{options.inspect}; exception: #{ex}."
-      return []
     end
 
     def purge_history!(chat = @msg.chat)
       Storage.with_storage do |store|
         store[KEY].delete(chat)
       end
-    rescue
     end
   end
 end

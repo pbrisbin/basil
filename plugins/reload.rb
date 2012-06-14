@@ -5,9 +5,9 @@ module Basil
     end
 
     def self.clear_loaded!
-      responders.delete_if       { true }
-      watchers.delete_if         { true }
-      email_strategies.delete_if { true }
+      responders.clear
+      watchers.clear
+      email_strategies.clear
     end
   end
 end

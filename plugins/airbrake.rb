@@ -1,6 +1,6 @@
 module Basil
   class Airbrake
-    include Basil::Utils
+    include Utils
 
     def self.pretty_print(group, out = [])
       most_recent_at = group["most-recent-notice-at"]["__content__"]
@@ -38,7 +38,7 @@ module Basil
     end
 
     def xml
-      @xml ||= get_xml(:host => @host, :port => 443, :path => @path)
+      @xml ||= get_xml('host' => @host, 'port' => 443, 'path' => @path)
     end
   end
 end

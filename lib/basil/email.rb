@@ -19,7 +19,6 @@ module Basil
       def self.parse(content)
         header_lines = []
         headers      = {}
-        body         = ""
 
         lines = content.split(/\r\n/)
 
@@ -41,88 +40,72 @@ module Basil
         end
 
         new(headers, body)
+      end
+    end
+
+    class << self
+      # Check for email on the configured interval, if a mail is found
+      # it is run through each of the email strategy plugins. Any
+      # replies returned will be handed to the delegate's broadcast_mail
+      # method.
+      def check(delegate)
+        # if the delegate doesn't support us, we just do nothing.
+        return unless delegate.respond_to?(:broadcast_message)
+
+        @delegate = delegate
+
+        Thread.new do
+          loop do
+            begin
+              with_imap do |imap|
+                imap.search(['NOT', 'DELETED']).each do |message_id|
+                  handle_message_id(imap, message_id)
+                end
+              end
+
+            rescue Exception => ex
+              # rescue any per-message error so we continue to check
+              $stderr.puts "Error checking email: #{ex}"
+            end
+
+            sleep (Config.email['interval'] || 30)
+          end
+        end
+      end
+
+      private
+
+      def handle_message_id(imap, message_id)
+        mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
+
+        Plugin.email_strategies.each do |strategy|
+          if msg = strategy.create_message(mail)
+            @delegate.broadcast_message(msg)
+          end
+        end
+
       rescue Exception => ex
-        $stderr.puts "#{ex}"
-        new(headers, body)
+        # rescue any process error so the message is still deleted
+        $stderr.puts "Error handling message id #{message_id}: #{ex}"
+      ensure
+        # we always, always delete the message. this stops malformed mails
+        # from causing recurring problems and prevents any duplicate
+        # processing. only risk is a dropped email here or there.
+        imap.store(message_id, "+FLAGS", [:Deleted])
       end
-    end
 
-    # Looping in its own Thread, check the configured email address on
-    # the given interval.
-    #
-    # Each mail found via IMAP will be turned into a  Email::Mail and
-    # handed to the create_message method on each object in the
-    # Plugin.email_strategies Array. Plugins can add objects to this
-    # Arry via Basil.check_email.
-    #
-    # When an object returns a Message, both the Message and triggering
-    # object will be yielded to the block which should handle the
-    # server-specific task of sending the message to chat. This gives
-    # the triggering object a chance to choose which chat the server
-    # should send to.
-    #
-    # Notes:
-    #
-    # 1. If multiple strategy objects return Messages for the given
-    #    Mail, they will all be yielded
-    # 2. Messages are always deleted from the IMAP server after
-    #    processing
-    #
-    def check_email(interval, &block)
-      Thread.new do
-        loop do
-          do_check(&block)
+      def with_imap(config = Config.email, &block)
+        imap = Net::IMAP.new(config['server'], config['port'], true)
+        imap.login(config['username'], config['password'])
+        imap.select(config['inbox'])
 
-          sleep interval
+        yield imap
+
+      ensure
+        if imap
+          imap.logout()
+          imap.disconnect()
         end
-      end
-    end
-
-    private
-
-    def do_check(&block)
-      with_imap do |imap|
-        imap.search(['NOT', 'DELETED']).each do |message_id|
-          handle_message_id(imap, message_id, &block)
-        end
-      end
-
-    rescue Exception => ex
-      $stderr.puts "Error checking email: #{ex}"
-    end
-
-    def handle_message_id(imap, message_id, &block)
-      mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
-
-      Plugin.email_strategies.each do |strategy|
-        if strategy.respond_to?(:create_message)
-          message = strategy.create_message(mail)
-          yield(strategy, message) if message
-        end
-      end
-
-    rescue Exception => ex
-      $stderr.puts "Error handling message id #{message_id}: #{ex}"
-    ensure
-      # we always, always delete the message. this stops malformed mails
-      # from causing recurring problems and prevents any duplicate
-      # processing. only risk is a dropped email here or there.
-      imap.store(message_id, "+FLAGS", [:Deleted])
-    end
-
-    def with_imap(config = Config.email, &block)
-      imap = Net::IMAP.new(config['server'], config['port'], true)
-      imap.login(config['username'], config['password'])
-      imap.select(config['inbox'])
-
-      yield imap
-
-    rescue Exception => ex
-      $stderr.puts "Error connecting to IMAP: #{ex}"
-    ensure
-      if imap
-        imap.logout()
-        imap.disconnect()
       end
     end
   end
