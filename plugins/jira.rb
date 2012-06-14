@@ -4,7 +4,6 @@ module Basil
 
     def initialize(path)
       @path = path
-      @json = nil
     end
 
     def method_missing(meth, *args)
@@ -14,12 +13,8 @@ module Basil
     private
 
     def json
-      unless @json
-        options = symbolize_keys(Config.jira).merge(:path => '/rest/api/2.0.alpha1' + @path)
-        @json = get_json(options)
-      end
-
-      @json
+      @json ||= get_json(Config.jira.merge(
+        'path' => '/rest/api/2.0.alpha1' + @path))
     end
   end
 
@@ -80,30 +75,26 @@ Basil.watch_for(/\w+-\d+/) {
   unless tickets.empty?
     says do |out|
       tickets.each do |id|
-        begin
-          ticket = Basil::JiraTicket.new(id)
+        ticket = Basil::JiraTicket.new(id)
 
-          if ticket.found?
-            url   = ticket.url
-            title = ticket.title
+        if ticket.found?
+          url   = ticket.url
+          title = ticket.title
 
-            # don't spam information that's already present in the
-            # triggering message
-            url_present   = @msg.text.include?(url)
-            title_present = @msg.text.include?(title)
+          # don't spam information that's already present in the
+          # triggering message
+          url_present   = @msg.text.include?(url)
+          title_present = @msg.text.include?(title)
 
-            unless url_present && title_present
-              if url_present
-                out << "#{id} : #{title}"
-              elsif title_present
-                out << "#{url}"
-              else
-                out << "#{ticket.description}"
-              end
+          unless url_present && title_present
+            if url_present
+              out << "#{id} : #{title}"
+            elsif title_present
+              out << "#{url}"
+            else
+              out << "#{ticket.description}"
             end
           end
-        rescue => e
-          $stderr.puts e.message
         end
       end
     end
@@ -113,9 +104,7 @@ Basil.watch_for(/\w+-\d+/) {
 
 }
 
-# DEPRECATION WARNING -- find foo is too general, this will be replaced
-# with something like "jira search foo" in the near future.
-Basil.respond_to(/^find (.+)/i) {
+Basil.respond_to(/^jira search (.+)/i) {
 
   begin
     jql  = escape('summary ~ "?" OR description ~ "?" OR comment ~ "?"'.gsub('?', @match_data[1].strip))
@@ -124,17 +113,14 @@ Basil.respond_to(/^find (.+)/i) {
     issues = json.issues
     len    = issues.length
 
-    replies('Search results:') do |out|
+    replies('Search results (first 10):') do |out|
       issues[0..10].each { |issue|
         ticket = Basil::JiraTicket.new(issue['key'])
         out << ticket.description if ticket.found?
       }
-
-      out << "plus #{len - 10} more..." if len > 10
     end
-  rescue => e
-    $stderr.puts e.message
-    replies "No results found."
+  rescue
+    replies "no results found."
   end
 
 }.description = 'find JIRA cards with given search term(s)'

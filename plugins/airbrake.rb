@@ -24,7 +24,7 @@ module Basil
 
       # we assume we only care about one environment and it's specified
       # in the config file as project.
-      project = Config.airbrake['project']
+      project = Config.airbrake['project'].to_s
 
       if project and !project.empty?
         @path = "/projects/#{project}/errors.xml?auth_token=#{Config.airbrake['token']}"

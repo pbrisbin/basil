@@ -1,6 +1,6 @@
 module Basil
   module Jenkins
-    extend Basil::Utils
+    extend Utils
 
     def self.on_error(msg = nil, &block)
       yield
