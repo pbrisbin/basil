@@ -1,26 +1,29 @@
+require 'singleton'
+require 'yaml'
+
 module Basil
   # Configuration is lazy-loaded from ./config/basil.yml. You can create
   # one from the provided example. Note: this location may change in the
   # future.
   class Config
-    include Basil
+    include Singleton
 
-    def self.method_missing(key)
-      if yaml.has_key?(key.to_s)
-        yaml[key.to_s]
-      else
-        # requesters of optional configuration values should be prepared
-        # to rescue this at the site of use.
-        raise "configuration key #{key} not found."
-      end
+    # delegate to our instance
+    def self.method_missing(meth, *args, &block)
+      self.instance.send(meth, *args, &block)
     end
 
-    def self.server
+    # delegate to our config file
+    def method_missing(key)
+      yaml[key.to_s] if yaml
+    end
+
+    # lazy-load a server object
+    def server(*args)
       unless @server
         case server_type
-        when :cli  ; @server = Server::Cli.new
-        when :skype; @server = Server::SkypeBot.new
-        when :test ; @server = Server::Mock.new
+        when :cli  ; @server = Cli.new(*args)
+        when :skype; @server = Skype.new(*args)
         else raise 'Invalid or missing server_type. Must be :skype or :cli.'
         end
       end
@@ -28,34 +31,28 @@ module Basil
       @server
     end
 
-    def self.config_file
-      @config_file ||= './config/basil.yml'
-    end
-
-    def self.config_file=(file)
-      @config_file = file
-    end
-
-    def self.yaml
-      return {} if @hidden
-
-      unless @yaml
-        require 'yaml'
-
-        fh = File.open(config_file)
-        @yaml = YAML::load(fh)
+    # lazy-load a dispatcher object
+    def dispatcher(*args)
+      unless @dispatcher
+        case dispatcher_type
+        when :simple  ; @dispatcher = DispatcherSimple.new(*args)
+        when :extended; @dispatcher = DispatcherExtended.new(*args)
+        else raise 'Invalid or missing dispatcher_type. Must be :simple or :extended.'
+        end
       end
 
-      @yaml
-    ensure
-      fh.close if fh
+      @dispatcher
+    end
+
+    def yaml
+      @yaml ||= YAML::load(File.read('config/basil.yml'))
     end
 
     # We need to temporarily hide the Config object during evaluation
     # plugins since it can access it and see passwords, etc. Through
     # this approach the only thing that can be seen is the location of
     # the config file which I believe is fairly innocuous.
-    def self.hide
+    def self.hide(&block)
       @hidden = true
 
       return yield

@@ -1,13 +1,20 @@
+# libs
 require 'forwardable'
-require 'basil/config'
-require 'basil/storage'
-require 'basil/utils'
-require 'basil/email'
+
+# mixins
 require 'basil/chat_history'
-require 'basil/readline'
+require 'basil/email'
+require 'basil/utils'
+
+# classes
+require 'basil/server'
+require 'basil/cli'
+require 'basil/skype'
+require 'basil/config'
+require 'basil/dispatch'
+require 'basil/message'
 require 'basil/plugins'
-require 'basil/servers/cli'
-require 'basil/servers/skype'
+require 'basil/storage'
 
 module Basil
   class << self
@@ -18,56 +25,38 @@ module Basil
     def_delegator Basil::Plugin, :check_email
   end
 
-  # Main program entry point. Loads plugins, instantiates your defined
-  # server, and calls its run method which should loop forever.
-  def self.run
-    Plugin.load!
-    server = Config.server
-    server.run
-  rescue Exception => e
-    $stderr.puts e.message
-    exit 1
-  end
+  class Main
+    attr_reader :server, :dispatcher
 
-  # Basil's dipatch method will take a valid message and ask each
-  # registered plugin (responders then watchers) if it wishes to act on
-  # it. The first reply received is returned, otherwise nil.
-  def self.dispatch(msg)
-    return nil unless msg && msg.text != ''
-
-    if msg.to_me?
-      Plugin.responders.each do |p|
-        reply = p.triggered(msg)
-        return reply if reply
-      end
+    def initialize(*args)
+      @server     = Config.server(self)
+      @dispatcher = Config.dispatcher(self)
     end
 
-    Plugin.watchers.each do |p|
-      reply = p.triggered(msg)
-      return reply if reply
+    def run
+      Plugin.load!
+
+      Email.check(server)
+
+      server.start
+
+      Thread.list.each(&:join)
+
+    rescue Exception => ex
+      $stderr.puts "#{ex}"
+      $stderr.puts "#{ex.backtrace.join("\n")}"
+
+      exit 1
     end
 
-    nil
-  end
+    def dispatch_message(msg)
+      ChatHistory.store_message(msg)
 
-  # The main basil data type: the Message. Servers should construct
-  # these and pass them through dispatch which will also return a
-  # Message if a response is triggered.
-  class Message
-    include Basil
-
-    attr_reader :to, :from, :from_name, :time, :text, :chat
-
-    def initialize(to, from, from_name, text, chat = nil)
-      @time = Time.now
-      @to, @from, @from_name, @text, @chat = to, from, from_name, text, chat
+      dispatcher.dispatch(msg)
     end
 
-    # Is this message to my configured nick?
-    def to_me?
-      to.downcase == Config.me.downcase
-    rescue
-      false
+    def sending_message(msg)
+
     end
   end
 end
