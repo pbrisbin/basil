@@ -47,9 +47,8 @@ module Basil
       include Logging
 
       # Check for email on the configured interval, if a mail is found
-      # it is run through each of the email strategy plugins. Any
-      # replies returned will be handed to the server's broadcast_mail
-      # method.
+      # it is run through each of the email checker plugins. Any replies
+      # returned will be handed to the server's broadcast_mail method.
       def check
         # if the server doesn't support us, we just do nothing.
         return unless Config.server.respond_to?(:broadcast_message)
@@ -82,10 +81,10 @@ module Basil
       def handle_message_id(imap, message_id)
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
-        Plugin.email_strategies.each do |strategy|
-          if msg = strategy.create_message(mail)
-            debug "stategy trigged, broadcasting #{msg.pretty}"
-            Config.server.broadcast_message(msg)
+        Plugin.email_checkers.each do |p|
+          if reply = p.email_triggered?(mail)
+            debug "#{p.pretty} triggered"
+            Config.server.broadcast_message(reply)
           end
         end
 
