@@ -25,7 +25,7 @@ pstore_file: ./basil.pstore
 #########################################################################
 
 jenkins:
-  host:     jenkins1.example.com
+  host:     jenkins.example.com
   port:     80
   user:     X
   password: X
@@ -43,13 +43,13 @@ confluence:
   password: X
 
 airbrake:
-  account: ideeli
-  project: SomeNumber   # https://ideeli.airbrakeapp.com/<project>/errors
-  token:   SomeLongHash # get from Settings
+  account: some_name
+  project: some_number   # https://some_name.airbrakeapp.com/<project>/errors
+  token:   some_log_hash # available in airbrake admin settings
 
 email:
   interval: 30 # seconds
-  server:   imap.gmail.com
+  server:   imap.example.com
   port:     993
   username: X
   password: X
