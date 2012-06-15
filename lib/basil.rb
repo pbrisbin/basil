@@ -2,10 +2,13 @@ require 'forwardable'
 
 # mixins
 require 'basil/chat_history'
+require 'basil/logging'
 require 'basil/utils'
 
-# classes
+# base classes
 require 'basil/server'
+
+# classes
 require 'basil/cli'
 require 'basil/config'
 require 'basil/dispatch'
@@ -26,19 +29,26 @@ module Basil
 
   class Main
     class << self
+      include Logging
+
       def run!(args)
+        debug "starting up"
+
         Plugin.load!
         Email.check
         Config.server.start
         Thread.list.each(&:join)
 
       rescue Exception => ex
-        $stderr.puts "#{ex}"
-        $stderr.puts "#{ex.backtrace.join("\n")}"
+        fatal "#{ex}"
+
+        debug "trace:"
+        ex.backtrace.map do |line|
+          debug "  #{line}"
+        end
 
         exit 1
       end
-
     end
   end
 end

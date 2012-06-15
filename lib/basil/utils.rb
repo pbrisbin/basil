@@ -32,7 +32,7 @@ module Basil
 
         return says(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(nil, Config.me, Config.me, txt)
+        return Message.new(nil, Config.me, Config.me, txt, @msg.chat)
       end
 
       nil
@@ -48,14 +48,14 @@ module Basil
 
         return replies(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(@msg.from_name, Config.me, Config.me, txt)
+        return Message.new(@msg.from_name, Config.me, Config.me, txt, @msg.chat)
       end
 
       nil
     end
 
     def forwards_to(new_to)
-      Message.new(new_to, Config.me, Config.me, @msg.text)
+      Message.new(new_to, Config.me, Config.me, @msg.text, @msg.chat)
     end
 
     def escape(str)

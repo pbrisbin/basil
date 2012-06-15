@@ -18,9 +18,6 @@ module Basil
       # 3. Sometimes, it's required you use the block argument
       #    immediately.
       #
-      # 4. Sometimes, it's required you don't pass the block argument to
-      #    any external methods.
-      #
       Rype.on(:chatmessage_received) do |chatmessage|
         chatmessage.from do |from|
           chatmessage.from_name do |from_name|
@@ -30,10 +27,14 @@ module Basil
                   is_private = members.length == 2
                   to, text   = parse_body(body)
 
+                  debug "chat name: #{chat.chatname}"
+                  debug "private chat: #{is_private}"
+
                   to  = Config.me if !to && is_private
                   msg = Message.new(to, from, from_name, text, chat.chatname)
 
                   if reply = dispatch_message(msg)
+                    debug "sending #{reply.pretty}"
                     prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
                     chat.send_message(prefix + reply.text)
                   end
@@ -52,6 +53,7 @@ module Basil
         chats.each do |chat|
           chat.topic do |topic|
             if [topic, chat.chatname].include?(msg.chat)
+              debug "topic or name match, sending broadcast"
               chat.send_message(msg.text)
             end
           end

@@ -18,5 +18,11 @@ module Basil
     rescue
       false
     end
+
+    # avoiding #to_s to preserve #inspect, see
+    # http://bugs.ruby-lang.org/issues/4453.
+    def pretty
+      "(#{chat}) #{to}: #{text.slice(0..10)}..."
+    end
   end
 end

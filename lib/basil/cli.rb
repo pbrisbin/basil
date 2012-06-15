@@ -5,7 +5,10 @@ module Basil
         print '> '; str = $stdin.gets.chomp
         msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
 
-        puts reply.text if reply = dispatch_message(msg)
+        if reply = dispatch_message(msg)
+          debug "sending #{reply.pretty}"
+          puts reply.text
+        end
       end
     end
   end

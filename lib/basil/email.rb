@@ -44,6 +44,8 @@ module Basil
     end
 
     class << self
+      include Logging
+
       # Check for email on the configured interval, if a mail is found
       # it is run through each of the email strategy plugins. Any
       # replies returned will be handed to the server's broadcast_mail
@@ -52,18 +54,22 @@ module Basil
         # if the server doesn't support us, we just do nothing.
         return unless Config.server.respond_to?(:broadcast_message)
 
+        debug "starting email checker loop"
+
         Thread.new do
           loop do
+            debug "checking email"
+
             begin
               with_imap do |imap|
                 imap.search(['NOT', 'DELETED']).each do |message_id|
+                  debug "mail found, handling"
                   handle_message_id(imap, message_id)
                 end
               end
 
             rescue Exception => ex
-              # rescue any per-message error so we continue to check
-              $stderr.puts "Error checking email: #{ex}"
+              error "checking email: #{ex}"
             end
 
             sleep (Config.email['interval'] || 30)
@@ -78,13 +84,13 @@ module Basil
 
         Plugin.email_strategies.each do |strategy|
           if msg = strategy.create_message(mail)
+            debug "stategy trigged, broadcasting #{msg.pretty}"
             Config.server.broadcast_message(msg)
           end
         end
 
       rescue Exception => ex
-        # rescue any process error so the message is still deleted
-        $stderr.puts "Error handling message id #{message_id}: #{ex}"
+        error "handling message id #{message_id}: #{ex}"
       ensure
         # we always, always delete the message. this stops malformed mails
         # from causing recurring problems and prevents any duplicate

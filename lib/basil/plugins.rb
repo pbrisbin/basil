@@ -86,5 +86,11 @@ module Basil
       when :watcher  ; Plugin.watchers   << self
       end; self
     end
+
+    # avoiding #to_s to preserve #inspect, see
+    # http://bugs.ruby-lang.org/issues/4453.
+    def pretty
+      "#{@type}: #{@regex.inspect}"
+    end
   end
 end

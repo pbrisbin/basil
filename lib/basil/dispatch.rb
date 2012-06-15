@@ -1,6 +1,8 @@
 module Basil
   class Dispatch
     class << self
+      include Logging
+
       # take a valid message and ask each registered plugin (responders
       # then watchers) if it wishes to act on it. The first reply
       # received is returned, otherwise nil.
@@ -9,14 +11,18 @@ module Basil
 
         if msg.to_me?
           Plugin.responders.each do |p|
-            reply = p.triggered?(msg)
-            return reply if reply
+            if reply = p.triggered?(msg)
+              debug "#{p.pretty} triggered"
+              return reply
+            end
           end
         end
 
         Plugin.watchers.each do |p|
-          reply = p.triggered?(msg)
-          return reply if reply
+          if reply = p.triggered?(msg)
+            debug "#{p.pretty} triggered"
+            return reply
+          end
         end
 
         nil
