@@ -5,6 +5,7 @@ module Basil
   class Plugin
     include Utils
     include ChatHistory
+    include Logging
 
     attr_reader :regex
     attr_accessor :description
@@ -12,6 +13,8 @@ module Basil
     private_class_method :new
 
     class << self
+      include Logging
+
       # Create an instance of Plugin which will look for regex only in
       # messages that are to basil.
       def respond_to(regex, &block)
@@ -50,10 +53,12 @@ module Basil
         dir = Config.plugins_directory
 
         if Dir.exists?(dir)
-          Dir.glob(dir + '/*').sort.each do |f|
+          debug "loading plugins from #{dir}"
+
+          Dir.glob("#{dir}/*").sort.each do |f|
             begin load(f)
             rescue Exception => ex
-              $stderr.puts "Error loading #{f}: #{ex}."
+              error "loading plugin #{f}: #{ex}"
               next
             end
           end

@@ -1,7 +1,8 @@
 module Basil
   # Utility functions that are useful across multiple plugins should
-  # reside here. They are mixed into the Plugin class. Most functions
-  # here should print to $stderr and return nil in the case of errors.
+  # reside here. They are mixed into the Plugin class. Functions here,
+  # and plugins in general, should avoid rescuing errors -- let them
+  # bubble up to be handled appropriately by the dispatcher.
   module Utils
     # Handles both single and multi-line statements to no one in
     # particular.
@@ -72,6 +73,8 @@ module Basil
     # is passed that begins with "https". Basic authentication is used
     # if :username or :password is given.
     def get_http(options)
+      debug "get_http called. options: #{options.inspect}"
+
       if options.is_a? Hash
         host     = options['host']
         port     = options['port'] || 80
