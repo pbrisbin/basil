@@ -1,155 +1,156 @@
-module Basil
-  module Jenkins
-    extend Utils
+module Jenkins
+  class Path
+    include Basil::Utils
+    include Basil::Logging
 
-    def self.short_status(job)
-      state = if job['color'] =~ /blue/
-                "is stable."
-              else
-                "is FAILING. See #{job['url']} for details."
-              end
+    # add an accessor method +method+ available in the api's json at
+    # +key+. if +conv+ is passed, it will be called on the value before
+    # returning it.
+    def self.def_accessor(method, key, conv = nil)
+      conversions[method] = conv
 
-      " * #{job['name']} #{state}"
+      self.class_eval %{
+        def #{method}
+          value = json['#{key}'] # may be nil
+          conv  = self.class.conversions[#{method.inspect}]
+
+          (value && conv) ? conv.call(value) : value
+        end
+      }
     end
 
-    class Api
-      include Basil::Utils
-
-      def initialize(path)
-        # path must include the trailing slash
-        @path = path.gsub(/[^\/]$/, '\&/')
-      end
-
-      def method_missing(method, *args)
-        json[method.to_s] if json
-      end
-
-      def passing?
-        color =~ /blue/
-      end
-
-      private
-
-      def json
-        @json ||= get_json(Config.jenkins.merge(
-          'path' => @path + 'api/json'))
-      end
+    # hold the lambdas described above
+    def self.conversions
+      @conversions ||= {}
     end
 
-    class EmailStrategy
-      SUBJECT_REGEX ||= /trunk_(unit|functionals|integration)/
-      CHAT_TITLE    ||= 'Dev/Arch + No more broken builds'
+    def path
+      raise "Subclass must implement"
+    end
 
-      def self.create_message(mail)
-        subject = mail['Subject']
+    def url
+      "http://#{Basil::Config.jenkins['host']}#{path}"
+    end
 
-        return unless subject =~ SUBJECT_REGEX
+    def json
+      unless @json
+        opts = Basil::Config.jenkins
+        opts['path'] = "#{path}api/json"
 
-        case subject
-        when /jenkins build is back to normal : (\w+) #(\d+)/i
-          msg = "(dance) #{$1} is back to normal"
-        when /build failed in Jenkins: (\w+) #(\d+)/i
-          build, job = $1, $2
-
-          extended = get_extended_info(build, job)
-          url      = "http://#{Basil::Config.jenkins['host']}/job/#{build}/#{job}/changes"
-
-          msg = [ "(headbang) #{$1} failed!", extended, "Please see #{url}" ].join("\n")
-        else
-          $stderr.puts "discarding non-matching email (subject: #{subject})"
-          return nil
-        end
-
-        Basil::Message.new(nil, Basil::Config.me, Basil::Config.me, msg, CHAT_TITLE)
+        @json = get_json(opts)
       end
 
-      def self.get_extended_info(build, job)
-        if status = Api.new("/job/#{build}/#{job}")
-          failCount  = status.actions[4]["failCount"] rescue '?'
+      @json
+    end
+  end
 
-          committers = []
-          status.changeSet['items'].each do |item|
-            committers << item['user']
-          end
+  class Job < Path
+    def_accessor :passing?,              'color',               lambda { |v| v =~ /blue/ }
+    def_accessor :failing?,              'color',               lambda { |v| v =~ /red/ }
+    def_accessor :aborted?,              'color',               lambda { |v| v =~ /aborted/ }
+    def_accessor :disabled?,             'color',               lambda { |v| v =~ /disabled/ }
+    def_accessor :builds,                'builds',              lambda { |v| v.map {|h| h['number']} }
+    def_accessor :health_report,         'healthReport',        lambda { |v| v.map {|h| h['description']}.join("\n") }
+    def_accessor :next_build_number,     'nextBuildNumber'
+    def_accessor :last_successful_build, 'lastSuccessfulBuild', lambda { |v| v['number'] rescue nil }
 
-          "#{failCount || '?'} failure(s). Commits made by #{committers.uniq.join(", ")}."
-        end
-      end
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+
+    def path
+      "/job/#{name}/"
+    end
+
+    def status
+      return 'build is green!'    if passing?
+      return 'last build failed.' if failing?
+      return 'last build aborted' if aborted?
+      return 'currently disabled' if disabled?
+
+      'current status unknown'
+    end
+  end
+
+  class Build < Path
+    def_accessor :building?,  'building'
+    def_accessor :duration,   'duration'
+    def_accessor :result,     'result'
+    def_accessor :fail_count, 'actions',   lambda { |v| (v[4]["failCount"] rescue '?') || '?' }
+    def_accessor :culprits,   'culprits',  lambda { |v| v.map {|h| h['fullName']}.join(', ') }
+    def_accessor :committers, 'changeSet', lambda { |v| v['items'].map {|h| h['user']}.uniq.join(', ') }
+
+    attr_reader :name, :number
+
+    def initialize(name, number)
+      @name, @number = name, number
+    end
+
+    def path
+      "/job/#{name}/#{number}/"
     end
   end
 end
 
-Basil.check_email(Basil::Jenkins::EmailStrategy)
+Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
+  name, number = @match_data.captures
 
-# TODO: not working anymore?
-#Basil.respond_to(/^jenkins$/) {
+  build = Jenkins::Build.new(name, number)
 
-  #says("build status") do |out|
-    #Basil::Jenkins::Api.new('/').jobs.each do |job|
-      #out << Basil::Jenkins.short_status(job)
-    #end
-  #end
+  set_chat('Dev/Arch + No more broken builds')
 
-#}.description = 'interacts with jenkins'
+  says do |out|
+    out << "(dance) #{build.name} is back to normal"
+    out << "Thanks go to #{build.committers}!"
+  end
+end
+
+Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
+  name, number = @match_data.captures
+
+  build = Jenkins::Build.new(name, number)
+
+  set_chat('Dev/Arch + No more broken builds')
+
+  says do |out|
+    out << "(headbang) #{build.name} ##{build.number} failed!"
+    out << "#{build.fail_count} failure(s). Culprits identified as #{build.culprits}."
+    out << "Please see #{build.url} for more details."
+  end
+end
+
+#Basil.respond_to('jenkins') do
+#
+# TODO: /api/json stopped working for me :(
+#
+#end
 
 Basil.respond_to(/^jenkins (\w+)/) {
 
-  job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
+  job = Jenkins::Job.new(@match_data[1])
 
   says do |out|
-    out << "#{job.displayName} is #{job.passing? ? "stable" : "FAILING"}"
-
-    job.healthReport.each do |line|
-      out << line['description']
-    end
-
-    out << "See #{job.url} for details."
+    out << "#{job.name}: #{job.status}"
+    out << job.health_report
   end
 
 }.description = 'retrieves info on a specific jenkins job'
 
-# TODO: not working anymore?
-#Basil.respond_to(/^who broke (.+?)\??$/) {
+Basil.respond_to(/^who broke (.+?)\??$/) {
 
-  #job = Basil::Jenkins::Api.new("/job/#{@match_data[1].strip}")
+  job = Jenkins::Job.new(@match_data[1])
 
-  #builds = job.builds.map { |b| b['number'].to_i }
-  #last_stable = job.lastStableBuild['number'].to_i rescue nil
+  if job.passing?
+    return says "#{job.name} is current green."
+  end
 
-  #if last_stable && builds.first == last_stable
-    #return says "#{job.displayName} is not broken."
-  #end
+  build = Jenkins::Build.new(job.name, job.builds.last)
 
-  #i = 0
-  #while Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}").building
-    #i += 1
-  #end
+  says do |out|
+    out << "The last completed build was #{build.number}"
+    out << "Culprits are #{build.culprits}."
+  end
 
-  #test_report = Basil::Jenkins::Api.new("/job/#{job.name}/#{builds[i]}/testReport")
-
-  #says do |out|
-    #test_report.suites.each do |s|
-      #s['cases'].each do |c|
-        #if c['status'] != 'PASSED'
-          #name  = "#{c['className']}##{c['name']}"
-          #since = c['failedSince']
-
-          #out << "#{name} first broke in #{since}"
-
-          #begin
-            #breaker = Basil::Jenkins::Api.new("/job/#{job.name}/#{since}")
-
-            #breaker.changeSet['items'].each do |item|
-              #out << "    * r#{item['revision']} [#{item['user']}] - #{item['msg']}"
-            #end
-          #rescue
-            #out << "    ! no info on that build"
-          #end
-
-          #out << ""
-        #end
-      #end
-    #end
-  #end
-
-#}.description = 'tells you what commits lead to the first broken build'
+}.description = 'tells you what commits lead to the first broken build'
