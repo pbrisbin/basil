@@ -31,10 +31,12 @@ module Basil
         p.register!
       end
 
-      # Register an object used for checking emails. See the Email
-      # module's documentation and an example in the jenkins plugin.
-      def check_email(obj)
-        email_strategies << obj
+      # Create an instance of Plugin which will look for regex in the
+      # subject of any emails basil receives.
+      def check_email(regex, &block)
+        p = new(:email_checker, regex)
+        p.define_singleton_method(:execute, &block)
+        p.register!
       end
 
       def responders
@@ -45,8 +47,8 @@ module Basil
         @watchers ||= []
       end
 
-      def email_strategies
-        @email_strategies ||= []
+      def email_checkers
+        @email_checkers ||= []
       end
 
       def load!
@@ -75,20 +77,36 @@ module Basil
       @description  = nil
     end
 
+    # if the message's text matches our regex, set the proper instance
+    # variables and call our execute method.
     def triggered?(msg)
       if @regex.nil? || msg.text =~ @regex
         @msg, @match_data = msg, $~
 
-        execute
-      else
-        nil
+        return execute
       end
+
+      nil
+    end
+
+    # if the mail's sbject matches our regex, set the proper instance
+    # variables and call our execute method.
+    def email_triggered?(mail)
+      if @regex.nil? || mail['Subject'] =~ @regex
+        @match_data = $~
+        @msg = Message.new(Config.me, mail['From'], mail['From'], mail.body, nil)
+
+        return execute
+      end
+
+      nil
     end
 
     def register!
       case @type
-      when :responder; Plugin.responders << self
-      when :watcher  ; Plugin.watchers   << self
+      when :responder    ; Plugin.responders     << self
+      when :watcher      ; Plugin.watchers       << self
+      when :email_checker; Plugin.email_checkers << self
       end; self
     end
 
