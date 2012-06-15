@@ -5,7 +5,8 @@ module Basil
   class Message
     include Basil
 
-    attr_reader :to, :from, :from_name, :time, :text, :chat
+    attr_reader :to, :from, :from_name, :time, :text
+    attr_accessor :chat
 
     def initialize(to, from, from_name, text, chat = nil)
       @time = Time.now
