@@ -18,10 +18,7 @@ module Basil
                   to  = Config.me if !to && is_private
                   msg = Message.new(to, from, from_name, text, chat.chatname)
 
-                  if reply = dispatch_message(msg)
-                    sending_message(reply)
-                    send_message(chat, reply)
-                  end
+                  send_message(chat, reply) if reply = dispatch_message(msg)
                 end
               end
             end
@@ -37,7 +34,6 @@ module Basil
         chats.each do |chat|
           chat.topic do |topic|
             if [topic, chat.chatname].include?(msg.chat)
-              sending_message(msg)
               send_message(chat, msg)
             end
           end

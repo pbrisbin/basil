@@ -1,7 +1,5 @@
 module Basil
   class Server
-    # called when the server has received an incoming message. returns
-    # a reply (which the server should send) or nil.
     def dispatch_message(msg)
       ChatHistory.store_message(msg)
 
@@ -17,12 +15,6 @@ module Basil
       $stderr.puts "Error dispatching #{msg.text}: #{ex}"
 
       nil
-    end
-
-    # called when the server is about to send any message for any
-    # reason. return value doesn't matter.
-    def sending_message(msg)
-
     end
   end
 end
