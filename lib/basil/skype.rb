@@ -49,6 +49,8 @@ module Basil
     end
     
     def broadcast_message(msg)
+      debug "broadcasting #{msg.pretty}"
+
       Rype.chats do |chats|
         chats.each do |chat|
           chat.topic do |topic|
