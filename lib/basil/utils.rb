@@ -59,6 +59,13 @@ module Basil
       Message.new(new_to, Config.me, Config.me, @msg.text, @msg.chat)
     end
 
+    # Set the chat attribute of the underlying message. This allows
+    # broadcasters to define what chat they're broadcasting to.
+    # Eventually, maybe we'll allow cross-chat communication via basil.
+    def set_chat(chat)
+      @msg.chat = chat if @msg
+    end
+
     def escape(str)
       require 'cgi'
       CGI::escape(str.strip)
@@ -73,8 +80,6 @@ module Basil
     # is passed that begins with "https". Basic authentication is used
     # if :username or :password is given.
     def get_http(options)
-      debug "get_http called. options: #{options.inspect}"
-
       if options.is_a? Hash
         host     = options['host']
         port     = options['port'] || 80
