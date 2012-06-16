@@ -1,13 +1,13 @@
 module Basil
   class Plugin
     def self.count_loaded
-      responders.length + watchers.length + email_strategies.length
+      responders.length + watchers.length + email_checkers.length
     end
 
     def self.clear_loaded!
       responders.clear
       watchers.clear
-      email_strategies.clear
+      email_checkers.clear
     end
   end
 end
