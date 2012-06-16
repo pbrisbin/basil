@@ -143,7 +143,7 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
   job = Jenkins::Job.new(@match_data[1])
 
   if job.passing?
-    return says "#{job.name} is current green."
+    return says "#{job.name} is currently green!"
   end
 
   build = Jenkins::Build.new(job.name, job.builds.last)
