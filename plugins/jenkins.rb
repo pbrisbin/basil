@@ -44,6 +44,26 @@ module Jenkins
     end
   end
 
+  class Status < Path
+    def_accessor :jobs, 'jobs', lambda { |v|
+      v.map { |h|
+        status = case h['color']
+                 when /blue/    ; 'is green'
+                 when /red/     ; 'is FAILING'
+                 when /aborted/ ; 'aborted'
+                 when /disabled/; 'disabled'
+                 else 'status unknown'
+                 end
+
+        "* #{h['name']}: build #{status}"
+      }.join("\n")
+    }
+
+    def path
+      '/'
+    end
+  end
+
   class Job < Path
     def_accessor :passing?,              'color',               lambda { |v| v =~ /blue/ }
     def_accessor :failing?,              'color',               lambda { |v| v =~ /red/ }
@@ -121,11 +141,11 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
   end
 end
 
-#Basil.respond_to('jenkins') do
-#
-# TODO: /api/json stopped working for me :(
-#
-#end
+Basil.respond_to('jenkins') {
+
+  says Jenkins::Status.new.jobs
+
+}.description = 'display the status of all jenkins builds'
 
 Basil.respond_to(/^jenkins (\w+)/) {
 
@@ -153,4 +173,4 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
     out << "Culprits are #{build.culprits}."
   end
 
-}.description = 'tells you what commits lead to the first broken build'
+}.description = 'tells you the likely culprits for a broken build'
