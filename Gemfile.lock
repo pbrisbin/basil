@@ -33,6 +33,10 @@ GEM
     nokogiri (1.5.0)
     ruby-dbus (0.7.0)
     simple_oauth (0.1.8)
+    simplecov (0.6.4)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.5.3)
+    simplecov-html (0.5.3)
     twitter (2.1.0)
       activesupport (>= 2.3.9, < 4)
       faraday (~> 0.7)
@@ -45,3 +49,4 @@ PLATFORMS
 DEPENDENCIES
   basil!
   rype!
+  simplecov
