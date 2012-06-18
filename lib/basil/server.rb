@@ -7,10 +7,8 @@ module Basil
       ChatHistory.store_message(msg)
 
       if Config.dispatcher_type == :extended
-        debug "using extended dispatcher"
         Dispatch.extended(msg)
       else
-        debug "using simple dispatcher"
         Dispatch.simple(msg)
       end
 

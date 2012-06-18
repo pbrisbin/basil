@@ -29,7 +29,21 @@ module Basil
       end
 
       def extended(msg)
+        return nil unless msg && msg.text != ''
+
         process_pipeline(replace_substitutions(msg))
+      end
+
+      def email(mail)
+        debug "dispatching through email"
+        return nil unless mail && mail['Subject']
+
+        Plugin.email_checkers.each do |p|
+          if reply = p.email_triggered?(mail)
+            debug "#{p.pretty} triggered"
+            return reply
+          end
+        end
       end
 
       private

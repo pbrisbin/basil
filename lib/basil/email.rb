@@ -81,11 +81,8 @@ module Basil
       def handle_message_id(imap, message_id)
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
-        Plugin.email_checkers.each do |p|
-          if reply = p.email_triggered?(mail)
-            debug "#{p.pretty} triggered"
-            Config.server.broadcast_message(reply)
-          end
+        if reply = Dispatch.email(mail)
+          Config.server.broadcast_message(reply)
         end
 
       rescue Exception => ex
