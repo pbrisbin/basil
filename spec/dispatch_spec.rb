@@ -8,6 +8,9 @@ module Basil
 
       @responder = Plugin.respond_to(/a match/) { self }
       @watcher   = Plugin.watch_for(/a match/)  { self }
+
+      # lift this requirement for the test
+      Dispatch.stub(:ensure_valid) { |obj| obj }
     end
 
     it "handles nil or empty messages" do
@@ -33,6 +36,9 @@ module Basil
       Plugin.email_checkers.clear
 
       @checker = Plugin.check_email(/a match/) { self }
+
+      # lift this requirement for the test
+      Dispatch.stub(:ensure_valid) { |obj| obj }
     end
 
     it "handles nil or empty subject lines" do
