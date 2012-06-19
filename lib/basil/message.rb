@@ -3,8 +3,6 @@ module Basil
   # these and pass them through dispatch which will also return a
   # Message if a response is triggered.
   class Message
-    include Basil
-
     attr_reader :to, :from, :from_name, :time, :text
     attr_accessor :chat
 
