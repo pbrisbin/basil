@@ -13,7 +13,7 @@ module Basil
           Plugin.responders.each do |p|
             if reply = p.triggered?(msg)
               debug "#{p.pretty} triggered"
-              return reply
+              return ensure_valid(reply)
             end
           end
         end
@@ -21,7 +21,7 @@ module Basil
         Plugin.watchers.each do |p|
           if reply = p.triggered?(msg)
             debug "#{p.pretty} triggered"
-            return reply
+            return ensure_valid(reply)
           end
         end
 
@@ -31,7 +31,7 @@ module Basil
       def extended(msg)
         return nil unless msg && msg.text != ''
 
-        process_pipeline(replace_substitutions(msg))
+        ensure_valid(process_pipeline(replace_substitutions(msg)))
       end
 
       def email(mail)
@@ -41,12 +41,22 @@ module Basil
         Plugin.email_checkers.each do |p|
           if reply = p.email_triggered?(mail)
             debug "#{p.pretty} triggered"
-            return reply
+            return ensure_valid(reply)
           end
         end
       end
 
       private
+
+      # dispatching must return a Message or nil, anything else will
+      # cause errors.
+      def ensure_valid(obj)
+        return obj if obj.nil? || obj.is_a?(Message)
+
+        error "invalid object <#{obj}>, expected Message or nil"
+
+        nil
+      end
 
       # collapse pipe-separated commands to one reply by dispatching
       # each component and feeding the reply of one as argument to the
