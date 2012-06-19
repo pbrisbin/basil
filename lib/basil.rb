@@ -37,7 +37,7 @@ module Basil
         Config.server.start
         Thread.list.each(&:join)
 
-      rescue Exception => ex
+      rescue => ex
         fatal "#{ex}"
 
         debug "trace:"

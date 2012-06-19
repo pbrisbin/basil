@@ -22,8 +22,6 @@ module Basil
 
         begin
           #{code}
-        
-        rescue SystemExit
         end
       }
 
@@ -31,7 +29,7 @@ module Basil
 
       [result, stdout.string]
 
-    rescue SyntaxError
+    rescue Exception
       [nil, nil]
     ensure
       $stdout = STDOUT
