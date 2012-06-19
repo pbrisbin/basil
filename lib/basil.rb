@@ -22,9 +22,7 @@ module Basil
   class << self
     extend Forwardable
 
-    def_delegator Basil::Plugin, :respond_to
-    def_delegator Basil::Plugin, :watch_for
-    def_delegator Basil::Plugin, :check_email
+    def_delegators Plugin, :respond_to, :watch_for, :check_email
   end
 
   class Main
