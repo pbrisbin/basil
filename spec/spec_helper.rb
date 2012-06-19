@@ -5,4 +5,5 @@ end
 
 require 'basil'
 
-# ...
+# quiet logging during tests
+Basil::Logger.level = ::Logger::FATAL
