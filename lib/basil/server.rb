@@ -1,3 +1,5 @@
+require 'shellwords'
+
 module Basil
   class Server
     include Logging
@@ -7,13 +9,15 @@ module Basil
 
       # Servers can register commands which will be checked for before
       # normal dispatching. Commands can be sent in chat with the
-      # message format "/command[ arg1 arg2 ...]".
+      # message format "/command [arguments]"
       #
       # If the Server has registered a block to execute for this
       # command, it will be called with the (possibly empty) list of
-      # space-separated arguments. If it returns a Message, that message
-      # is sent and dispatching does not occur. If it returns nil,
-      # normal dispatching will proceed.
+      # shell split arguments.
+      #
+      # If it returns a Message, that message is sent and dispatching
+      # does not occur. If it returns nil, normal dispatching will
+      # proceed.
       def has_command(command, &block)
         return unless block_given?
 
@@ -50,7 +54,7 @@ module Basil
     def server_command?(msg)
       if msg.to_me? && msg.text =~ %r{^/(\w+)( (.*))?$}
         command = $1
-        args   = $3.split(/\s+/) rescue []
+        args    = $3.shellsplit rescue []
 
         if block = self.class.server_commands[command.to_sym]
           debug "calling server command :#{command} with #{args}"
