@@ -20,8 +20,6 @@ module Basil
       # proceed.
       def has_command(command, &block)
         return unless block_given?
-
-        debug "server has command /#{command}"
         server_commands[command.to_sym] = block
       end
 
@@ -57,7 +55,7 @@ module Basil
         args    = $3.shellsplit rescue []
 
         if block = self.class.server_commands[command.to_sym]
-          debug "calling server command :#{command} with #{args}"
+          debug "executing server command: #{command}(#{args.join(', ')})"
           return block.call(*args)
         end
       end

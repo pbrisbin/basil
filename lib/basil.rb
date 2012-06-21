@@ -30,19 +30,18 @@ module Basil
       include Logging
 
       def run!(args)
-        debug "starting up"
-
         Plugin.load!
         Email.check
+
         Config.server.start
+
         Thread.list.each(&:join)
 
       rescue => ex
         fatal "#{ex}"
 
-        debug "trace:"
         ex.backtrace.map do |line|
-          debug "  #{line}"
+          debug "#{line}"
         end
 
         exit 1

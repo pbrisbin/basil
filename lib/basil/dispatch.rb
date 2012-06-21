@@ -35,7 +35,6 @@ module Basil
       end
 
       def email(mail)
-        debug "dispatching through email"
         return nil unless mail && mail['Subject']
 
         Plugin.email_checkers.each do |p|
