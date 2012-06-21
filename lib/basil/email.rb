@@ -25,7 +25,7 @@ module Basil
         while !(line = lines.shift).empty?
           if line =~ /^\s+(.*)/ # continuation
             last = header_lines.pop
-            line = last + $1 if last
+            line = "#{last} #{$1}" if last
           end
 
           header_lines << line
@@ -71,6 +71,8 @@ module Basil
               error "checking email: #{ex}"
             end
 
+            break unless poll_email?
+
             sleep (Config.email['interval'] || 30)
           end
         end
@@ -106,6 +108,13 @@ module Basil
           imap.logout()
           imap.disconnect()
         end
+      end
+
+      def poll_email?
+        # right now we just use this to prevent looping during testing,
+        # eventually this might be used to allow an in-chat command to
+        # shut down the polling (or something)
+        true
       end
     end
   end
