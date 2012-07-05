@@ -7,62 +7,63 @@ module Basil
     include ChatHistory
     include Logging
 
+    class << self
+      # so we have log methods in class methods
+      include Logging
+    end
+
     attr_reader :regex
     attr_accessor :description
 
     private_class_method :new
 
-    class << self
-      include Logging
+    # Create an instance of Plugin which will look for regex only in
+    # messages that are to basil.
+    def self.respond_to(regex, &block)
+      p = new(:responder, regex)
+      p.define_singleton_method(:execute, &block)
+      p.register!
+    end
 
-      # Create an instance of Plugin which will look for regex only in
-      # messages that are to basil.
-      def respond_to(regex, &block)
-        p = new(:responder, regex)
-        p.define_singleton_method(:execute, &block)
-        p.register!
-      end
+    # Create an instance of Plugin which will look for regex in any
+    # messages sent in the chat.
+    def self.watch_for(regex, &block)
+      p = new(:watcher, regex)
+      p.define_singleton_method(:execute, &block)
+      p.register!
+    end
 
-      # Create an instance of Plugin which will look for regex in any
-      # messages sent in the chat.
-      def watch_for(regex, &block)
-        p = new(:watcher, regex)
-        p.define_singleton_method(:execute, &block)
-        p.register!
-      end
+    # Create an instance of Plugin which will look for regex in the
+    # subject of any emails basil receives.
+    def self.check_email(regex, &block)
+      p = new(:email_checker, regex)
+      p.define_singleton_method(:execute, &block)
+      p.register!
+    end
 
-      # Create an instance of Plugin which will look for regex in the
-      # subject of any emails basil receives.
-      def check_email(regex, &block)
-        p = new(:email_checker, regex)
-        p.define_singleton_method(:execute, &block)
-        p.register!
-      end
+    def self.responders
+      @responders ||= []
+    end
 
-      def responders
-        @responders ||= []
-      end
+    def self.watchers
+      @watchers ||= []
+    end
 
-      def watchers
-        @watchers ||= []
-      end
+    def self.email_checkers
+      @email_checkers ||= []
+    end
 
-      def email_checkers
-        @email_checkers ||= []
-      end
+    def self.load!
+      dir = Config.plugins_directory
 
-      def load!
-        dir = Config.plugins_directory
+      if Dir.exists?(dir)
+        debug "loading plugins from #{dir}"
 
-        if Dir.exists?(dir)
-          debug "loading plugins from #{dir}"
-
-          Dir.glob("#{dir}/*").sort.each do |f|
-            begin load(f)
-            rescue Exception => ex
-              error "loading plugin #{f}: #{ex}"
-              next
-            end
+        Dir.glob("#{dir}/*").sort.each do |f|
+          begin load(f)
+          rescue Exception => ex
+            error "loading plugin #{f}: #{ex}"
+            next
           end
         end
       end

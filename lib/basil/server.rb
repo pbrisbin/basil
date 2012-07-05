@@ -4,28 +4,24 @@ module Basil
   class Server
     include Logging
 
-    class << self
-      include Logging
+    # Servers can register commands which will be checked for before
+    # normal dispatching. Commands can be sent in chat with the
+    # message format "/command [arguments]"
+    #
+    # If the Server has registered a block to execute for this
+    # command, it will be called with the (possibly empty) list of
+    # shell split arguments.
+    #
+    # If it returns a Message, that message is sent and dispatching
+    # does not occur. If it returns nil, normal dispatching will
+    # proceed.
+    def self.has_command(command, &block)
+      return unless block_given?
+      server_commands[command.to_sym] = block
+    end
 
-      # Servers can register commands which will be checked for before
-      # normal dispatching. Commands can be sent in chat with the
-      # message format "/command [arguments]"
-      #
-      # If the Server has registered a block to execute for this
-      # command, it will be called with the (possibly empty) list of
-      # shell split arguments.
-      #
-      # If it returns a Message, that message is sent and dispatching
-      # does not occur. If it returns nil, normal dispatching will
-      # proceed.
-      def has_command(command, &block)
-        return unless block_given?
-        server_commands[command.to_sym] = block
-      end
-
-      def server_commands
-        @server_commands ||= {}
-      end
+    def self.server_commands
+      @server_commands ||= {}
     end
 
     def dispatch_message(msg)
