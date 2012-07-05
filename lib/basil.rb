@@ -31,11 +31,10 @@ module Basil
 
       def run!(args)
         Plugin.load!
+
         Email.check
 
         Config.server.start
-
-        Thread.list.each(&:join)
 
       rescue => ex
         fatal "#{ex}"

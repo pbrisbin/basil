@@ -48,6 +48,7 @@ module Basil
       end
 
       Rype.attach
+      Rype.thread.join
     end
     
     def broadcast_message(msg)
