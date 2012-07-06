@@ -10,7 +10,9 @@ module Basil
       end
 
       def set
-        File.write(Config.lock_file, '')
+        File.open(Config.lock_file, 'w') do |fh|
+          fh.write('')
+        end
       end
 
       def unset
