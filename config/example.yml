@@ -14,6 +14,9 @@ plugins_directory: ./plugins
 # Where basil will persist his data.
 pstore_file: ./basil.pstore
 
+# Where a locking server will store its lock file.
+lock_file: /tmp/basil.lock
+
 # Required only on OSX and ruby 1.9 for https requests to work (JIRA).
 # Install curl-ca-bundle via ports. The get_* utilities will use this
 # cert file for secure requests if the configuration option is present.

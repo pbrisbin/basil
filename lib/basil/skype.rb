@@ -50,6 +50,8 @@ module Basil
       Rype.attach
       Rype.thread.join
     end
+
+    lock_start
     
     def broadcast_message(msg)
       debug "broadcasting #{msg.pretty}"

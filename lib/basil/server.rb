@@ -24,6 +24,26 @@ module Basil
       @server_commands ||= {}
     end
 
+    # Redefine your start method to be wrapped in a lock file, ensuring
+    # no more than one instance of your server can be run at a time.
+    def self.lock_start
+      alias_method :original_start, :start
+
+      define_method(:start) do
+        Lock.guard!
+
+        begin
+          Lock.set
+
+          original_start
+
+        ensure
+          Lock.unset
+        end
+      end
+
+    end
+
     def dispatch_message(msg)
       debug "dispatching #{msg.pretty}"
       ChatHistory.store_message(msg)
