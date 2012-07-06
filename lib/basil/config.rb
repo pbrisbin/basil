@@ -35,16 +35,20 @@ module Basil
     end
 
     # We need to temporarily hide the Config object during evaluation
-    # plugins since it can access it and see passwords, etc. Through
-    # this approach the only thing that can be seen is the location of
-    # the config file which I believe is fairly innocuous.
-    def self.hide(&block)
+    # plugins since it can access it and see passwords, etc.
+    def hide(&block)
       @hidden = true
 
       yield
 
     ensure
       @hidden = false
+    end
+
+    # this is mostly to support testing, but perhaps it should be part
+    # of the reload plugin eventually.
+    def invalidate
+      @yaml = nil
     end
   end
 end
