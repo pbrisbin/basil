@@ -30,18 +30,10 @@ module Basil
       alias_method :original_start, :start
 
       define_method(:start) do
-        Lock.guard!
-
-        begin
-          Lock.set
-
+        Lock.guard do
           original_start
-
-        ensure
-          Lock.unset
         end
       end
-
     end
 
     def dispatch_message(msg)
