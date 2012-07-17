@@ -5,6 +5,8 @@ module Basil
     def start
       debug "starting skype server"
 
+      Rype::Logger.set(Basil::Logger)
+
       # Note: there are a number of oddities in how the dbus connection
       # behaves. Also, if you break this code by violating the below,
       # you won't get an exception, basil just stops listening.
