@@ -1,6 +1,5 @@
 require 'forwardable'
 require 'logger'
-require 'singleton'
 
 module Basil
   module Logging
@@ -15,18 +14,16 @@ module Basil
   end
 
   class Logger
-    include Singleton
+    class << self
+      def method_missing(*args, &block)
+        logger.send(*args, &block)
+      end
 
-    def self.method_missing(meth, *args, &block)
-      self.instance.send(meth, *args, &block)
-    end
+      private
 
-    def method_missing(meth, *args, &block)
-      @logger.send(meth, *args, &block)
-    end
-
-    def initialize
-      @logger = ::Logger.new(STDERR)
+      def logger
+        @logger ||= ::Logger.new(STDERR)
+      end
     end
   end
 end
