@@ -3,7 +3,7 @@ require 'rype'
 module Basil
   class Skype < Server
     def start
-      debug "starting skype server"
+      info "starting skype server"
 
       Rype::Logger.set(Basil::Logger)
 
@@ -38,7 +38,7 @@ module Basil
                   msg = Message.new(to, from, from_name, text, chat.chatname)
 
                   if reply = dispatch_message(msg)
-                    debug "sending #{reply.pretty}"
+                    info "sending #{reply.pretty}"
                     prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
                     chat.send_message(prefix + reply.text)
                   end
@@ -56,7 +56,7 @@ module Basil
     lock_start
     
     def broadcast_message(msg)
-      debug "broadcasting #{msg.pretty}"
+      info "broadcasting #{msg.pretty}"
 
       Rype.chats do |chats|
         chats.each do |chat|

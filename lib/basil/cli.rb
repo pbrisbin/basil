@@ -5,14 +5,14 @@ module Basil
     end
 
     def start
-      debug "starting cli server"
+      info "starting cli server"
 
       loop do
         print '> '; str = $stdin.gets.chomp
         msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
 
         if reply = dispatch_message(msg)
-          debug "sending #{reply.pretty}"
+          info "sending #{reply.pretty}"
           puts reply.text
         end
       end

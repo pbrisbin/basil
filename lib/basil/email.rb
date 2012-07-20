@@ -53,7 +53,7 @@ module Basil
         # if the server doesn't support us, we just do nothing.
         return unless Config.server.respond_to?(:broadcast_message)
 
-        debug "starting email checker loop"
+        info "starting email checker loop"
 
         Thread.new do
           loop do
@@ -62,7 +62,7 @@ module Basil
             begin
               with_imap do |imap|
                 imap.search(['NOT', 'DELETED']).each do |message_id|
-                  debug "mail found, handling"
+                  info "mail found, handling"
                   handle_message_id(imap, message_id)
                 end
               end

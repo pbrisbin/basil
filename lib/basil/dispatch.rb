@@ -12,7 +12,7 @@ module Basil
         if msg.to_me?
           Plugin.responders.each do |p|
             if reply = p.triggered?(msg)
-              debug "#{p.pretty} triggered"
+              info "#{p.pretty} triggered"
               return ensure_valid(reply)
             end
           end
@@ -20,7 +20,7 @@ module Basil
 
         Plugin.watchers.each do |p|
           if reply = p.triggered?(msg)
-            debug "#{p.pretty} triggered"
+            info "#{p.pretty} triggered"
             return ensure_valid(reply)
           end
         end
@@ -39,7 +39,7 @@ module Basil
 
         Plugin.email_checkers.each do |p|
           if reply = p.email_triggered?(mail)
-            debug "#{p.pretty} triggered"
+            info "#{p.pretty} triggered"
             return ensure_valid(reply)
           end
         end
