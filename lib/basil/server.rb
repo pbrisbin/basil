@@ -37,7 +37,7 @@ module Basil
     end
 
     def dispatch_message(msg)
-      info "dispatching #{msg.pretty}"
+      debug "dispatching #{msg.pretty}"
       ChatHistory.store_message(msg)
 
       if reply = server_command?(msg)
