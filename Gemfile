@@ -1,7 +1,6 @@
 source "http://rubygems.org"
 
-#gem "rype", :git => "http://github.com/nfelger/rype"
-gem "rype", :git => "http://github.com/pbrisbin/rype", :branch => "logger"
+gem "rype", :git => "http://github.com/nfelger/rype"
 gemspec
 
 group :test do
