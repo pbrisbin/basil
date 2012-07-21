@@ -31,8 +31,13 @@ module Basil
       include Logging
 
       def run!(args)
-        unless args.first == '--debug'
-          Logger.level = ::Logger::INFO
+        while arg = args.shift
+          case arg
+          when '--debug'
+            Logger.level = ::Logger::DEBUG
+          when '--cli'
+            Config.server = Cli.new
+          end
         end
 
         Plugin.load!
