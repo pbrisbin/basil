@@ -22,7 +22,9 @@ module Basil
       private
 
       def logger
-        @logger ||= ::Logger.new(STDERR)
+        @logger ||= ::Logger.new(STDERR).tap do |logger|
+          logger.level = ::Logger::INFO
+        end
       end
     end
   end
