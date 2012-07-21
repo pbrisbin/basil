@@ -16,6 +16,8 @@ module Basil
       yaml[key.to_s] if yaml
     end
 
+    attr_writer :server
+
     def server
       unless @server
         case server_type
