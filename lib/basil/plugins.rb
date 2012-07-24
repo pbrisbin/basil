@@ -17,28 +17,29 @@ module Basil
 
     private_class_method :new
 
+    def self.create(type, regex, &block)
+      p = new(type, regex)
+      p.define_singleton_method(:execute, &block)
+      p.register!
+    end
+    private_class_method :create
+
     # Create an instance of Plugin which will look for regex only in
     # messages that are to basil.
     def self.respond_to(regex, &block)
-      p = new(:responder, regex)
-      p.define_singleton_method(:execute, &block)
-      p.register!
+      create(:responder, regex, &block)
     end
 
     # Create an instance of Plugin which will look for regex in any
     # messages sent in the chat.
     def self.watch_for(regex, &block)
-      p = new(:watcher, regex)
-      p.define_singleton_method(:execute, &block)
-      p.register!
+      create(:watcher, regex, &block)
     end
 
     # Create an instance of Plugin which will look for regex in the
     # subject of any emails basil receives.
     def self.check_email(regex, &block)
-      p = new(:email_checker, regex)
-      p.define_singleton_method(:execute, &block)
-      p.register!
+      create(:email_checker, regex, &block)
     end
 
     def self.responders
