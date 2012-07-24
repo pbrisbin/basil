@@ -83,10 +83,10 @@ module Basil
     # variables and call our execute method.
     def triggered?(msg)
       if type == :email_checker
-        matcher = ->(m) { regex.nil? || msg['Subject'] =~ regex }
-        coercer = ->(m) { Message.new(Config.me, msg['From'], msg['From'], msg.body, nil) }
+        matcher = ->(m) { regex.nil? || m['Subject'] =~ regex }
+        coercer = ->(m) { Message.new(Config.me, m['From'], m['From'], m.body, nil) }
       else
-        matcher = ->(m) { regex.nil? || msg.text =~ regex }
+        matcher = ->(m) { regex.nil? || m.text =~ regex }
       end
 
       if matcher.call(msg)
