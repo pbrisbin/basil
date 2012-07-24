@@ -40,10 +40,6 @@ module Basil
           end
         end
 
-        Plugin.load!
-
-        Email.check
-
         Config.server.start
 
       rescue => ex

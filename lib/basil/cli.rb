@@ -7,6 +7,8 @@ module Basil
     def start
       info "starting cli server"
 
+      super
+
       loop do
         print '> '; str = $stdin.gets.chomp
         msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')

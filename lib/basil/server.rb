@@ -36,6 +36,13 @@ module Basil
       end
     end
 
+    # Loads plugins and kicks off the email checking loop. Subclasses
+    # should call super in their start method overrides.
+    def start
+      Plugin.load!
+      Email.check
+    end
+
     def dispatch_message(msg)
       debug "dispatching #{msg.pretty}"
       ChatHistory.store_message(msg)

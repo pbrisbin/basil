@@ -5,6 +5,8 @@ module Basil
     def start
       info "starting skype server"
 
+      super
+
       Rype::Logger.set(Basil::Logger)
 
       # Note: there are a number of oddities in how the dbus connection
