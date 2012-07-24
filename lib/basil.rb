@@ -24,16 +24,17 @@ module Basil
     include Logging
 
     extend Forwardable
-    def_delegators Plugin, :respond_to, :watch_for, :check_email
+    def_delegators Plugin, :respond_to,
+                           :watch_for,
+                           :check_email
 
-    def run(args)
-      while arg = args.shift
-        case arg
-        when '--debug'
-          Logger.level = ::Logger::DEBUG
-        when '--cli'
-          Config.server = Cli.new
-        end
+    def run(argv)
+      if argv.include?('--debug')
+        Logger.level = ::Logger::DEBUG
+      end
+
+      if argv.include?('--cli')
+        Config.server = Cli.new
       end
 
       Config.server.start
