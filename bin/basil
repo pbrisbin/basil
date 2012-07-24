@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 require 'basil'
 
-Basil::Main.run! ARGV
+Basil.run ARGV

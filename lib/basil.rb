@@ -21,36 +21,31 @@ require 'basil/storage'
 
 module Basil
   class << self
+    include Logging
+
     extend Forwardable
-
     def_delegators Plugin, :respond_to, :watch_for, :check_email
-  end
 
-  class Main
-    class << self
-      include Logging
-
-      def run!(args)
-        while arg = args.shift
-          case arg
-          when '--debug'
-            Logger.level = ::Logger::DEBUG
-          when '--cli'
-            Config.server = Cli.new
-          end
+    def run(args)
+      while arg = args.shift
+        case arg
+        when '--debug'
+          Logger.level = ::Logger::DEBUG
+        when '--cli'
+          Config.server = Cli.new
         end
-
-        Config.server.start
-
-      rescue => ex
-        fatal "#{ex}"
-
-        ex.backtrace.map do |line|
-          debug "#{line}"
-        end
-
-        exit 1
       end
+
+      Config.server.start
+
+    rescue => ex
+      fatal "#{ex}"
+
+      ex.backtrace.map do |line|
+        debug "#{line}"
+      end
+
+      exit 1
     end
   end
 end
