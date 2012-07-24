@@ -10,22 +10,12 @@ module Basil
         return nil unless msg && msg.text != ''
 
         if msg.to_me?
-          Plugin.responders.each do |p|
-            if reply = p.triggered?(msg)
-              info "#{p.pretty} triggered"
-              return ensure_valid(reply)
-            end
+          if reply = dispatch_through(Plugin.responders, msg)
+            return reply
           end
         end
 
-        Plugin.watchers.each do |p|
-          if reply = p.triggered?(msg)
-            info "#{p.pretty} triggered"
-            return ensure_valid(reply)
-          end
-        end
-
-        nil
+        dispatch_through(Plugin.watchers, msg)
       end
 
       def extended(msg)
@@ -37,15 +27,21 @@ module Basil
       def email(mail)
         return nil unless mail && mail['Subject']
 
-        Plugin.email_checkers.each do |p|
-          if reply = p.email_triggered?(mail)
+        dispatch_through(Plugin.email_checkers, mail)
+      end
+
+      private
+
+      def dispatch_through(plugins, msg)
+        plugins.each do |p|
+          if reply = p.triggered?(msg)
             info "#{p.pretty} triggered"
             return ensure_valid(reply)
           end
         end
-      end
 
-      private
+        nil
+      end
 
       # dispatching must return a Message or nil, anything else will
       # cause errors.
