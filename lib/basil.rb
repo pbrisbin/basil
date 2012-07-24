@@ -15,7 +15,7 @@ require 'basil/dispatch'
 require 'basil/email'
 require 'basil/lock'
 require 'basil/message'
-require 'basil/plugins'
+require 'basil/plugin'
 require 'basil/skype'
 require 'basil/storage'
 
