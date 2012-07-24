@@ -12,9 +12,6 @@ module Basil
       include Logging
     end
 
-    attr_reader :regex
-    attr_accessor :description
-
     private_class_method :new
 
     def self.create(type, regex, &block)
@@ -70,6 +67,9 @@ module Basil
       end
     end
 
+    attr_reader :type, :regex
+    attr_accessor :description
+
     def initialize(type, regex)
       if regex.is_a? String
         regex = Regexp.new("^#{regex}$")
@@ -82,21 +82,16 @@ module Basil
     # if the message's text matches our regex, set the proper instance
     # variables and call our execute method.
     def triggered?(msg)
-      if @regex.nil? || msg.text =~ @regex
-        @msg, @match_data = msg, $~
-
-        return execute
+      if type == :email_checker
+        matcher = ->(m) { regex.nil? || msg['Subject'] =~ regex }
+        coercer = ->(m) { Message.new(Config.me, msg['From'], msg['From'], msg.body, nil) }
+      else
+        matcher = ->(m) { regex.nil? || msg.text =~ regex }
       end
 
-      nil
-    end
-
-    # if the mail's sbject matches our regex, set the proper instance
-    # variables and call our execute method.
-    def email_triggered?(mail)
-      if @regex.nil? || mail['Subject'] =~ @regex
+      if matcher.call(msg)
+        @msg = coercer ? coercer.call(msg) : msg
         @match_data = $~
-        @msg = Message.new(Config.me, mail['From'], mail['From'], mail.body, nil)
 
         return execute
       end
