@@ -92,6 +92,16 @@ module Jenkins
 
       'current status unknown'
     end
+
+    def build!
+      res = get_http "#{url}/build"
+
+      if res.is_a? ::Net::HTTPFound
+        "Build started"
+      else
+        "Could not start build (#{res.code})"
+      end
+    end
   end
 
   class Build < Path
@@ -174,3 +184,10 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
   end
 
 }.description = 'tells you the likely culprits for a broken build'
+
+Basil.respond_to(/^build (\w+)/) {
+
+  says Jenkins::Job.new(@match_data[1]).build!
+
+}.description = 'triggers a build for the specified job'
+
