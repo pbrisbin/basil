@@ -94,7 +94,10 @@ module Jenkins
     end
 
     def build!
-      res = get_http "#{url}/build"
+      opts = Basil::Config.jenkins
+      opts['path'] = "#{url}/build"
+
+      res = get_http(opts)
 
       if res.is_a? ::Net::HTTPFound
         "Build started"
