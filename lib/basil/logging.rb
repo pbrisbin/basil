@@ -3,6 +3,8 @@ require 'logger'
 
 module Basil
   module Logging
+    # when we're included, define delegators for use in both class and
+    # instance methods
     def self.included(base)
       base.extend(Forwardable)
       base.def_delegators Logger, :fatal,
@@ -10,6 +12,17 @@ module Basil
                                   :warn,
                                   :info,
                                   :debug
+
+      base.class_eval do
+        class << self
+          extend(Forwardable)
+          def_delegators Logger, :fatal,
+                                 :error,
+                                 :warn,
+                                 :info,
+                                 :debug
+        end
+      end
     end
   end
 

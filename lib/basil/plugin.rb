@@ -7,11 +7,6 @@ module Basil
     include ChatHistory
     include Logging
 
-    class << self
-      # so we have log methods in class methods
-      include Logging
-    end
-
     private_class_method :new
 
     def self.create(type, regex, &block)

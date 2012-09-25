@@ -2,6 +2,8 @@ require 'net/imap'
 
 module Basil
   module Email
+    include Logging
+
     # This class represents a parsed email. Headers are accessed like
     # array indices and body is provided as a method. The parsing is
     # naive, but it works for our purpose.
@@ -44,8 +46,6 @@ module Basil
     end
 
     class << self
-      include Logging
-
       # Check for email on the configured interval, if a mail is found
       # it is run through each of the email checker plugins. Any replies
       # returned will be handed to the server's broadcast_mail method.
@@ -73,7 +73,7 @@ module Basil
 
             break unless poll_email?
 
-            sleep (Config.email['interval'] || 30)
+            sleep(Config.email['interval'] || 30)
           end
         end
       end

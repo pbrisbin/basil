@@ -20,9 +20,9 @@ require 'basil/skype'
 require 'basil/storage'
 
 module Basil
-  class << self
-    include Logging
+  include Logging
 
+  class << self
     extend Forwardable
     def_delegators Plugin, :respond_to,
                            :watch_for,
