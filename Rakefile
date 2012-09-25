@@ -16,7 +16,10 @@ end
 
 desc "shortcut to run basil in cli mode"
 task :cli do
-  system('bundle exec bin/basil --cli')
+  cmd =  'bundle exec bin/basil --cli'
+  cmd += ' --debug' if ENV['DEBUG']
+
+  system(cmd)
 end
 
 task :default => :spec
