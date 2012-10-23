@@ -56,7 +56,7 @@ module Basil
     end
 
     lock_start
-    
+
     def broadcast_message(msg)
       info "broadcasting #{msg.pretty}"
 

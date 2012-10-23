@@ -92,7 +92,7 @@ module Basil
     it "provides parse_http" do
       resp = double("resp", :body => 'a body')
       @plugin.should_receive(:get_http).with('args').and_return(resp)
-      
+
       result = @plugin.parse_http('args') { |b| b }
       result.should == 'a body'
     end
