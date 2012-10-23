@@ -132,7 +132,7 @@ Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat('Dev/Arch + No more broken builds')
+  set_chat('Dev/Arch Broken Builds')
 
   says do |out|
     out << "(dance) #{build.name} is back to normal"
