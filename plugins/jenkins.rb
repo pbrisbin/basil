@@ -145,7 +145,7 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat('Dev/Arch + No more broken builds')
+  set_chat('Dev/Arch Broken Builds')
 
   says do |out|
     out << "(headbang) #{build.name} ##{build.number} failed!"
