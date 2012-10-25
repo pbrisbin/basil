@@ -80,7 +80,9 @@ module Basil
     # is passed that begins with "https". Basic authentication is used
     # if :username or :password is given.
     def get_http(options)
-      if options.is_a? Hash
+      Logger.debug("getting http: #{options.inspect}")
+
+      resp = if options.is_a? Hash
         host     = options['host']
         port     = options['port'] || 80
         path     = options['path'] || '/'
@@ -88,7 +90,7 @@ module Basil
         password = options['password'] # may be nil
         secure   = port == 443
 
-        require (secure ? 'net/https' : 'net/http')
+        require(secure ? 'net/https' : 'net/http')
         net = Net::HTTP.new(host, port)
 
         if secure
@@ -106,9 +108,15 @@ module Basil
         end
       else
         url = options
-        require (url =~ /^https/ ? 'net/https' : 'net/http')
+        require(url =~ /^https/ ? 'net/https' : 'net/http')
         Net::HTTP.get_response(URI.parse(url))
       end
+
+      unless resp.is_a?(Net::HTTPOK)
+        Logger.warn("Non-200 HTTP response: #{resp}")
+      end
+
+      resp
     end
 
     # Pass-through to get_http but yields to the block for conversion
