@@ -14,7 +14,7 @@ module Basil
 
     def json
       @json ||= get_json(Config.jira.merge(
-        'path' => '/rest/api/2.0.alpha1' + @path))
+        'path' => '/rest/api/2' + @path))
     end
   end
 
@@ -39,7 +39,7 @@ module Basil
     end
 
     def title
-      @title ||= json.fields['summary']['value'] rescue nil
+      @title ||= json.fields['summary'] rescue nil
     end
 
     private
@@ -51,7 +51,6 @@ module Basil
 end
 
 Basil.watch_for(/\w+-\d+/) {
-
   tickets = []
 
   # people might mention more than one ticket in a message
@@ -68,6 +67,8 @@ Basil.watch_for(/\w+-\d+/) {
       if !timeout || Time.now > timeout
         tickets << id
         store[:jira_timeouts][id] = Time.now + Basil::JiraTicket::TIMEOUT
+      else
+        info("ignoring ticket #{id} due to timeout #{timeout}")
       end
     end
   end
