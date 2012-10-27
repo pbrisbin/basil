@@ -32,6 +32,7 @@ jenkins:
   port:     80
   user:     X
   password: X
+  broadcast_chat: "Name of chat to hear about broken builds"
 
 jira:
   host:     jira.example.com
