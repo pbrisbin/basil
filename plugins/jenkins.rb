@@ -131,7 +131,7 @@ Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat('Broken Build Notification')
+  set_chat(Basil::Config.jenkins['broadcast_chat'])
 
   says do |out|
     out << "(dance) #{build.name} is back to normal"
@@ -144,7 +144,7 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat('Broken Build Notification')
+  set_chat(Basil::Config.jenkins['broadcast_chat'])
 
   says do |out|
     out << "(headbang) #{build.name} ##{build.number} failed!"
