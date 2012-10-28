@@ -9,7 +9,8 @@ pidfile='./tmp/basil.pid'
 
 case $1 in
   start)
-    bundle exec bin/basil &> "$logfile" &
+    echo 'starting service...' >> "$logfile"
+    bundle exec bin/basil &>> "$logfile" &
     echo $! > "$pidfile"
 
     if ps $! &>/dev/null; then
@@ -21,6 +22,7 @@ case $1 in
 
     ;;
   stop)
+    echo 'stopping service...' >> "$logfile"
     kill $(cat "$pidfile")
     ;;
   restart)
