@@ -4,10 +4,10 @@ module Jenkins
     include Basil::Logging
 
     # add an accessor method +method+ available in the api's json at
-    # +key+. if +conv+ is passed, it will be called on the value before
+    # +key+. if a block is passed, it will be called on the value before
     # returning it.
-    def self.def_accessor(method, key, conv = nil)
-      conversions[method] = conv
+    def self.def_accessor(method, key, &block)
+      conversions[method] = block
 
       self.class_eval %{
         def #{method}
@@ -19,7 +19,6 @@ module Jenkins
       }
     end
 
-    # hold the lambdas described above
     def self.conversions
       @conversions ||= {}
     end
@@ -45,8 +44,8 @@ module Jenkins
   end
 
   class Status < Path
-    def_accessor :jobs, 'jobs', lambda { |v|
-      v.map { |h|
+    def_accessor(:jobs, 'jobs') do |v|
+      v.map do |h|
         status = case h['color']
                  when /blue/    ; 'is green'
                  when /red/     ; 'is FAILING'
@@ -56,8 +55,8 @@ module Jenkins
                  end
 
         "* #{h['name']}: build #{status}"
-      }.join("\n")
-    }
+      end.join("\n")
+    end
 
     def path
       '/'
@@ -65,14 +64,14 @@ module Jenkins
   end
 
   class Job < Path
-    def_accessor :passing?,              'color',               lambda { |v| v =~ /blue/ }
-    def_accessor :failing?,              'color',               lambda { |v| v =~ /red/ }
-    def_accessor :aborted?,              'color',               lambda { |v| v =~ /aborted/ }
-    def_accessor :disabled?,             'color',               lambda { |v| v =~ /disabled/ }
-    def_accessor :builds,                'builds',              lambda { |v| v.map {|h| h['number']} }
-    def_accessor :health_report,         'healthReport',        lambda { |v| v.map {|h| h['description']}.join("\n") }
-    def_accessor :next_build_number,     'nextBuildNumber'
-    def_accessor :last_successful_build, 'lastSuccessfulBuild', lambda { |v| v['number'] rescue nil }
+    def_accessor(:passing?,              'color')               { |v| v =~ /blue/ }
+    def_accessor(:failing?,              'color')               { |v| v =~ /red/ }
+    def_accessor(:aborted?,              'color')               { |v| v =~ /aborted/ }
+    def_accessor(:disabled?,             'color')               { |v| v =~ /disabled/ }
+    def_accessor(:builds,                'builds')              { |v| v.map {|h| h['number']} }
+    def_accessor(:health_report,         'healthReport')        { |v| v.map {|h| h['description']}.join("\n") }
+    def_accessor(:next_build_number,     'nextBuildNumber')
+    def_accessor(:last_successful_build, 'lastSuccessfulBuild') { |v| v['number'] rescue nil }
 
     attr_reader :name
 
@@ -108,12 +107,12 @@ module Jenkins
   end
 
   class Build < Path
-    def_accessor :building?,  'building'
-    def_accessor :duration,   'duration'
-    def_accessor :result,     'result'
-    def_accessor :fail_count, 'actions',   lambda { |v| (v[4]["failCount"] rescue '?') || '?' }
-    def_accessor :culprits,   'culprits',  lambda { |v| v.map {|h| h['fullName']}.join(', ') }
-    def_accessor :committers, 'changeSet', lambda { |v| v['items'].map {|h| h['user']}.uniq.join(', ') }
+    def_accessor(:building?,  'building')
+    def_accessor(:duration,   'duration')
+    def_accessor(:result,     'result')
+    def_accessor(:fail_count, 'actions')   { |v| (v[4]["failCount"] rescue '?') || '?' }
+    def_accessor(:culprits,   'culprits')  { |v| v.map {|h| h['fullName']}.join(', ') }
+    def_accessor(:committers, 'changeSet') { |v| v['items'].map {|h| h['user']}.uniq.join(', ') }
 
     attr_reader :name, :number
 
