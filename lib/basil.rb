@@ -1,25 +1,20 @@
 require 'forwardable'
 
-# mixins
-require 'basil/chat_history'
-require 'basil/logging'
-require 'basil/utils'
-
-# base classes
-require 'basil/server'
-
-# classes
-require 'basil/cli'
-require 'basil/config'
-require 'basil/dispatch'
-require 'basil/email'
-require 'basil/lock'
-require 'basil/message'
-require 'basil/plugin'
-require 'basil/skype'
-require 'basil/storage'
-
 module Basil
+  autoload :ChatHistory, 'basil/chat_history'
+  autoload :Cli,         'basil/cli'
+  autoload :Config,      'basil/config'
+  autoload :Dispatch,    'basil/dispatch'
+  autoload :Email,       'basil/email'
+  autoload :Lock,        'basil/lock'
+  autoload :Logging,     'basil/logging'
+  autoload :Message,     'basil/message'
+  autoload :Plugin,      'basil/plugin'
+  autoload :Server,      'basil/server'
+  autoload :Skype,       'basil/skype'
+  autoload :Storage,     'basil/storage'
+  autoload :Utils,       'basil/utils'
+
   include Logging
 
   class << self
