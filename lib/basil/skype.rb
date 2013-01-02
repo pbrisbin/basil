@@ -1,23 +1,8 @@
 require 'skype'
-
-class Skype
-  attr_writer :command_manager
-
-  def get(property)
-    response = send_raw_command("GET #{property}")
-    response[property.length..-1].strip
-  end
-
-  def message_chat(name, message)
-    send_raw_command("CHATMESSAGE #{name} #{message}")
-  end
-end
+require 'skype/ext'
 
 module Basil
   class Skype < Server
-    attr_reader :skype
-    attr_writer :chatnames
-
     def start
       info "starting skype server"
 
@@ -27,20 +12,30 @@ module Basil
 
       @skype = ::Skype.new(Config.me)
 
-      skype.command_manager = CommandManager.new(self)
+      skype.command_manager = ::Skype::Delegator.new(skype, self)
       skype.connect
       skype.run
     end
 
     lock_start
 
-    def handle_message(message_id)
-      msg = build_message(message_id)
+    # Called on the CHATS api event
+    def chats(args)
+      @chatnames = args.split(', ')
+    end
 
-      if reply = dispatch_message(msg)
-        info "sending #{reply.pretty}"
-        prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
-        skype.message_chat(msg.chat, prefix + reply.text)
+    # Called on the CHATMESSAGE api event
+    def chatmessage(args)
+      id, _, action = args.split(' ')
+
+      if action.downcase == 'received'
+        msg = build_message(id)
+
+        if reply = dispatch_message(msg)
+          info "sending #{reply.pretty}"
+          prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
+          skype.message_chat(msg.chat, prefix + reply.text)
+        end
       end
     end
 
@@ -64,6 +59,8 @@ module Basil
     end
 
     private
+
+    attr_reader :skype
 
     def debug?
       Logger.level == ::Logger::DEBUG
@@ -89,38 +86,6 @@ module Basil
       when /^@(\w+)[,;:]? +(.*)/; [$1, $2]
       when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
       else [nil, body]
-      end
-    end
-  end
-
-  # This class quacks like a ::Skype::CommandManager but is constructed
-  # with a reference to the running server and delegates to it. Also
-  # fixes a bug in #process_command that prevented commands that return
-  # empty responses from being usable.
-  class CommandManager < ::Skype::CommandManager
-    def initialize(server)
-      @skype  = server.skype
-      @server = server
-    end
-
-    def process_command(command)
-      command, args = command.split(/\s+/, 2)
-      command = command.downcase.to_sym rescue nil
-
-      if command && self.public_methods.include?(command)
-        self.send(command, args)
-      end
-    end
-
-    def chats(args)
-      @server.chatnames = args.split(', ')
-    end
-
-    def chatmessage(args)
-      id, _, action = args.split(' ')
-
-      if action.downcase == 'received'
-        @server.handle_message(id)
       end
     end
   end
