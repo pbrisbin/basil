@@ -1,78 +1,87 @@
-require 'rype'
+require 'skype'
+
+class Skype
+  attr_writer :command_manager
+
+  def get(property)
+    response = send_raw_command("GET #{property}")
+    response[property.length..-1].strip
+  end
+
+  def message_chat(name, message)
+    send_raw_command("CHATMESSAGE #{name} #{message}")
+  end
+end
 
 module Basil
   class Skype < Server
+    attr_reader :skype
+    attr_writer :chatnames
+
     def start
       info "starting skype server"
 
       super
 
-      Rype::Logger.set(Basil::Logger)
+      ::Skype.DEBUG = debug?
 
-      # Note: there are a number of oddities in how the dbus connection
-      # behaves. Also, if you break this code by violating the below,
-      # you won't get an exception, basil just stops listening.
-      #
-      # Therefore, if you touch this method, keep in mind the following:
-      #
-      # 1. You must use nested blocks when you need to access multiple
-      #    parts of a skype object.
-      #
-      # 2. The order of your nesting seems to matter. Though I've yet to
-      #    determine how or why.
-      #
-      # 3. Sometimes, it's required you use the block argument
-      #    immediately.
-      #
-      Rype.on(:chatmessage_received) do |chatmessage|
-        chatmessage.from do |from|
-          chatmessage.from_name do |from_name|
-            chatmessage.body do |body|
-              chatmessage.chat do |chat|
-                chat.members do |members|
-                  is_private = members.length == 2
-                  to, text   = parse_body(body)
+      @skype = ::Skype.new(Config.me)
 
-                  debug "chat name: #{chat.chatname}"
-                  debug "private chat: #{is_private}"
-
-                  to  = Config.me if !to && is_private
-                  msg = Message.new(to, from, from_name, text, chat.chatname)
-
-                  if reply = dispatch_message(msg)
-                    info "sending #{reply.pretty}"
-                    prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
-                    chat.send_message(prefix + reply.text)
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-
-      Rype.attach
-      Rype.thread.join
+      skype.command_manager = CommandManager.new(self)
+      skype.connect
+      skype.run
     end
 
     lock_start
 
+    def handle_message(message_id)
+      msg = build_message(message_id)
+
+      if reply = dispatch_message(msg)
+        info "sending #{reply.pretty}"
+        prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
+        skype.message_chat(msg.chat, prefix + reply.text)
+      end
+    end
+
     def broadcast_message(msg)
       info "broadcasting #{msg.pretty}"
 
-      Rype.chats do |chats|
-        chats.each do |chat|
-          chat.topic do |topic|
-            if [topic, chat.chatname].include?(msg.chat)
-              debug "topic or name match, sending broadcast"
-              chat.send_message(msg.text)
-            end
-          end
+      Timeout.timeout(3) do
+        @chatnames = nil
+        skype.send_raw_command('SEARCH CHATS')
+        sleep 0.1 while @chatnames.nil?
+      end
+
+      @chatnames.each do |name|
+        topic = skype.get("CHAT #{name} TOPIC").strip
+
+        if [topic, name].include?(msg.chat)
+          debug "topic or name match, sending broadcast"
+          skype.message_chat(name, msg.text)
         end
       end
     end
 
     private
+
+    def debug?
+      Logger.level == ::Logger::DEBUG
+    end
+
+    def build_message(message_id)
+      chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
+      from         = skype.get("CHATMESSAGE #{message_id} FROM_HANDLE")
+      from_name    = skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME")
+      body         = skype.get("CHATMESSAGE #{message_id} BODY")
+      members      = skype.get("CHAT #{chatname} MEMBERS").split(' ')
+      private_chat = members.length == 2
+
+      to, text = parse_body(body)
+      to = Config.me if !to && private_chat
+
+      Message.new(to, from, from_name, text, chatname)
+    end
 
     def parse_body(body)
       case body
@@ -81,6 +90,38 @@ module Basil
       when /^@(\w+)[,;:]? +(.*)/; [$1, $2]
       when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
       else [nil, body]
+      end
+    end
+  end
+
+  # This class quacks like a ::Skype::CommandManager but is constructed
+  # with a reference to the running server and delegates to it. Also
+  # fixes a bug in #process_command that prevented commands that return
+  # empty responses from being usable.
+  class CommandManager < ::Skype::CommandManager
+    def initialize(server)
+      @skype  = server.skype
+      @server = server
+    end
+
+    def process_command(command)
+      command, args = command.split(/\s+/, 2)
+      command = command.downcase.to_sym rescue nil
+
+      if command && self.public_methods.include?(command)
+        self.send(command, args)
+      end
+    end
+
+    def chats(args)
+      @server.chatnames = args.split(', ')
+    end
+
+    def chatmessage(args)
+      id, _, action = args.split(' ')
+
+      if action.downcase == 'received'
+        @server.handle_message(id)
       end
     end
   end
