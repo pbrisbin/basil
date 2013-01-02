@@ -74,8 +74,7 @@ module Basil
       from         = skype.get("CHATMESSAGE #{message_id} FROM_HANDLE")
       from_name    = skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME")
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
-      members      = skype.get("CHAT #{chatname} MEMBERS").split(' ')
-      private_chat = members.length == 2
+      private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
 
       to, text = parse_body(body)
       to = Config.me if !to && private_chat
