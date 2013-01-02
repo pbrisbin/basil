@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "rype", :git => "http://github.com/nfelger/rype"
+gem "ruby-skype", :git => "http://github.com/mscharley/ruby-skype"
 gemspec
 
 group :test do
