@@ -28,7 +28,7 @@ module Basil
     def chatmessage(args)
       id, _, action = args.split(' ')
 
-      if action.downcase == 'received'
+      if action && action.downcase == 'received'
         msg = build_message(id)
 
         if reply = dispatch_message(msg)
