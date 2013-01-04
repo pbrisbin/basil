@@ -71,7 +71,7 @@ module Basil
 
         if block = self.class.server_commands[command.to_sym]
           debug "executing server command: #{command}(#{args.join(', ')})"
-          return block.call(*args)
+          return instance_exec(*args, &block)
         end
       end
     end
