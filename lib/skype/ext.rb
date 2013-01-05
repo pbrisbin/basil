@@ -10,11 +10,6 @@ class Skype
     listeners[cmd.downcase.to_sym].each do |block|
       block.call(args)
     end
-
-    if chats.nil? || rand(100) < 5
-      # 5% of the time, we freshen our chats list
-      send_raw_command('SEARCH CHATS')
-    end
   end
 
   #
@@ -40,30 +35,14 @@ class Skype
     end
   end
 
-  def setup_chats_handler
-    on(:chats) { |args| self.chats = args.split(', ') }
-  end
-
   def debug=(value)
     self.class.DEBUG = value
-  end
-
-  def chats
-    mutex.synchronize { @chats }
-  end
-
-  def chats=(chats)
-    mutex.synchronize { @chats = chats }
   end
 
   private
 
   def listeners
     @listeners ||= Hash.new { |h,k| h[k] = [] }
-  end
-
-  def mutex
-    @mutex ||= Mutex.new
   end
 
 end

@@ -25,16 +25,8 @@ module Basil
     lock_start
 
     def broadcast_message(msg)
-      info "broadcasting #{msg.pretty}"
-
-      (skype.chats || []).each do |name|
-        topic = skype.get("CHAT #{name} TOPIC").strip
-
-        if [topic, name].include?(msg.chat)
-          debug "topic or name match, sending broadcast"
-          skype.message_chat(name, msg.text)
-        end
-      end
+      info "broadcasting to #{msg.chat}: #{msg.pretty}"
+      skype.message_chat(msg.chat, msg.text)
     end
 
     private
@@ -42,7 +34,6 @@ module Basil
     def skype
       @skype ||= ::Skype.new(Config.me).tap do |skype|
         skype.debug = Logger.level == ::Logger::DEBUG
-        skype.setup_chats_handler
       end
     end
 
