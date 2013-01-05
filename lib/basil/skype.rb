@@ -8,27 +8,7 @@ module Basil
 
       super
 
-      ::Skype.DEBUG = debug?
-
-      @skype = ::Skype.new(Config.me)
-
-      skype.command_manager = ::Skype::Delegator.new(skype, self)
-      skype.connect
-      skype.run
-    end
-
-    lock_start
-
-    # Called on the CHATS api event
-    def chats(args)
-      @chatnames = args.split(', ')
-    end
-
-    # Called on the CHATMESSAGE api event
-    def chatmessage(args)
-      id, _, action = args.split(' ')
-
-      if action && action.downcase == 'received'
+      skype.on_chatmessage_received do |id|
         msg = build_message(id)
 
         if reply = dispatch_message(msg)
@@ -37,18 +17,17 @@ module Basil
           skype.message_chat(msg.chat, prefix + reply.text)
         end
       end
+
+      skype.connect
+      skype.run
     end
+
+    lock_start
 
     def broadcast_message(msg)
       info "broadcasting #{msg.pretty}"
 
-      Timeout.timeout(3) do
-        @chatnames = nil
-        skype.send_raw_command('SEARCH CHATS')
-        sleep 0.1 while @chatnames.nil?
-      end
-
-      @chatnames.each do |name|
+      (skype.chats || []).each do |name|
         topic = skype.get("CHAT #{name} TOPIC").strip
 
         if [topic, name].include?(msg.chat)
@@ -60,10 +39,11 @@ module Basil
 
     private
 
-    attr_reader :skype
-
-    def debug?
-      Logger.level == ::Logger::DEBUG
+    def skype
+      @skype ||= ::Skype.new(Config.me).tap do |skype|
+        skype.debug = Logger.level == ::Logger::DEBUG
+        skype.setup_chats_handler
+      end
     end
 
     def build_message(message_id)
