@@ -48,8 +48,8 @@ confluence:
 
 airbrake:
   account: some_name
-  project: some_number   # https://some_name.airbrakeapp.com/<project>/errors
-  token:   some_log_hash # available in airbrake admin settings
+  project: some_number    # https://some_name.airbrakeapp.com/<project>/errors
+  token:   some_long_hash # available in airbrake admin settings
 
 email:
   interval: 30 # seconds
