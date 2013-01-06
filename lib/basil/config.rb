@@ -20,12 +20,6 @@ module Basil
         raise ArgumentError, "Invalid server_type: #{server_type}"
       end
 
-      attr_accessor :debug
-
-      def debug?
-        @debug.nil? ? false : @debug
-      end
-
       def yaml
         return {} if @hidden
 

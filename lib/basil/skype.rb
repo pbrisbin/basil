@@ -28,9 +28,7 @@ module Basil
     private
 
     def skype
-      @skype ||= ::Skype.new(Config.me).tap do |skype|
-        skype.debug = Config.debug?
-      end
+      @skype ||= ::Skype.new(Config.me)
     end
 
     def build_message(message_id)

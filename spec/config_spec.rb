@@ -20,14 +20,6 @@ module Basil
       Config.server.should be_a(Cli)
     end
 
-    it "can hold a debug setting" do
-      Config.debug?.should be_false
-
-      Config.debug = true
-
-      Config.debug?.should be_true
-    end
-
     it "can be hidden" do
       Config.hide do
         Config.key_foo.should be_nil
