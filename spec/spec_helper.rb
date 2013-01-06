@@ -4,3 +4,5 @@ SimpleCov.start do
 end
 
 require 'basil'
+
+Basil::Loggers.level = 6 # OFF
