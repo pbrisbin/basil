@@ -24,8 +24,10 @@ module Basil
 
     def run(argv)
       if argv.include?('--debug')
-        Config.debug = true
+        Loggers.level = 0 # DEBUG
       end
+
+      logger.debug "Basil #{VERSION}"
 
       if argv.include?('--cli')
         Config.server = Cli.new
@@ -34,8 +36,14 @@ module Basil
       Config.server.start
 
     rescue => ex
-      $stderr.puts "#{ex}"
+      logger.fatal ex
+
       exit 1
     end
+
+    def logger
+      @logger ||= Loggers['main']
+    end
+
   end
 end
