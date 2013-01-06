@@ -17,9 +17,7 @@ module Basil
 
   class << self
     extend Forwardable
-    def_delegators Plugin, :respond_to,
-                           :watch_for,
-                           :check_email
+    delegate [:respond_to, :watch_for, :check_email] => Plugin
 
     def run(argv)
       if argv.include?('--debug')
