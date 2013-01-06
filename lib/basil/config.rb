@@ -1,56 +1,53 @@
-require 'singleton'
 require 'yaml'
 
 module Basil
-  # Configuration is lazy-loaded from ./config/basil.yml. You can create
-  # one from the provided example. Note: this location may change in the
-  # future.
   class Config
-    include Singleton
+    private_class_method :new
 
-    def self.method_missing(meth, *args, &block)
-      self.instance.send(meth, *args, &block)
-    end
-
-    def method_missing(key)
-      yaml[key.to_s] if yaml
-    end
-
-    attr_writer :server
-
-    def server
-      unless @server
-        case server_type
-        when :cli  ; @server = Cli.new
-        when :skype; @server = Skype.new
-        else raise 'Invalid or missing server_type. Must be :skype or :cli.'
-        end
+    class << self
+      def method_missing(key, *_)
+        yaml[key.to_s] if yaml
       end
 
-      @server
-    end
+      attr_writer :server
 
-    def yaml
-      return {} if @hidden
+      def server
+        @server ||= begin
+          server_class = Basil.const_get("#{server_type}".capitalize)
+          server_class.new
+        end
+      rescue NameError
+        raise ArgumentError, "Invalid server_type: #{server_type}"
+      end
 
-      @yaml ||= YAML::load(File.read('config/basil.yml'))
-    end
+      attr_accessor :debug
 
-    # We need to temporarily hide the Config object during evaluation
-    # plugins since it can access it and see passwords, etc.
-    def hide(&block)
-      @hidden = true
+      def debug?
+        @debug.nil? ? false : @debug
+      end
 
-      yield
+      def yaml
+        return {} if @hidden
 
-    ensure
-      @hidden = false
-    end
+        @yaml ||= YAML::load(File.read('config/basil.yml'))
+      end
 
-    # this is mostly to support testing, but perhaps it should be part
-    # of the reload plugin eventually.
-    def invalidate
-      @yaml = nil
+      # We need to temporarily hide the Config object during evaluation
+      # plugins since it can access it and see passwords, etc.
+      def hide(&block)
+        @hidden = true
+
+        yield
+
+      ensure
+        @hidden = false
+      end
+
+      # this is mostly to support testing, but perhaps it should be part
+      # of the reload plugin eventually.
+      def invalidate
+        @yaml = nil
+      end
     end
   end
 end
