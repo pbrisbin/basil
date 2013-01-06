@@ -42,6 +42,8 @@ module Basil
     end
 
     def dispatch_message(msg)
+      logger.debug "Dispatching #{msg.pretty}"
+
       ChatHistory.store_message(msg)
 
       if reply = server_command?(msg)
@@ -55,7 +57,7 @@ module Basil
       end
 
     rescue => ex
-      nil
+      logger.warn ex
     end
 
     def server_command?(msg)
@@ -64,9 +66,14 @@ module Basil
         args    = $3.shellsplit rescue []
 
         if block = self.class.server_commands[command.to_sym]
+          logger.info "Handling command: #{command}(#{args.join(', ')})"
           return instance_exec(*args, &block)
         end
       end
+    end
+
+    def logger
+      @logger ||= Loggers['server']
     end
   end
 end
