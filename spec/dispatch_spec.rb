@@ -19,13 +19,13 @@ module Basil
     end
 
     it "checks responders first" do
-      msg = double("msg", :to_me? => true, :text => 'a match')
+      msg = double("msg", :to_me? => true, :text => 'a match', :pretty => '')
 
       Dispatch.simple(msg).should == @responder
     end
 
     it "checks watchers" do
-      msg = double("msg", :to_me? => false, :text => 'a match')
+      msg = double("msg", :to_me? => false, :text => 'a match', :pretty => '')
 
       Dispatch.simple(msg).should == @watcher
     end

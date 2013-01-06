@@ -5,24 +5,35 @@ module Basil
       # then watchers) if it wishes to act on it. The first reply
       # received is returned, otherwise nil.
       def simple(msg)
+        logger.debug 'Simple'
+        logger.debug msg
+
         return nil unless msg && msg.text != ''
 
         if msg.to_me?
+          logger.debug 'Responders'
           if reply = dispatch_through(Plugin.responders, msg)
             return reply
           end
         end
 
+        logger.debug 'Watchers'
         dispatch_through(Plugin.watchers, msg)
       end
 
       def extended(msg)
+        logger.debug 'Extended'
+        logger.debug msg
+
         return nil unless msg && msg.text != ''
 
         ensure_valid(process_pipeline(replace_substitutions(msg)))
       end
 
       def email(mail)
+        logger.debug 'Email'
+        logger.debug mail
+
         return nil unless mail && mail['Subject']
 
         dispatch_through(Plugin.email_checkers, mail)
@@ -33,9 +44,12 @@ module Basil
       def dispatch_through(plugins, msg)
         plugins.each do |p|
           if reply = p.triggered?(msg)
+            logger.info "#{p.pretty} triggered"
             return ensure_valid(reply)
           end
         end
+
+        logger.debug 'No response'
 
         nil
       end
@@ -44,6 +58,9 @@ module Basil
       # cause errors.
       def ensure_valid(obj)
         return obj if obj.nil? || obj.is_a?(Message)
+
+        logger.warn "Invalid object returned"
+        logger.warn obj
 
         nil
       end
@@ -84,6 +101,10 @@ module Basil
         end
 
         msg
+      end
+
+      def logger
+        @logger ||= Loggers['dispatching']
       end
     end
   end
