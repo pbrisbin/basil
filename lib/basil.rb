@@ -7,13 +7,16 @@ module Basil
   autoload :Dispatch,    'basil/dispatch'
   autoload :Email,       'basil/email'
   autoload :Lock,        'basil/lock'
-  autoload :Logger ,     'basil/logger'
+  autoload :Loggers,     'basil/loggers'
   autoload :Message,     'basil/message'
   autoload :Plugin,      'basil/plugin'
   autoload :Server,      'basil/server'
   autoload :Skype,       'basil/skype'
   autoload :Storage,     'basil/storage'
   autoload :Utils,       'basil/utils'
+  autoload :VERSION,     'basil/version'
+
+  Loggers.init!
 
   class << self
     extend Forwardable
