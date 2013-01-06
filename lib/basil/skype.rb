@@ -4,15 +4,12 @@ require 'skype/ext'
 module Basil
   class Skype < Server
     def start
-      info "starting skype server"
-
       super
 
       skype.on_chatmessage_received do |id|
         msg = build_message(id)
 
         if reply = dispatch_message(msg)
-          info "sending #{reply.pretty}"
           prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
           skype.message_chat(msg.chat, prefix + reply.text)
         end
@@ -25,7 +22,6 @@ module Basil
     lock_start
 
     def broadcast_message(msg)
-      info "broadcasting to #{msg.chat}: #{msg.pretty}"
       skype.message_chat(msg.chat, msg.text)
     end
 
@@ -33,7 +29,7 @@ module Basil
 
     def skype
       @skype ||= ::Skype.new(Config.me).tap do |skype|
-        skype.debug = Logger.level == ::Logger::DEBUG
+        skype.debug = Config.debug?
       end
     end
 

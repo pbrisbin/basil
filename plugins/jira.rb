@@ -67,8 +67,6 @@ Basil.watch_for(/\w+-\d+/) {
       if !timeout || Time.now > timeout
         tickets << id
         store[:jira_timeouts][id] = Time.now + Basil::JiraTicket::TIMEOUT
-      else
-        info("ignoring ticket #{id} due to timeout #{timeout}")
       end
     end
   end

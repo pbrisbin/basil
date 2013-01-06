@@ -2,8 +2,6 @@ require 'shellwords'
 
 module Basil
   class Server
-    include Logging
-
     # Servers can register commands which will be checked for before
     # normal dispatching. Commands can be sent in chat with the
     # message format "/command [arguments]"
@@ -44,11 +42,9 @@ module Basil
     end
 
     def dispatch_message(msg)
-      debug "dispatching #{msg.pretty}"
       ChatHistory.store_message(msg)
 
       if reply = server_command?(msg)
-        info "handled as a server command"
         return reply
       end
 
@@ -59,8 +55,6 @@ module Basil
       end
 
     rescue => ex
-      error "#{ex}"
-
       nil
     end
 
@@ -70,7 +64,6 @@ module Basil
         args    = $3.shellsplit rescue []
 
         if block = self.class.server_commands[command.to_sym]
-          debug "executing server command: #{command}(#{args.join(', ')})"
           return instance_exec(*args, &block)
         end
       end

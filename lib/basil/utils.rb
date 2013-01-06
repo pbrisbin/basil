@@ -80,8 +80,6 @@ module Basil
     # is passed that begins with "https". Basic authentication is used
     # if :username or :password is given.
     def get_http(options)
-      Logger.debug("getting http: #{options.inspect}")
-
       resp = if options.is_a? Hash
         host     = options['host']
         port     = options['port'] || 80
@@ -113,7 +111,7 @@ module Basil
       end
 
       unless resp.is_a?(Net::HTTPOK)
-        Logger.warn("Non-200 HTTP response: #{resp}")
+
       end
 
       resp

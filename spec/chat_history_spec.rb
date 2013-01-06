@@ -7,7 +7,6 @@ module Basil
       Storage.stub(:with_storage).and_yield(@store)
 
       class MyPlugin
-        include Logging
         include ChatHistory
 
         attr_accessor :msg

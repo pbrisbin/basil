@@ -22,8 +22,6 @@ module Basil
     # Messages are returned most recent first. Valid option keys are
     # :chat, :from and :to which limit the results accordingly.
     def chat_history(options = {})
-      debug "accessing chat history with #{options}"
-
       history = []
 
       Storage.with_storage do |store|
@@ -54,8 +52,6 @@ module Basil
     end
 
     def purge_history!(chat = @msg.chat)
-      debug "purging chat history for #{chat}"
-
       Storage.with_storage do |store|
         store[KEY].delete(chat)
       end

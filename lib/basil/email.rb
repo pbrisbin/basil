@@ -2,8 +2,6 @@ require 'net/imap'
 
 module Basil
   module Email
-    include Logging
-
     # This class represents a parsed email. Headers are accessed like
     # array indices and body is provided as a method. The parsing is
     # naive, but it works for our purpose.
@@ -53,22 +51,17 @@ module Basil
         # if the server doesn't support us, we just do nothing.
         return unless Config.server.respond_to?(:broadcast_message)
 
-        info "starting email checker loop"
-
         Thread.new do
           loop do
-            debug "checking email"
-
             begin
               with_imap do |imap|
                 imap.search(['NOT', 'DELETED']).each do |message_id|
-                  info "mail found, handling"
                   handle_message_id(imap, message_id)
                 end
               end
 
             rescue Exception => ex
-              error "checking email: #{ex}"
+
             end
 
             break unless poll_email?
@@ -88,7 +81,7 @@ module Basil
         end
 
       rescue Exception => ex
-        error "handling message id #{message_id}: #{ex}"
+
       ensure
         # we always, always delete the message. this stops malformed mails
         # from causing recurring problems and prevents any duplicate

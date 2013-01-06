@@ -5,8 +5,6 @@ module Basil
     end
 
     def start
-      info "starting cli server"
-
       super
 
       loop do
@@ -14,7 +12,6 @@ module Basil
         msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
 
         if reply = dispatch_message(msg)
-          info "sending #{reply.pretty}"
           puts reply.text
         end
       end

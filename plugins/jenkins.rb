@@ -1,7 +1,6 @@
 module Jenkins
   class Path
     include Basil::Utils
-    include Basil::Logging
 
     # add an accessor method +method+ available in the api's json at
     # +key+. if a block is passed, it will be called on the value before

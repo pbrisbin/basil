@@ -1,8 +1,6 @@
 module Basil
   class Dispatch
     class << self
-      include Logging
-
       # take a valid message and ask each registered plugin (responders
       # then watchers) if it wishes to act on it. The first reply
       # received is returned, otherwise nil.
@@ -35,7 +33,6 @@ module Basil
       def dispatch_through(plugins, msg)
         plugins.each do |p|
           if reply = p.triggered?(msg)
-            info "#{p.pretty} triggered"
             return ensure_valid(reply)
           end
         end
@@ -47,8 +44,6 @@ module Basil
       # cause errors.
       def ensure_valid(obj)
         return obj if obj.nil? || obj.is_a?(Message)
-
-        error "invalid object <#{obj}>, expected Message or nil"
 
         nil
       end

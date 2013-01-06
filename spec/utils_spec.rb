@@ -4,7 +4,6 @@ module Basil
   describe Utils do
     before do
       class MyPlugin
-        include Logging
         include Utils
 
         attr_accessor :msg

@@ -5,7 +5,6 @@ module Basil
   class Plugin
     include Utils
     include ChatHistory
-    include Logging
 
     private_class_method :new
 
@@ -50,12 +49,10 @@ module Basil
       dir = Config.plugins_directory
 
       if Dir.exists?(dir)
-        debug "loading plugins from #{dir}"
-
         Dir.glob("#{dir}/*").sort.each do |f|
           begin load(f)
           rescue Exception => ex
-            error "loading plugin #{f}: #{ex}"
+
             next
           end
         end

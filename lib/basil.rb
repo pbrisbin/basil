@@ -7,15 +7,13 @@ module Basil
   autoload :Dispatch,    'basil/dispatch'
   autoload :Email,       'basil/email'
   autoload :Lock,        'basil/lock'
-  autoload :Logging,     'basil/logging'
+  autoload :Logger ,     'basil/logger'
   autoload :Message,     'basil/message'
   autoload :Plugin,      'basil/plugin'
   autoload :Server,      'basil/server'
   autoload :Skype,       'basil/skype'
   autoload :Storage,     'basil/storage'
   autoload :Utils,       'basil/utils'
-
-  include Logging
 
   class << self
     extend Forwardable
@@ -25,7 +23,7 @@ module Basil
 
     def run(argv)
       if argv.include?('--debug')
-        Logger.level = ::Logger::DEBUG
+        Config.debug = true
       end
 
       if argv.include?('--cli')
@@ -35,12 +33,7 @@ module Basil
       Config.server.start
 
     rescue => ex
-      fatal "#{ex}"
-
-      ex.backtrace.map do |line|
-        debug "#{line}"
-      end
-
+      $stderr.puts "#{ex}"
       exit 1
     end
   end
