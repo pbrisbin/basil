@@ -21,7 +21,7 @@ module Basil
     # avoiding #to_s to preserve #inspect, see
     # http://bugs.ruby-lang.org/issues/4453.
     def pretty
-      "(#{chat}) #{to || 'n/a'}: #{text.slice(0..20)}..."
+      "(#{chat}) #{to || 'n/a'}: #{text}"
     end
   end
 end
