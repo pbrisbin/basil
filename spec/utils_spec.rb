@@ -7,6 +7,10 @@ module Basil
         include Utils
 
         attr_accessor :msg
+
+        def logger
+          Loggers['global']
+        end
       end
 
       @plugin = MyPlugin.new
@@ -55,7 +59,7 @@ module Basil
 
     it "provides escape" do
       # no need to test CGI::escape all that thoroughly...
-      txt = @plugin.escape('foo bar').should == 'foo+bar'
+      @plugin.escape('foo bar').should == 'foo+bar'
     end
 
     it "provides get_http simply" do

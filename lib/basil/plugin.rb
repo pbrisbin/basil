@@ -45,11 +45,15 @@ module Basil
         Dir.glob("#{dir}/*").sort.each do |f|
           begin load(f)
           rescue Exception => ex
-
+            logger.warn ex
             next
           end
         end
       end
+    end
+
+    def self.logger
+      @logger ||= Loggers['plugins']
     end
 
     attr_reader :type, :regex
@@ -92,6 +96,10 @@ module Basil
     # http://bugs.ruby-lang.org/issues/4453.
     def pretty
       "#{type}: #{regex.inspect}"
+    end
+
+    def logger
+      self.class.logger
     end
   end
 end
