@@ -35,7 +35,7 @@ module Basil
       @server.stub(:broadcast_message)
       Config.stub(:server).and_return(@server)
 
-      @imap = double("imap")
+      @imap = double("imap", :store => nil)
       Email.stub(:with_imap).and_yield(@imap)
     end
 
@@ -53,9 +53,10 @@ module Basil
 
       Email::Mail.should_receive(:parse).with('message body').and_return('a mail')
 
-      Dispatch.should_receive(:email).with('a mail').and_return('a reply')
+      reply = double('reply', :pretty => "a reply")
+      Dispatch.should_receive(:email).with('a mail').and_return(reply)
 
-      @server.should_receive(:broadcast_message).with('a reply')
+      @server.should_receive(:broadcast_message).with(reply)
 
       Email.check
     end

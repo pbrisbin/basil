@@ -49,20 +49,17 @@ module Basil
       # returned will be handed to the server's broadcast_mail method.
       def check
         # if the server doesn't support us, we just do nothing.
-        return unless Config.server.respond_to?(:broadcast_message)
+        if Config.server.respond_to?(:broadcast_message)
+          logger.debug "Server supports broadcasting"
+        else
+          logger.debug "Server does not support broadcasting" and return
+        end
 
         Thread.new do
+          logger.debug "Email polling spawned"
+
           loop do
-            begin
-              with_imap do |imap|
-                imap.search(['NOT', 'DELETED']).each do |message_id|
-                  handle_message_id(imap, message_id)
-                end
-              end
-
-            rescue Exception => ex
-
-            end
+            poll_email
 
             break unless poll_email?
 
@@ -73,23 +70,38 @@ module Basil
 
       private
 
+      def poll_email
+        with_imap do |imap|
+          imap.search(['NOT', 'DELETED']).each do |message_id|
+            handle_message_id(imap, message_id)
+          end
+        end
+
+      rescue Exception => ex
+        logger.error ex
+      end
+
       def handle_message_id(imap, message_id)
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
+        logger.debug "Dispatching: #{mail['Subject']}"
+
         if reply = Dispatch.email(mail)
+          logger.info "Broadcasting: #{reply.pretty}"
           Config.server.broadcast_message(reply)
         end
 
       rescue Exception => ex
-
+        logger.warn ex
       ensure
         # we always, always delete the message. this stops malformed mails
         # from causing recurring problems and prevents any duplicate
         # processing. only risk is a dropped email here or there.
-        imap.store(message_id, "+FLAGS", [:Deleted])
+        imap.store(message_id, "+FLAGS", [:Deleted]) rescue $!
       end
 
       def with_imap(config = Config.email, &block)
+        logger.debug 'Logging into IMAP'
         imap = Net::IMAP.new(config['server'], config['port'], true)
         imap.login(config['username'], config['password'])
         imap.select(config['inbox'])
@@ -100,6 +112,7 @@ module Basil
         if imap
           imap.logout()
           imap.disconnect()
+          logger.debug 'Disconnected from IMAP'
         end
       end
 
@@ -108,6 +121,10 @@ module Basil
         # eventually this might be used to allow an in-chat command to
         # shut down the polling (or something)
         true
+      end
+
+      def logger
+        @logger ||= Loggers['email']
       end
     end
   end
