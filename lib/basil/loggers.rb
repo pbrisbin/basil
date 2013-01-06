@@ -2,7 +2,7 @@ require 'log4r'
 
 module Basil
   class Loggers
-    LOGGER_NAMES = %w( main email server )
+    LOGGER_NAMES = %w( main email server plugins dispatching )
 
     class << self
       include Log4r
