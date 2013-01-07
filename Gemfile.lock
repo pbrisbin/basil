@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    basil (0.0.2)
+    basil (0.1.0.pre)
       fakefs
       faster_xml_simple
       log4r
