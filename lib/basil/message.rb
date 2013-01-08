@@ -1,27 +1,32 @@
 module Basil
-  # The main basil data type: the Message. Servers should construct
-  # these and pass them through dispatch which will also return a
-  # Message if a response is triggered.
   class Message
-    attr_reader :to, :from, :from_name, :time, :text
-    attr_accessor :chat
+    # Who a Message is from and what it is are immutable
+    attr_reader :from, :from_name, :text
 
-    def initialize(to, from, from_name, text, chat = nil)
-      @time = Time.now
-      @to, @from, @from_name, @text, @chat = to, from, from_name, text, chat
+    # Messages can be forwarded around by changing the to or chat
+    # attributes
+    attr_accessor :to, :chat
+
+    def initialize(options)
+      # required
+      @from      = options.fetch(:from)      { raise ArgumentError, 'from is required' }
+      @from_name = options.fetch(:from_name) { raise ArgumentError, 'from_name is required' }
+
+      # optional
+      @to   = options[:to]
+      @chat = options[:chat]
+      @text = options.fetch(:text, '')
     end
 
-    # Is this message to my configured nick?
     def to_me?
       to.downcase == Config.me.downcase
     rescue
       false
     end
 
-    # avoiding #to_s to preserve #inspect, see
-    # http://bugs.ruby-lang.org/issues/4453.
-    def pretty
-      "(#{chat}) #{to || 'n/a'}: #{text}"
+    def inspect
+      "#<Message:#{object_id} chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: #{text}>"
     end
+
   end
 end
