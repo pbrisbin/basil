@@ -5,7 +5,7 @@ module Basil
   # bubble up to be handled appropriately by the dispatcher.
   module Utils
     # Accesses chat history
-    def chat_history(options)
+    def chat_history(options = {})
       chat = options.delete(:chat)
 
       ChatHistory.get_messages(chat || @msg.chat, options)

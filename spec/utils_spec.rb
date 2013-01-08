@@ -17,6 +17,20 @@ module Basil
       @plugin.msg = Message.new('to', 'from', 'from_name', 'text', 'chat')
     end
 
+    it "provides chat history" do
+      options = { :foo => 'foo', :bar => 'bar' }
+
+      ChatHistory.should_receive(:get_messages).with('chat', options)
+
+      @plugin.chat_history(options)
+    end
+
+    it "can purge chat history" do
+      ChatHistory.should_receive(:clear).with('chat')
+
+      @plugin.purge_history!
+    end
+
     it "provides says" do
       reply = @plugin.says "something"
 

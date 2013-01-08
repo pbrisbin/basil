@@ -4,7 +4,6 @@ module Basil
   # Plugin with a singleton execute method.
   class Plugin
     include Utils
-    include ChatHistory
 
     private_class_method :new
 
