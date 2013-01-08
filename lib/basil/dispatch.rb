@@ -44,7 +44,7 @@ module Basil
       def dispatch_through(plugins, msg)
         plugins.each do |p|
           if reply = p.triggered?(msg)
-            logger.info "#{p.pretty} triggered"
+            logger.info "#{p} triggered"
             return ensure_valid(reply)
           end
         end

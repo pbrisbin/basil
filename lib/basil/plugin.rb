@@ -91,10 +91,8 @@ module Basil
       nil
     end
 
-    # avoiding #to_s to preserve #inspect, see
-    # http://bugs.ruby-lang.org/issues/4453.
-    def pretty
-      "#{type}: #{regex.inspect}"
+    def inspect
+      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: #{description.inspect}>"
     end
 
     def logger
