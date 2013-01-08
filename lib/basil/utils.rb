@@ -46,7 +46,7 @@ module Basil
 
         return says(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(:from => Config.me, :from_name => Config.me, :text => txt, :chat => @msg.chat)
+        return Message.new(:from => Config.me, :text => txt, :chat => @msg.chat)
       end
 
       nil
@@ -62,7 +62,7 @@ module Basil
 
         return replies(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(:to => @msg.from_name, :from => Config.me, :from_name => Config.me, :text => txt, :chat => @msg.chat)
+        return Message.new(:to => @msg.from_name, :from => Config.me, :text => txt, :chat => @msg.chat)
       end
 
       nil

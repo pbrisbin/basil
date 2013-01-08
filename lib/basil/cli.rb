@@ -9,11 +9,10 @@ module Basil
 
       loop do
         print '> '
-        msg = Message.new(:to        => Config.me,
-                          :from      => ENV['USER'],
-                          :from_name => ENV['USER'],
-                          :text      => $stdin.gets.chomp,
-                          :chat      => 'cli')
+        msg = Message.new(:to   => Config.me,
+                          :from => ENV['USER'],
+                          :text => $stdin.gets.chomp,
+                          :chat => 'cli')
 
         if reply = dispatch_message(msg)
           puts reply.text

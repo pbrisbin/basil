@@ -76,7 +76,7 @@ module Basil
     def triggered?(msg)
       if type == :email_checker
         matcher = ->(m) { regex.nil? || m['Subject'] =~ regex }
-        coercer = ->(m) { Message.new(:to => Config.me, :from => m['From'], :from_name => m['From'], :text => m.body) }
+        coercer = ->(m) { Message.new(:to => Config.me, :from => m['From'], :text => m.body) }
       else
         matcher = ->(m) { regex.nil? || m.text =~ regex }
       end
