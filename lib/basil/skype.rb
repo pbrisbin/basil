@@ -6,12 +6,14 @@ module Basil
     def start
       super
 
-      skype.on_chatmessage_received do |id|
-        msg = build_message(id)
+      skype.debug = true
 
-        if reply = dispatch_message(msg)
-          prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
-          skype.message_chat(msg.chat, prefix + reply.text)
+      skype.on_chatmessage_received do |id|
+        if msg = build_message(id)
+          if reply = dispatch_message(msg)
+            prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
+            skype.message_chat(msg.chat, prefix + reply.text)
+          end
         end
       end
 
@@ -33,6 +35,7 @@ module Basil
 
     def build_message(message_id)
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
+      chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
       private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
 
       to, text = parse_body(body)
@@ -40,9 +43,12 @@ module Basil
 
       Message.new(:from      => skype.get("CHATMESSAGE #{message_id} FROM_HANDLE"),
                   :from_name => skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME"),
-                  :chat      => skype.get("CHATMESSAGE #{message_id} CHATNAME"),
                   :to        => to,
+                  :chat      => chatname,
                   :text      => text)
+
+    rescue ::Skype::Errors::GeneralError => ex
+      logger.error ex; nil
     end
 
     def parse_body(body)
