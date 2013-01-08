@@ -13,11 +13,6 @@ module Basil
       Dispatch.stub(:ensure_valid) { |obj| obj }
     end
 
-    it "handles nil or empty messages" do
-      Dispatch.simple(nil).should be_nil
-      Dispatch.simple(double('empty', :text => '')).should be_nil
-    end
-
     it "checks responders first" do
       msg = double("msg", :to_me? => true, :text => 'a match')
 
@@ -41,11 +36,6 @@ module Basil
       Dispatch.stub(:ensure_valid) { |obj| obj }
     end
 
-    it "handles nil or empty subject lines" do
-      Dispatch.email(nil).should be_nil
-      Dispatch.email({'Subject' => nil }).should be_nil
-    end
-
     it "dispatches" do
       mail = { 'Subject' => 'a match',
                'From'    => 'from' }
@@ -67,11 +57,6 @@ module Basil
 
     def msg(text)
       Message.new(:to => Config.me, :from => 'from', :from_name => 'from_name', :text => text, :chat => 'chat')
-    end
-
-    it "handles nil or empty messages" do
-      Dispatch.extended(nil).should be_nil
-      Dispatch.extended(double("empty", :text => "")).should be_nil
     end
 
     it "dispatches normally" do

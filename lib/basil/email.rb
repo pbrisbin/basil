@@ -86,13 +86,14 @@ module Basil
       end
 
       def handle_message_id(imap, message_id)
-        mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
+        if mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
+          logger.info "Dispatching #{mail}"
 
-        if reply = Dispatch.email(mail)
-          logger.info "Broadcasting: #{reply}"
-          Config.server.broadcast_message(reply)
+          if reply = Dispatch.email(mail)
+            logger.info "Broadcasting: #{reply}"
+            Config.server.broadcast_message(reply)
+          end
         end
-
       rescue Exception => ex
         logger.warn ex
       ensure

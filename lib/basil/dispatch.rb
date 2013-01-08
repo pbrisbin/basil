@@ -5,11 +5,6 @@ module Basil
       # then watchers) if it wishes to act on it. The first reply
       # received is returned, otherwise nil.
       def simple(msg)
-        logger.debug 'Simple'
-        logger.debug msg
-
-        return nil unless msg && msg.text != ''
-
         if msg.to_me?
           logger.debug 'Responders'
           if reply = dispatch_through(Plugin.responders, msg)
@@ -22,20 +17,10 @@ module Basil
       end
 
       def extended(msg)
-        logger.debug 'Extended'
-        logger.debug msg
-
-        return nil unless msg && msg.text != ''
-
         ensure_valid(process_pipeline(replace_substitutions(msg)))
       end
 
       def email(mail)
-        logger.debug 'Email'
-        logger.debug mail
-
-        return nil unless mail && mail['Subject']
-
         dispatch_through(Plugin.email_checkers, mail)
       end
 

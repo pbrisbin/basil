@@ -9,11 +9,11 @@ module Basil
       skype.debug = true
 
       skype.on_chatmessage_received do |id|
-        if msg = build_message(id)
-          if reply = dispatch_message(msg)
-            prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
-            skype.message_chat(msg.chat, prefix + reply.text)
-          end
+        msg = handle_skype_error { build_message(id) }
+
+        if reply = dispatch_message(msg)
+          prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
+          handle_skype_error { skype.message_chat(msg.chat, prefix + reply.text) }
         end
       end
 
@@ -59,6 +59,13 @@ module Basil
       when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
       else [nil, body]
       end
+    end
+
+    def handle_skype_error(&block)
+      yield
+    rescue ::Skype::Errors::GeneralError => ex
+      logger.error ex
+      nil
     end
   end
 end

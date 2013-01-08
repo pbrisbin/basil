@@ -42,7 +42,11 @@ module Basil
     end
 
     def dispatch_message(msg)
-      logger.debug "Dispatching #{msg}"
+      unless msg && msg.text != ''
+        raise ArgumentError, 'Nil or empty message dispatched'
+      end
+
+      logger.info "Dispatching #{msg}"
 
       ChatHistory.store_message(msg)
 
@@ -58,6 +62,8 @@ module Basil
 
     rescue => ex
       logger.warn ex
+
+      nil
     end
 
     def server_command?(msg)
