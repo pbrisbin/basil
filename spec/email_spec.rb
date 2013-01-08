@@ -53,10 +53,9 @@ module Basil
 
       Email::Mail.should_receive(:parse).with('message body').and_return('a mail')
 
-      reply = double('reply', :pretty => "a reply")
-      Dispatch.should_receive(:email).with('a mail').and_return(reply)
+      Dispatch.should_receive(:email).with('a mail').and_return('a reply')
 
-      @server.should_receive(:broadcast_message).with(reply)
+      @server.should_receive(:broadcast_message).with('a reply')
 
       Email.check
     end

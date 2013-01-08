@@ -1,12 +1,11 @@
 Basil.respond_to(/^give (\w+) (.*)/) {
 
-  # form a message to basil without the give
-  msg = Basil::Message.new(Basil::Config.me, @msg.from, @msg.from_name, @match_data[2].strip)
+  msg = Basil::Message.from_message(@msg, :text => @match_data[2].strip)
 
-  # set the ivar as basil's reply
-  @msg = Basil.dispatch(msg)
+  if reply = Basil::Config.server.dispatch_message(msg)
+    reply.to = @match_data[1]
+  end
 
-  # so we can forward it on
-  @msg ? forwards_to(@match_data[1]) : nil
+  reply
 
 }.description = 'executes a plugin replying to someone else'

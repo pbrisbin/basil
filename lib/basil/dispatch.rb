@@ -76,7 +76,7 @@ module Basil
 
         while command = commands.shift
           text  = reply ? "#{command} #{reply.text}" : command
-          reply = simple(Message.new(Config.me, msg.from, msg.from_name, text, msg.chat))
+          reply = simple(Message.from_message(msg, :to => Config.me, :text => text))
 
           # invalid component
           return simple(msg) unless reply
@@ -92,12 +92,12 @@ module Basil
           pref, sub, suf = m.captures
 
           # handle pipelines inside substitutions
-          reply = process_pipeline(Message.new(Config.me, msg.from, msg.from_name, sub, msg.chat))
+          reply = process_pipeline(Message.from_message(msg, :to => Config.me, :text => sub))
 
           # invalid component
           return msg unless reply
 
-          msg = Message.new(Config.me, msg.from, msg.from_name, "#{pref}#{reply.text}#{suf}", msg.chat)
+          msg = Message.from_message(msg, :to => Config.me, :text => "#{pref}#{reply.text}#{suf}")
         end
 
         msg

@@ -7,6 +7,18 @@ module Basil
     # attributes
     attr_accessor :to, :chat
 
+    def self.from_message(message, options = {})
+      args = {
+        :to        => message.to,
+        :from      => message.from,
+        :from_name => message.from_name,
+        :text      => message.text,
+        :chat      => message.chat
+      }.merge(options)
+
+      new(args)
+    end
+
     def initialize(options)
       # required
       @from      = options.fetch(:from)      { raise ArgumentError, 'from is required' }

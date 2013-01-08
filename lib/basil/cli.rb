@@ -8,8 +8,12 @@ module Basil
       super
 
       loop do
-        print '> '; str = $stdin.gets.chomp
-        msg = Message.new(Config.me, ENV['USER'], ENV['USER'], str, 'cli')
+        print '> '
+        msg = Message.new(:to        => Config.me,
+                          :from      => ENV['USER'],
+                          :from_name => ENV['USER'],
+                          :text      => $stdin.gets.chomp,
+                          :chat      => 'cli')
 
         if reply = dispatch_message(msg)
           puts reply.text

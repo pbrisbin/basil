@@ -85,7 +85,7 @@ module Basil
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
 
         if reply = Dispatch.email(mail)
-          logger.info "Broadcasting: #{reply.pretty}"
+          logger.info "Broadcasting: #{reply}"
           Config.server.broadcast_message(reply)
         end
 

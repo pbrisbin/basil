@@ -14,7 +14,7 @@ module Basil
       end
 
       @plugin = MyPlugin.new
-      @plugin.msg = Message.new('to', 'from', 'from_name', 'text', 'chat')
+      @plugin.msg = Message.new(:to => 'to', :from => 'from', :from_name => 'from_name', :text =>'text', :chat => 'chat')
     end
 
     it "provides chat history" do

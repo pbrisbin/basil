@@ -42,7 +42,7 @@ module Basil
     end
 
     def dispatch_message(msg)
-      logger.debug "Dispatching #{msg.pretty}"
+      logger.debug "Dispatching #{msg}"
 
       ChatHistory.store_message(msg)
 

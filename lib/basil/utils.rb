@@ -46,7 +46,7 @@ module Basil
 
         return says(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(nil, Config.me, Config.me, txt, @msg.chat)
+        return Message.new(:from => Config.me, :from_name => Config.me, :text => txt, :chat => @msg.chat)
       end
 
       nil
@@ -62,14 +62,14 @@ module Basil
 
         return replies(out.join("\n")) unless out.empty?
       elsif txt
-        return Message.new(@msg.from_name, Config.me, Config.me, txt, @msg.chat)
+        return Message.new(:to => @msg.from_name, :from => Config.me, :from_name => Config.me, :text => txt, :chat => @msg.chat)
       end
 
       nil
     end
 
     def forwards_to(new_to)
-      Message.new(new_to, Config.me, Config.me, @msg.text, @msg.chat)
+      Message.from_message(@msg, :to => new_to, :from => Config.me, :from_name => Config.me)
     end
 
     # Set the chat attribute of the underlying message. This allows

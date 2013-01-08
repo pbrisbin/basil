@@ -7,10 +7,10 @@ module Basil
       Storage.stub(:with_storage).and_yield(@store)
 
       # fake some conversations
-      @msgs = [ Message.new('jim', 'bob', 'Bob', 'A message', 'chat_a'),
-                Message.new('bob', 'jim', 'Jim', 'A message', 'chat_a'),
-                Message.new('jim', 'bob', 'Bob', 'Another message', 'chat_b'),
-                Message.new('bob', 'jim', 'Jim', 'Another message', 'chat_b') ]
+      @msgs = [ Message.new(:to => 'jim', :from => 'bob', :from_name => 'Bob', :chat => 'chat_a'),
+                Message.new(:to => 'bob', :from => 'jim', :from_name => 'Jim', :chat => 'chat_a'),
+                Message.new(:to => 'jim', :from => 'bob', :from_name => 'Bob', :chat => 'chat_b'),
+                Message.new(:to => 'bob', :from => 'jim', :from_name => 'Jim', :chat => 'chat_b') ]
 
       # store all our sample messages
       @msgs.each { |msg| ChatHistory.store_message(msg) }

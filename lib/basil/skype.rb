@@ -32,16 +32,17 @@ module Basil
     end
 
     def build_message(message_id)
-      chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
-      from         = skype.get("CHATMESSAGE #{message_id} FROM_HANDLE")
-      from_name    = skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME")
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
       private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
 
       to, text = parse_body(body)
       to = Config.me if !to && private_chat
 
-      Message.new(to, from, from_name, text, chatname)
+      Message.new(:from      => skype.get("CHATMESSAGE #{message_id} FROM_HANDLE"),
+                  :from_name => skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME"),
+                  :chat      => skype.get("CHATMESSAGE #{message_id} CHATNAME"),
+                  :to        => to,
+                  :text      => text)
     end
 
     def parse_body(body)

@@ -10,7 +10,7 @@ module Basil
       Dispatch.stub(:extended) { |msg| msg }
       Dispatch.stub(:simple)   { |msg| msg }
 
-      @msg = Message.new('to', 'from', 'from_name', 'text', 'chat')
+      @msg = Message.new(:to => 'to', :from => 'from', :from_name => 'from_name', :text => 'text', :chat => 'chat')
     end
 
     it "should store in chat history" do
