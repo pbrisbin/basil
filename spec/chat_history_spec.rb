@@ -6,14 +6,6 @@ module Basil
       @store = {} # simple hash
       Storage.stub(:with_storage).and_yield(@store)
 
-      class MyPlugin
-        include ChatHistory
-
-        attr_accessor :msg
-      end
-
-      @plugin = MyPlugin.new
-
       # fake some conversations
       @msgs = [ Message.new('jim', 'bob', 'Bob', 'A message', 'chat_a'),
                 Message.new('bob', 'jim', 'Jim', 'A message', 'chat_a'),
@@ -22,32 +14,30 @@ module Basil
 
       # store all our sample messages
       @msgs.each { |msg| ChatHistory.store_message(msg) }
-
-      # make it so we're "in" chat_a
-      @plugin.msg = double('msg', :chat => 'chat_a')
     end
 
-    it "can fetch messages for this chat" do
-      @plugin.chat_history.should == [@msgs[1], @msgs[0]]
+    it "can fetch messages for a chat" do
+      msgs = ChatHistory.get_messages('chat_a')
+      msgs.should == [@msgs[1], @msgs[0]]
+
+      msgs = ChatHistory.get_messages('chat_b')
+      msgs.should == [@msgs[3], @msgs[2]]
     end
 
     it "can fetch messages to someone" do
-      @plugin.chat_history(:to => 'Jim').should == [@msgs[0]]
-
+      msgs = ChatHistory.get_messages('chat_a', :to => 'Jim')
+      msgs.should == [@msgs[0]]
     end
 
     it "can fetch messages from someone" do
-      @plugin.chat_history(:from => 'Jim').should == [@msgs[1]]
-    end
-
-    it "can fetch for another chat" do
-      @plugin.chat_history(:chat => 'chat_b').should == [@msgs[3], @msgs[2]]
+      msgs = ChatHistory.get_messages('chat_a', :from => 'Jim')
+      msgs.should == [@msgs[1]]
     end
 
     it "can purge chat history" do
-      @plugin.purge_history!
-      @plugin.chat_history.should be_empty
-      @plugin.chat_history(:chat => 'chat_b').should_not be_empty
+      ChatHistory.clear_history('chat_a')
+      ChatHistory.get_messages('chat_a').should be_empty
+      ChatHistory.get_messages('chat_b').should_not be_empty
     end
   end
 end

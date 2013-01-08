@@ -4,6 +4,19 @@ module Basil
   # and plugins in general, should avoid rescuing errors -- let them
   # bubble up to be handled appropriately by the dispatcher.
   module Utils
+    # Accesses chat history
+    def chat_history(options)
+      chat = options.delete(:chat)
+
+      ChatHistory.get_messages(chat || @msg.chat, options)
+    end
+
+    # Purges chat history
+    def purge_history!(chat = @msg.chat)
+      ChatHistory.clear(chat)
+    end
+
+    #
     # Handles both single and multi-line statements to no one in
     # particular.
     #
