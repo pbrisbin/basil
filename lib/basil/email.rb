@@ -16,8 +16,8 @@ module Basil
         @headers[arg]
       end
 
-      def inspect
-        "#<Mail from: #{self['From']}, subject: #{self['Subject']}>"
+      def to_s
+        "#<Mail from: #{self['From']}, subject: #{self['Subject']} >"
       end
 
       def self.parse(content)

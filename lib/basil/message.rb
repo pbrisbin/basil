@@ -32,8 +32,8 @@ module Basil
       to && to.downcase == Config.me.downcase
     end
 
-    def inspect
-      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: #{text}>"
+    def to_s
+      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: `#{text}' >"
     end
 
   end

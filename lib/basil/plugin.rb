@@ -91,8 +91,8 @@ module Basil
       nil
     end
 
-    def inspect
-      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: #{description.inspect}>"
+    def to_s
+      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: `#{description.inspect}' >"
     end
 
     def logger
