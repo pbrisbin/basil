@@ -16,6 +16,10 @@ module Basil
         @headers[arg]
       end
 
+      def inspect
+        "#<Mail from: #{self['From']}, subject: #{self['Subject']}>"
+      end
+
       def self.parse(content)
         header_lines = []
         headers      = {}
@@ -52,7 +56,7 @@ module Basil
         if Config.server.respond_to?(:broadcast_message)
           logger.debug "Server supports broadcasting"
         else
-          logger.debug "Server does not support broadcasting" and return
+          logger.debug "Server does not support broadcasting"; return
         end
 
         Thread.new do
