@@ -92,7 +92,7 @@ module Basil
     end
 
     def to_s
-      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: `#{description.inspect}' >"
+      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: #{description.inspect} >"
     end
 
     def logger

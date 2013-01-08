@@ -33,7 +33,7 @@ module Basil
     end
 
     def to_s
-      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: `#{text}' >"
+      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: \"#{text}\" >"
     end
 
   end
