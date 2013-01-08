@@ -20,24 +20,20 @@ module Basil
     end
 
     def initialize(options)
-      # required
-      @from      = options.fetch(:from)      { raise ArgumentError, 'from is required' }
-      @from_name = options.fetch(:from_name) { raise ArgumentError, 'from_name is required' }
+      @from = options.fetch(:from) { raise ArgumentError, 'from is required' }
 
-      # optional
-      @to   = options[:to]
-      @chat = options[:chat]
-      @text = options.fetch(:text, '')
+      @to        = options[:to]
+      @from_name = options.fetch(:from_name, @from)
+      @chat      = options[:chat]
+      @text      = options.fetch(:text, '')
     end
 
     def to_me?
-      to.downcase == Config.me.downcase
-    rescue
-      false
+      to && to.downcase == Config.me.downcase
     end
 
     def inspect
-      "#<Message:#{object_id} chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: #{text}>"
+      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: #{text}>"
     end
 
   end

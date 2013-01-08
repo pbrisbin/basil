@@ -2,12 +2,24 @@ require 'spec_helper'
 
 module Basil
   describe Message do
-    it "can be constructed with only from/from_name" do
-      msg = Message.new(:from => 'me', :from_name => 'Me')
+    it "should raise when from is not given" do
+      lambda { Message.new(:to => 'you') }.should raise_error(ArgumentError)
+    end
+
+    it "can be constructed with only from" do
+      msg = Message.new(:from => 'me')
 
       msg.from.should == 'me'
-      msg.from_name.should == 'Me'
+      msg.from_name.should == 'me'
       msg.text.should == ''
+    end
+
+    it "can be constructed from another message" do
+      msg  = Message.new(:from => 'me')
+      msg2 = Message.from_message(msg, :to => 'you')
+
+      msg2.from.should == 'me'
+      msg2.to.should == 'you'
     end
 
     it "has a text attribute" do
