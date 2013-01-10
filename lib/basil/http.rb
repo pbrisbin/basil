@@ -15,7 +15,7 @@ module Basil
       #
       def get(options)
         logger.debug "GET"
-        logger.debug options
+        log_options(options)
 
         resp = case options
                when Hash   then complex_get(options)
@@ -66,6 +66,14 @@ module Basil
 
       def require_net_http(secure)
         require(secure ? 'net/https' : 'net/http')
+      end
+
+      def log_options(options)
+        if options.is_a?(Hash) && options.has_key?('password')
+          logger.debug options.merge('password' => 'xxx')
+        else
+          logger.debug options
+        end
       end
 
       def logger
