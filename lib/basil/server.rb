@@ -14,7 +14,7 @@ module Basil
 
     def start
       Plugin.load!
-      Email.check if Config.server.respond_to?(:broadcast_message)
+      Email.check if respond_to?(:broadcast_message)
 
       main_loop do |*args|
         dispatch(*args)

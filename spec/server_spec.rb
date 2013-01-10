@@ -1,6 +1,47 @@
 require 'spec_helper'
 
 module Basil
+  describe Server do
+    it "loads plugins and runs the main loop" do
+      server = Class.new(Server).new
+
+      Plugin.should_receive(:load!)
+      Email.should_not_receive(:check)
+
+      server.should_receive(:main_loop).and_yield('some', 'args')
+      server.should_receive(:build_message).with('some' ,'args').and_return(nil)
+
+      server.start
+    end
+
+    it "checks email for servers that support it" do
+      server = Class.new(Server).new
+
+      Plugin.stub(:load!)
+      server.stub(:main_loop)
+
+      Email.should_receive(:check)
+      server.stub(:broadcast_message)
+
+      server.start
+    end
+
+    it "stores messages in history and dispatches them" do
+      server = Class.new(Server).new
+
+      Plugin.stub(:load!)
+      server.stub(:main_loop).and_yield
+      server.stub(:build_message).and_return('a message')
+
+      ChatHistory.should_receive(:store_message).with('a message')
+      Dispatch.should_receive(:process).with('a message').and_return('a reply')
+
+      # we rely on the fact that our test double returns the result of
+      # dispatching from the start call.
+      server.start.should == 'a reply'
+    end
+  end
+
   describe Server, 'with locked start' do
     before do
       Config.stub(:lock_file).and_return('/tmp/basil_test.lock')
