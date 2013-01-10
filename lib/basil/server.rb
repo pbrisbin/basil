@@ -58,7 +58,7 @@ module Basil
 
       reply = server_command?(msg) || Dispatch.process(msg)
 
-      logger.info "Reply #{msg}" if reply
+      logger.info "Reply #{reply}" if reply
 
       reply
 
