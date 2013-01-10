@@ -71,24 +71,10 @@ module Basil
       end
     end
 
-    # if the message's text matches our regex, set the proper instance
-    # variables and call our execute method.
-    def triggered?(msg)
-      if type == :email_checker
-        matcher = ->(m) { regex.nil? || m['Subject'] =~ regex }
-        coercer = ->(m) { Message.new(:to => Config.me, :from => m['From'], :text => m.body) }
-      else
-        matcher = ->(m) { regex.nil? || m.text =~ regex }
-      end
-
-      if matcher.call(msg)
-        @msg = coercer ? coercer.call(msg) : msg
-        @match_data = $~
-
-        return execute
-      end
-
-      nil
+    # Set the appropriate instance variables for an execution context.
+    def set_context(msg, match_data)
+      @msg = msg
+      @match_data = match_data
     end
 
     def to_s

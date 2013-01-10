@@ -1,52 +1,8 @@
 require 'net/imap'
+require 'basil/email/mail'
 
 module Basil
   module Email
-    # This class represents a parsed email. Headers are accessed like
-    # array indices and body is provided as a method. The parsing is
-    # naive, but it works for our purpose.
-    class Mail
-      attr_reader :body
-
-      def initialize(headers, body)
-        @headers, @body = headers, body
-      end
-
-      def [](arg)
-        @headers[arg]
-      end
-
-      def to_s
-        "#<Mail from: #{self['From']}, subject: #{self['Subject']} >"
-      end
-
-      def self.parse(content)
-        header_lines = []
-        headers      = {}
-
-        lines = content.split(/\r\n/)
-
-        while !(line = lines.shift).empty?
-          if line =~ /^\s+(.*)/ # continuation
-            last = header_lines.pop
-            line = "#{last} #{$1}" if last
-          end
-
-          header_lines << line
-        end
-
-        body = lines.join("\n")
-
-        header_lines.each do |hl|
-          if hl =~ /^([^:]+):(.*)$/
-            headers[$1] = $2.strip
-          end
-        end
-
-        new(headers, body)
-      end
-    end
-
     class << self
       # Check for email on the configured interval, if a mail is found
       # it is run through each of the email checker plugins. Any replies
@@ -89,7 +45,7 @@ module Basil
         if mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
           logger.info "Dispatching #{mail}"
 
-          if reply = Dispatch.email(mail)
+          if reply = Dispatch.simple(mail)
             logger.info "Broadcasting: #{reply}"
             Config.server.broadcast_message(reply)
           end

@@ -2,47 +2,11 @@ require 'spec_helper'
 
 module Basil
   describe Dispatch, 'simple' do
-    before do
-      Plugin.responders.clear
-      Plugin.watchers.clear
+    it "simply delegates to the message" do
+      msg = double('msg')
+      msg.should_receive(:dispatch)
 
-      @responder = Plugin.respond_to(/a match/) { self }
-      @watcher   = Plugin.watch_for(/a match/)  { self }
-
-      # lift this requirement for the test
-      Dispatch.stub(:ensure_valid) { |obj| obj }
-    end
-
-    it "checks responders first" do
-      msg = double("msg", :to_me? => true, :text => 'a match')
-
-      Dispatch.simple(msg).should == @responder
-    end
-
-    it "checks watchers" do
-      msg = double("msg", :to_me? => false, :text => 'a match')
-
-      Dispatch.simple(msg).should == @watcher
-    end
-  end
-
-  describe Dispatch, 'email' do
-    before do
-      Plugin.email_checkers.clear
-
-      @checker = Plugin.check_email(/a match/) { self }
-
-      # lift this requirement for the test
-      Dispatch.stub(:ensure_valid) { |obj| obj }
-    end
-
-    it "dispatches" do
-      mail = { 'Subject' => 'a match',
-               'From'    => 'from' }
-
-      mail.stub(:body).and_return('a body')
-
-      Dispatch.email(mail).should == @checker
+      Dispatch.simple(msg)
     end
   end
 

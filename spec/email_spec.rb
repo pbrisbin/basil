@@ -1,31 +1,6 @@
 require 'spec_helper'
 
 module Basil
-  describe Email::Mail do
-    it "parses from simple emails" do
-      content = [
-        'Date: A date',
-        'Subject: A subject',
-        'To: A to address',
-        'From: A from address',
-        'Foo: A header with',
-        '  continuation',
-        '',
-        'Some multi-',
-        'line body'
-      ].join("\r\n") # CRLF
-
-      mail = Email::Mail.parse(content)
-
-      mail['Date'].should    == 'A date'
-      mail['Subject'].should == 'A subject'
-      mail['To'].should      == 'A to address'
-      mail['From'].should    == 'A from address'
-      mail['Foo'].should     == 'A header with continuation'
-      mail.body.should       == "Some multi-\nline body"
-    end
-  end
-
   describe Email, 'check' do
     before do
       Thread.stub(:new).and_yield
@@ -53,7 +28,7 @@ module Basil
 
       Email::Mail.should_receive(:parse).with('message body').and_return('a mail')
 
-      Dispatch.should_receive(:email).with('a mail').and_return('a reply')
+      Dispatch.should_receive(:simple).with('a mail').and_return('a reply')
 
       @server.should_receive(:broadcast_message).with('a reply')
 

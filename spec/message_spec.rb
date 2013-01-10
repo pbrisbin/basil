@@ -53,5 +53,22 @@ module Basil
       msg.to = 'you'
       msg.to_me?.should be_false
     end
+
+    it "should dispatch through responders and watchers" do
+      responder = Plugin.respond_to(/a match/) { self }
+      watcher   = Plugin.watch_for(/a match/)  { self }
+
+      msg = Message.new(:from => 'x', :text => 'a match')
+
+      msg.stub(:to_me?).and_return(true)
+      msg.dispatch.should == responder
+
+      msg.stub(:to_me?).and_return(false)
+      msg.dispatch.should == watcher
+
+      msg = Message.from_message(msg, :text => 'no match')
+
+      msg.dispatch.should be_nil
+    end
   end
 end

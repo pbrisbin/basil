@@ -32,8 +32,31 @@ module Basil
       to && to.downcase == Config.me.downcase
     end
 
+    def dispatch
+      if to_me? && (reply = dispatch_through(Plugin.responders))
+        return reply
+      end
+
+      dispatch_through(Plugin.watchers)
+    end
+
     def to_s
       "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: \"#{text}\" >"
+    end
+
+    private
+
+    def dispatch_through(plugins)
+      reply = nil
+
+      plugins.each do |p|
+        if p.regex =~ text
+          p.set_context(self, $~)
+          reply = p.execute and break
+        end
+      end
+
+      reply
     end
 
   end

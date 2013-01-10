@@ -1,46 +1,21 @@
 module Basil
   class Dispatch
     class << self
-      # take a valid message and ask each registered plugin (responders
-      # then watchers) if it wishes to act on it. The first reply
-      # received is returned, otherwise nil.
-      def simple(msg)
-        if msg.to_me?
-          logger.debug 'Responders'
-          if reply = dispatch_through(Plugin.responders, msg)
-            return reply
-          end
-        end
-
-        logger.debug 'Watchers'
-        dispatch_through(Plugin.watchers, msg)
-      end
-
       def extended(msg)
-        ensure_valid(process_pipeline(replace_substitutions(msg)))
+        ensure_valid(
+          process_pipeline(
+            replace_substitutions(msg)
+        ))
       end
 
-      def email(mail)
-        dispatch_through(Plugin.email_checkers, mail)
+      def simple(msg)
+        msg.dispatch
       end
 
       private
 
-      def dispatch_through(plugins, msg)
-        plugins.each do |p|
-          if reply = p.triggered?(msg)
-            logger.info "#{p} triggered"
-            return ensure_valid(reply)
-          end
-        end
-
-        logger.debug 'No response'
-
-        nil
-      end
-
-      # dispatching must return a Message or nil, anything else will
-      # cause errors.
+      # extended dispatching must return a Message or nil, anything else
+      # will cause errors.
       def ensure_valid(obj)
         return obj if obj.nil? || obj.is_a?(Message)
 
