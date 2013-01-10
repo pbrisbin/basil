@@ -3,15 +3,17 @@ module Basil
     def main_loop
       loop do
         print '> '
-        msg = Message.new(:to   => Config.me,
-                          :from => ENV['USER'],
-                          :text => $stdin.gets.chomp,
-                          :chat => 'cli')
-
-        if reply = dispatch_message(msg)
-          puts reply.text
-        end
+        r = yield and puts r.text
       end
+    end
+
+    def build_message(*args)
+      Message.new(
+        :to   => Config.me,
+        :from => ENV['USER'],
+        :text => $stdin.gets.chomp,
+        :chat => 'cli'
+      )
     end
   end
 end

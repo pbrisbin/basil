@@ -12,23 +12,29 @@ module Basil
       end
     end
 
-    # Loads plugins and kicks off the email checking loop. Subclasses
-    # should call super in their start method overrides.
     def start
       Plugin.load!
       Email.check if Config.server.respond_to?(:broadcast_message)
 
-      main_loop
-    end
-
-    def main_loop
-      raise NotImplementedError, "Server classes must implement #main_loop"
-    end
-
-    def dispatch_message(msg)
-      unless msg && msg.text != ''
-        raise ArgumentError, 'Nil or empty message dispatched'
+      main_loop do |*args|
+        dispatch(*args)
       end
+    end
+
+    # See Basil::Cli for a simple main_loop / build_message setup.
+    def main_loop
+      raise NotImplementedError, "#{self.class} must implement #{__method__}"
+    end
+
+    # See Basil::Cli for a simple main_loop / build_message setup.
+    def build_message(*args)
+      raise NotImplementedError, "#{self.class} must implement #{__method__}"
+    end
+
+    private
+
+    def dispatch(*args)
+      msg = build_message(*args) or raise ArgumentError, 'nil message dispatched'
 
       ChatHistory.store_message(msg)
 
