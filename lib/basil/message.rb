@@ -34,11 +34,11 @@ module Basil
     end
 
     def dispatch
-      if to_me? && (reply = dispatch_through(Plugin.responders))
-        return reply
+      if to_me?
+        reply = dispatch_through(Plugin.responders)
       end
 
-      dispatch_through(Plugin.watchers)
+      reply or dispatch_through(Plugin.watchers)
     end
 
     def to_s
