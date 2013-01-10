@@ -84,6 +84,8 @@ module Basil
       end
     end
 
+    private
+
     def logger
       @logger ||= Loggers['server']
     end
