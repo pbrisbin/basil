@@ -1,5 +1,7 @@
 require 'forwardable'
 
+Signal.trap('INT') { puts 'killed.'; exit 1 }
+
 module Basil
   autoload :ChatHistory, 'basil/chat_history'
   autoload :Cli,         'basil/cli'
