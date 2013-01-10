@@ -6,6 +6,7 @@ module Basil
   autoload :Config,      'basil/config'
   autoload :Dispatch,    'basil/dispatch'
   autoload :Email,       'basil/email'
+  autoload :HTTP,        'basil/http'
   autoload :Lock,        'basil/lock'
   autoload :Loggers,     'basil/loggers'
   autoload :Message,     'basil/message'

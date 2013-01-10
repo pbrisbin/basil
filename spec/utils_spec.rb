@@ -76,35 +76,6 @@ module Basil
       @plugin.escape('foo bar').should == 'foo+bar'
     end
 
-    it "provides get_http simply" do
-      require 'net/http' # so we can stub things
-
-      URI.should_receive(:parse).with('a_url').and_return('parsed_url')
-      Net::HTTP.should_receive(:get_response).with('parsed_url')
-
-      @plugin.get_http('a_url')
-    end
-
-    it "provides get_http with an options hash" do
-      require 'net/http' # so we can stub things
-
-      net  = double('net')
-      http = double('http')
-      req  = double('req')
-
-      Net::HTTP.should_receive(:new).with('host', 'port').and_return(net)
-      Net::HTTP::Get.should_receive(:new).with('path').and_return(req)
-
-      net.should_receive(:start).and_yield(http)
-      req.should_receive(:basic_auth).with('username', 'password')
-      http.should_receive(:request).with(req)
-
-      @plugin.get_http('host' => 'host',
-                       'port' => 'port',
-                       'path' => 'path',
-                       'user' => 'username',
-                       'password' => 'password')
-    end
 
     it "provides parse_http" do
       resp = double("resp", :body => 'a body')
