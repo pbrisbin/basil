@@ -1,9 +1,5 @@
 module Basil
   class Cli < Server
-    has_command(:quit) do |*args|
-      exit 0
-    end
-
     def main_loop
       loop do
         print '> '
