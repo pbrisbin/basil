@@ -1,6 +1,16 @@
 module Basil
   class Dispatch
     class << self
+      def process(msg)
+        if extended?
+          extended(msg)
+        else
+          simple(msg)
+        end
+      end
+
+      private
+
       def extended(msg)
         ensure_valid(
           process_pipeline(
@@ -12,7 +22,9 @@ module Basil
         msg.dispatch
       end
 
-      private
+      def extended?
+        Config.dispatch_type == :extended
+      end
 
       # extended dispatching must return a Message or nil, anything else
       # will cause errors.

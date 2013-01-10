@@ -28,7 +28,7 @@ module Basil
 
       Email::Mail.should_receive(:parse).with('message body').and_return('a mail')
 
-      Dispatch.should_receive(:simple).with('a mail').and_return('a reply')
+      Dispatch.should_receive(:process).with('a mail').and_return('a reply')
 
       @server.should_receive(:broadcast_message).with('a reply')
 

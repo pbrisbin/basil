@@ -52,19 +52,15 @@ module Basil
         raise ArgumentError, 'Nil or empty message dispatched'
       end
 
-      logger.info "Dispatching #{msg}"
-
       ChatHistory.store_message(msg)
 
-      if reply = server_command?(msg)
-        return reply
-      end
+      logger.info "Dispatching #{msg}"
 
-      if Config.dispatcher_type == :extended
-        Dispatch.extended(msg)
-      else
-        Dispatch.simple(msg)
-      end
+      reply = server_command?(msg) || Dispatch.process(msg)
+
+      logger.info "Reply #{msg}" if reply
+
+      reply
 
     rescue => ex
       logger.warn ex
