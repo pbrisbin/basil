@@ -25,7 +25,7 @@ class Skype
   end
 
   def on(event, &block)
-    listeners[event] << block
+    listeners[event] << block if block
   end
 
   def on_chatmessage_received(&block)
@@ -33,10 +33,6 @@ class Skype
       id, _, status = args.split(' ')
       yield(id) if status && status == 'RECEIVED'
     end
-  end
-
-  def debug=(value)
-    self.class.DEBUG = value
   end
 
   private
