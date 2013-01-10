@@ -6,45 +6,45 @@ module Basil
     KEY = :chat_history
     LIM = 100 # number of message to kep per chat
 
-    def self.store_message(message)
-      Storage.with_storage do |store|
-        store[KEY]               ||= {}
-        store[KEY][message.chat] ||= []
-        store[KEY][message.chat].unshift(message)
-
-        while store[KEY][message.chat].length > LIM
-          store[KEY][message.chat].pop
+    class << self
+      def store_message(message)
+        with_history(message.chat) do |history|
+          history.unshift(message)
+          history.pop while history.length > LIM
         end
       end
-    end
 
-    # Messages are returned most recent first. Valid option keys are
-    # :from and :to which limit the results accordingly.
-    def self.get_messages(chat, options = {})
-      Storage.with_storage do |store|
-        history = store[KEY][chat] || []
+      # Messages are returned most recent first. Valid option keys are
+      # :from and :to which limit the results accordingly.
+      def get_messages(chat, options = {})
+        with_history(chat) do |history|
+          messages = history.dup
 
-        if options.has_key?(:from)
-          # messages from someone
-          history = history.select do |msg|
-            msg.from_name =~ /#{options[:from]}/i
+          if options.has_key?(:from)
+            messages.keep_if { |msg| msg.from_name =~ /#{options[:from]}/i }
           end
-        end
 
-        if options.has_key?(:to)
-          # messages to someone
-          history = history.select do |msg|
-            msg.to =~ /#{options[:to]}/i
+          if options.has_key?(:to)
+            messages.keep_if { |msg| msg.to =~ /#{options[:to]}/i }
           end
-        end
 
-        history
+          messages
+        end
       end
-    end
 
-    def self.clear_history(chat)
-      Storage.with_storage do |store|
-        store[KEY].delete(chat)
+      def clear_history(chat)
+        with_history(chat, &:clear)
+      end
+
+      private
+
+      def with_history(chat, &block)
+        Storage.with_storage do |store|
+          store[KEY]       ||= {}
+          store[KEY][chat] ||= []
+
+          yield(store[KEY][chat])
+        end
       end
     end
   end
