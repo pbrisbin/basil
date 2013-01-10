@@ -30,12 +30,6 @@ module Basil
       @checker.regex.should   == /^string$/
     end
 
-    it "assigns the correct type" do
-      @responder.type.should == :responder
-      @watcher.type.should   == :watcher
-      @checker.type.should   == :email_checker
-    end
-
     it "has an accessible description" do
       @responder.description.should be_nil
       @responder.description = 'A description'

@@ -10,19 +10,19 @@ module Basil
     # Create an instance of Plugin which will look for regex only in
     # messages that are to basil.
     def self.respond_to(regex, &block)
-      new(:responder, regex, &block)
+      new(regex, &block).tap { |p| responders << p }
     end
 
     # Create an instance of Plugin which will look for regex in any
     # messages sent in the chat.
     def self.watch_for(regex, &block)
-      new(:watcher, regex, &block)
+      new(regex, &block).tap { |p| watchers << p }
     end
 
     # Create an instance of Plugin which will look for regex in the
     # subject of any emails basil receives.
     def self.check_email(regex, &block)
-      new(:email_checker, regex, &block)
+      new(regex, &block).tap { |p| email_checkers << p }
     end
 
     def self.responders
@@ -55,20 +55,13 @@ module Basil
       @logger ||= Loggers['plugins']
     end
 
-    attr_reader :type, :regex
+    attr_reader :regex
     attr_accessor :description
 
-    def initialize(type, regex, &block)
-      @type  = type
+    def initialize(regex, &block)
       @regex = regex.is_a?(String) ? Regexp.new("^#{regex}$") : regex
 
       define_singleton_method(:execute, &block)
-
-      case type
-      when :responder    ; Plugin.responders     << self
-      when :watcher      ; Plugin.watchers       << self
-      when :email_checker; Plugin.email_checkers << self
-      end
     end
 
     # Set the appropriate instance variables for an execution context.
@@ -78,7 +71,7 @@ module Basil
     end
 
     def to_s
-      "#<Plugin type: #{type}, regex: #{regex.inspect}, description: #{description.inspect} >"
+      "#<Plugin regex: #{regex.inspect}, description: #{description.inspect} >"
     end
 
     def logger
