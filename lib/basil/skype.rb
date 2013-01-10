@@ -4,14 +4,12 @@ require 'skype/ext'
 module Basil
   class Skype < Server
     def main_loop
-      skype.debug = true
-
       skype.on_chatmessage_received do |id|
-        msg = handle_skype_error { build_message(id) }
+        msg = get_message(id)
 
         if reply = dispatch_message(msg)
           prefix = reply.to ? "#{reply.to.split(' ').first}, " : ''
-          handle_skype_error { skype.message_chat(msg.chat, prefix + reply.text) }
+          message_chat(msg.chat, prefix + reply.text)
         end
       end
 
@@ -22,7 +20,7 @@ module Basil
     lock_start
 
     def broadcast_message(msg)
-      skype.message_chat(msg.chat, msg.text)
+      message_chat(msg.chat, msg.text)
     end
 
     private
@@ -31,7 +29,13 @@ module Basil
       @skype ||= ::Skype.new(Config.me)
     end
 
-    def build_message(message_id)
+    def message_chat(chat, text)
+      skype.message_chat(msg.chat, msg.text)
+    rescue ::Skype::Errors::GeneralError => ex
+      logger.error ex; nil
+    end
+
+    def get_message(message_id)
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
       chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
       private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
@@ -59,11 +63,5 @@ module Basil
       end
     end
 
-    def handle_skype_error(&block)
-      yield
-    rescue ::Skype::Errors::GeneralError => ex
-      logger.error ex
-      nil
-    end
   end
 end
