@@ -4,7 +4,7 @@ module Basil
   # pre-dispatch for every message they see.
   module ChatHistory
     KEY = :chat_history
-    LIM = 100 # number of message to kep per chat
+    LIM = 100 # number of messages to keep per chat
 
     class << self
       def store_message(message)
