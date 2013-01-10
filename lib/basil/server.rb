@@ -38,7 +38,7 @@ module Basil
     # should call super in their start method overrides.
     def start
       Plugin.load!
-      Email.check
+      Email.check if Config.server.respond_to?(:broadcast_message)
     end
 
     def dispatch_message(msg)

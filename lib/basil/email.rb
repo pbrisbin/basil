@@ -8,13 +8,6 @@ module Basil
       # it is run through each of the email checker plugins. Any replies
       # returned will be handed to the server's broadcast_mail method.
       def check
-        # if the server doesn't support us, we just do nothing.
-        if Config.server.respond_to?(:broadcast_message)
-          logger.debug "Server supports broadcasting"
-        else
-          logger.debug "Server does not support broadcasting"; return
-        end
-
         Thread.new do
           logger.debug "Email polling spawned"
 
