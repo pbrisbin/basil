@@ -3,9 +3,7 @@ require 'skype/ext'
 
 module Basil
   class Skype < Server
-    def start
-      super
-
+    def main_loop
       skype.debug = true
 
       skype.on_chatmessage_received do |id|

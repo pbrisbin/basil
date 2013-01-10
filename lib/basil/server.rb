@@ -39,6 +39,12 @@ module Basil
     def start
       Plugin.load!
       Email.check if Config.server.respond_to?(:broadcast_message)
+
+      main_loop
+    end
+
+    def main_loop
+      raise NotImplementedError, "Server classes must implement #main_loop"
     end
 
     def dispatch_message(msg)

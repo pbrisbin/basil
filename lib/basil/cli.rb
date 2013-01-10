@@ -4,9 +4,7 @@ module Basil
       exit 0
     end
 
-    def start
-      super
-
+    def main_loop
       loop do
         print '> '
         msg = Message.new(:to   => Config.me,
