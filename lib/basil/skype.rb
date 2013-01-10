@@ -29,8 +29,8 @@ module Basil
       @skype ||= ::Skype.new(Config.me)
     end
 
-    def message_chat(chat, text)
-      skype.message_chat(msg.chat, msg.text)
+    def message_chat(*args)
+      skype.message_chat(*args)
     rescue ::Skype::Errors::GeneralError => ex
       logger.error ex; nil
     end
