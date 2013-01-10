@@ -1,7 +1,7 @@
 module Basil
   class Message
     # Who a Message is from and what it is are immutable
-    attr_reader :from, :from_name, :text
+    attr_reader :from, :from_name, :text, :time
 
     # Messages can be forwarded around by changing the to or chat
     # attributes
@@ -26,6 +26,7 @@ module Basil
       @from_name = options.fetch(:from_name, @from)
       @chat      = options[:chat]
       @text      = options.fetch(:text, '')
+      @time      = Time.now
     end
 
     def to_me?

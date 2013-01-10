@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'timecop'
 
 module Basil
   describe Message do
@@ -39,6 +40,13 @@ module Basil
 
       msg.to.should == 'other to'
       msg.chat.should == 'other chat'
+    end
+
+    it "sets a time attribute when created" do
+      Timecop.freeze do
+        msg = Message.new(:from => 'me')
+        msg.time.should == Time.now
+      end
     end
 
     it "knows me case insensitively" do
