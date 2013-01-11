@@ -6,9 +6,6 @@ module Basil
       Thread.stub(:new).and_yield
       Email.stub(:poll_email?).and_return(false)
 
-      @server = double("server")
-      @server.stub(:broadcast_message)
-      Config.stub(:server).and_return(@server)
 
       @imap = double("imap", :store => nil)
       Email.stub(:with_imap).and_yield(@imap)
@@ -20,17 +17,19 @@ module Basil
       Email.check
     end
 
-    xit "should parse and dispatch mails" do
+    it "should parse and dispatch mails" do
+      server = double("server")
+      Config.stub(:server).and_return(server)
+
       attrs = double('attrs', :attr => {'RFC822' => 'message body'})
 
       @imap.should_receive(:search).and_return(['message_id'])
       @imap.should_receive(:fetch).with('message_id', 'RFC822').and_return([attrs])
 
-      Email::Mail.should_receive(:parse).with('message body').and_return('a mail')
+      mail = mock
+      mail.should_receive(:dispatch).with(server)
 
-      Dispatch.should_receive(:process).with('a mail').and_return('a reply')
-
-      @server.should_receive(:broadcast_message).with('a reply')
+      Email::Mail.should_receive(:parse).with('message body').and_return(mail)
 
       Email.check
     end
