@@ -1,15 +1,16 @@
 module Basil
-  class Dispatch
+  module Dispatch
     class << self
+
       def process(msg)
-        if extended?
-          extended(msg)
-        else
-          simple(msg)
-        end
+        extended? ? extended(msg) : simple(msg)
       end
 
       private
+
+      def extended?
+        Config.dispatch_type == :extended
+      end
 
       def extended(msg)
         ensure_valid(
@@ -20,10 +21,6 @@ module Basil
 
       def simple(msg)
         msg.dispatch
-      end
-
-      def extended?
-        Config.dispatch_type == :extended
       end
 
       # extended dispatching must return a Message or nil, anything else
@@ -79,5 +76,6 @@ module Basil
         @logger ||= Loggers['dispatching']
       end
     end
+
   end
 end
