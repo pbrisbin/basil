@@ -34,7 +34,7 @@ module Basil
 
     def send_message(msg)
       prefix = msg.to && "#{msg.to.split(' ').first}, "
-      message_chat(msg.chat, "#{prefix}#{msg.text}")
+      skype.message_chat(msg.chat, "#{prefix}#{msg.text}")
     rescue ::Skype::Errors::GeneralError => ex
       logger.error ex; nil
     end
