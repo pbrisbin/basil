@@ -24,6 +24,6 @@ Basil.respond_to('reload') {
 
   c = Basil::Plugin.count_loaded
 
-  says "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
+  @msg.say "#{a - b} plugins removed, #{c - b} plugins (re)loaded."
 
 }.description = 'reloads all plugins'

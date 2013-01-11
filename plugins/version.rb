@@ -1,4 +1,2 @@
-require 'basil/version'
-
-Basil.respond_to('version')      { says Basil::VERSION }
-Basil.respond_to('ruby version') { says RUBY_VERSION   }
+Basil.respond_to('version')      { @msg.say Basil::VERSION }
+Basil.respond_to('ruby version') { @msg.say RUBY_VERSION   }

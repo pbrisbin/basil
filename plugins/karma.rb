@@ -15,8 +15,6 @@ Basil.watch_for(/(\w+)(--|\+\+)($|[!?.,:; ])/) {
     end
   end
 
-  nil
-
 }
 
 Basil.respond_to(/^karma (\w+)/) {
@@ -36,6 +34,6 @@ Basil.respond_to(/^karma (\w+)/) {
           "negative karma (#{karma})"
         end
 
-  replies "#{k} currently has #{msg}"
+  @msg.reply "#{k} currently has #{msg}"
 
 }.description = "report a word's current karma"

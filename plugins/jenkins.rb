@@ -130,12 +130,10 @@ Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat(Basil::Config.jenkins['broadcast_chat'])
+  @msg.chat = Basil::Config.jenkins['broadcast_chat']
 
-  says do |out|
-    out << "(dance) #{build.name} is back to normal"
-    out << "Thanks go to #{build.committers}!"
-  end
+  @msg.say "(dance) #{build.name} is back to normal"
+  @msg.say "Thanks go to #{build.committers}!"
 end
 
 Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
@@ -143,18 +141,16 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  set_chat(Basil::Config.jenkins['broadcast_chat'])
+  @msg.chat = Basil::Config.jenkins['broadcast_chat']
 
-  says do |out|
-    out << "(headbang) #{build.name} ##{build.number} failed!"
-    out << "#{build.fail_count} failure(s). Culprits identified as #{build.culprits}."
-    out << "Please see #{build.url} for more details."
-  end
+  @msg.say "(headbang) #{build.name} ##{build.number} failed!"
+  @msg.say "#{build.fail_count} failure(s). Culprits identified as #{build.culprits}."
+  @msg.say "Please see #{build.url} for more details."
 end
 
 Basil.respond_to('jenkins') {
 
-  says Jenkins::Status.new.jobs
+  @msg.say Jenkins::Status.new.jobs
 
 }.description = 'display the status of all jenkins builds'
 
@@ -162,10 +158,8 @@ Basil.respond_to(/^jenkins (\w+)/) {
 
   job = Jenkins::Job.new(@match_data[1])
 
-  says do |out|
-    out << "#{job.name}: #{job.status}"
-    out << job.health_report
-  end
+  @msg.say "#{job.name}: #{job.status}"
+  @msg.say job.health_report
 
 }.description = 'retrieves info on a specific jenkins job'
 
@@ -174,21 +168,19 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
   job = Jenkins::Job.new(@match_data[1])
 
   if job.passing?
-    return says "#{job.name} is currently green!"
+    return @msg.say "#{job.name} is currently green!"
   end
 
   build = Jenkins::Build.new(job.name, job.builds.last)
 
-  says do |out|
-    out << "The last completed build was #{build.number}"
-    out << "Culprits are #{build.culprits}."
-  end
+  @msg.say "The last completed build was #{build.number}"
+  @msg.say "Culprits are #{build.culprits}."
 
 }.description = 'tells you the likely culprits for a broken build'
 
 Basil.respond_to(/^build (\w+)/) {
 
-  says Jenkins::Job.new(@match_data[1]).build!
+  @msg.say Jenkins::Job.new(@match_data[1]).build!
 
 }.description = 'triggers a build for the specified job'
 

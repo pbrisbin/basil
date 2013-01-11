@@ -37,7 +37,7 @@ Basil.respond_to(/^grab (.+)/) do
       store[Basil::QuoteDb::KEY] << quote
     end
 
-    says 'Ta-da!'
+    @msg.say 'Ta-da!'
   end
 
 end
@@ -45,11 +45,11 @@ end
 # replies with the last quote grabbed for the named person
 Basil.respond_to(/^q(uote)? (.+)/) do
   quote = Basil::QuoteDb.quote(@match_data[2])
-  quote ? says(quote) : nil
+  quote && @msg.say(quote)
 end
 
 # replies with a random quote grabbed for the named person
 Basil.respond_to(/^rq(uote)? (.+)/) do
   quote = Basil::QuoteDb.quote(@match_data[2], true)
-  quote ? says(quote) : nil
+  quote && @msg.say(quote)
 end

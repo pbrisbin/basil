@@ -13,6 +13,6 @@ Basil.respond_to(/^fight (\S+) (\S+)/) {
 
   score = play.call(@match_data[1], @match_data[2])
 
-  says score
+  @msg.say score
 
 }.description = 'plays out a fictional battle between two combatants'

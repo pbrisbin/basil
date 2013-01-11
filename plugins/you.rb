@@ -4,6 +4,6 @@
 #
 Basil.respond_to(/^you(.*)/) {
 
-  replies "no, YOU#{@match_data[1]}!"
+  @msg.reply "no, YOU#{@match_data[1]}!"
 
 }

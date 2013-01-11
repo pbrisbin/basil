@@ -1,5 +1,5 @@
 Basil.respond_to('test') {
 
-  says "Hello world from #{self.inspect}!"
+  @msg.say "Hello world from #{self.inspect}!"
 
 }.description = 'tests that the bot is working'

@@ -15,7 +15,7 @@ Basil.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
                               :locked    => false } # TODO:
   end
 
-  says 'Ta-da!'
+  @msg.say 'Ta-da!'
 
 }.description = 'store a new factoid (or overwrite existing)'
 
@@ -31,8 +31,8 @@ Basil::Plugin.respond_to(/^\w+$/) {
 
   if fact
     case fact[:action]
-    when 'reply' then replies fact[:fact]
-    when 'say'   then says    fact[:fact]
+    when 'reply' then @msg.reply fact[:fact]
+    when 'say'   then @msg.say   fact[:fact]
     else nil
     end
   else
@@ -52,12 +52,8 @@ Basil.respond_to(/^factinfo (\w+)$/) {
   end
 
   if fact
-    replies do |out|
-      out << "fact #{key}: created #{fact[:created]} by #{fact[:by]}, requested #{fact[:requested]} time(s)."
-      out << "<#{fact[:action]}> #{fact[:fact]}"
-    end
-  else
-    nil
+    @msg.say "fact #{key}: created #{fact[:created]} by #{fact[:by]}, requested #{fact[:requested]} time(s)."
+    @msg.say "<#{fact[:action]}> #{fact[:fact]}"
   end
 
 }.description = 'give information about a factoid'
@@ -69,6 +65,6 @@ Basil.respond_to(/^(del|rm) ?factoid (\w+)$/) {
     store[:factoids].delete(@match_data[2])
   end
 
-  says 'Ta-da!'
+  @msg.say 'Ta-da!'
 
 }.description = 'remove a factoid'

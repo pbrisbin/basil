@@ -52,12 +52,8 @@ Basil.respond_to(/^eval (.*)/) {
   end
 
   if stdout # will be "" unless SyntaxError
-    says do |out|
-      out << stdout if stdout != ""
-      out << " => #{retval.inspect}"
-    end
-  else
-    nil
+    @msg.say stdout if stdout != ""
+    @msg.say "=> #{retval.inspect}"
   end
 
 }.description = 'evaluates ruby expressions'

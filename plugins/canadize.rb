@@ -1,3 +1,5 @@
-Basil.respond_to(/canadize (.+)/) do
-  says "#{@match_data[1]}, eh?"
-end
+Basil.respond_to(/canadize (.+)/) {
+
+  @msg.say "#{@match_data[1]}, eh?"
+
+}

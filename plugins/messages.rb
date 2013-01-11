@@ -9,7 +9,7 @@ Basil.respond_to(/^tell ([^:]*): (.+)/) {
     store[:tell_messages] << { :time => Time.now, :to => to, :from => from, :message => msg }
   end
 
-  replies "consider it noted."
+  @msg.reply "consider it noted."
 
 }.description = "Leave a message for someone"
 
@@ -22,19 +22,19 @@ Basil.respond_to(/^(do i have any |any )?messages\??$/i) {
     msgs = store[:tell_messages].select { |msg| @msg.from_name =~ /#{msg[:to]}/i }
 
     if msgs.empty?
-      replies "sorry, I have no messages for you."
+      @msg.reply "sorry, I have no messages for you."
     else
       store[:tell_notified][@msg.from] = false
 
-      replies("your messages:") do |out|
-        msgs.each do |msg|
-          out << "#{msg[:time].strftime("On %D, at %r")}, #{msg[:from]} wrote:"
-          out << '> ' + msg[:message]
-          out << ''
+      @msg.reply 'your messages:'
 
-          # remove the message
-          store[:tell_messages].delete(msg)
-        end
+      msgs.each do |msg|
+        @msg.say "#{msg[:time].strftime("On %D, at %r")}, #{msg[:from]} wrote:"
+        @msg.say '> ' + msg[:message]
+        @msg.say ''
+
+        # remove the message
+        store[:tell_messages].delete(msg)
       end
     end
   end
@@ -61,15 +61,11 @@ Basil.watch_for(/.*/) {
     len = msgs.length
 
     # plularize correctly
-    reply = if len == 1
-              "you have #{len} message, say 'messages?' to me to see it."
-            else
-              "you have #{len} messages, say 'messages?' to me to see them."
-            end
-
-    replies reply
-  else
-    nil
+    if len == 1
+      @msg.reply "you have #{len} message, say 'messages?' to me to see it."
+    else
+      @msg.reply "you have #{len} messages, say 'messages?' to me to see them."
+    end
   end
 
 }

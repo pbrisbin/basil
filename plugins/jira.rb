@@ -71,36 +71,31 @@ Basil.watch_for(/\w+-\d+/) {
     end
   end
 
-  unless tickets.empty?
-    says do |out|
-      tickets.each do |id|
-        ticket = Basil::JiraTicket.new(id)
+  if tickets.any?
+    tickets.each do |id|
+      ticket = Basil::JiraTicket.new(id)
 
-        if ticket.found?
-          url   = ticket.url
-          title = ticket.title
+      if ticket.found?
+        url   = ticket.url
+        title = ticket.title
 
-          # don't spam information that's already present in the
-          # triggering message
-          url_present   = @msg.text.include?(url)
-          title_present = @msg.text.include?(title)
+        # don't spam information that's already present in the
+        # triggering message
+        url_present   = @msg.text.include?(url)
+        title_present = @msg.text.include?(title)
 
-          unless url_present && title_present
-            if url_present
-              out << "#{id} : #{title}"
-            elsif title_present
-              out << "#{url}"
-            else
-              out << "#{ticket.description}"
-            end
+        unless url_present && title_present
+          if url_present
+            @msg.say "#{id} : #{title}"
+          elsif title_present
+            @msg.say "#{url}"
+          else
+            @msg.say "#{ticket.description}"
           end
         end
       end
     end
-  else
-    nil
   end
-
 }
 
 Basil.respond_to(/^jira search (.+)/i) {
@@ -112,14 +107,14 @@ Basil.respond_to(/^jira search (.+)/i) {
     issues = json.issues
     len    = issues.length
 
-    replies('Search results (first 10):') do |out|
-      issues[0..10].each { |issue|
-        ticket = Basil::JiraTicket.new(issue['key'])
-        out << ticket.description if ticket.found?
-      }
+    @msg.reply 'Search results (first 10):'
+
+    issues[0..10].each do |issue|
+      ticket = Basil::JiraTicket.new(issue['key'])
+      @msg.say ticket.description if ticket.found?
     end
   rescue
-    replies "no results found."
+    @msg.reply "no results found."
   end
 
 }.description = 'find JIRA cards with given search term(s)'

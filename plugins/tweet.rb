@@ -21,6 +21,6 @@ Basil.respond_to(/tweet (.+)/) {
 
   Twitter.update(message)
 
-  says "successfully twittereded!"
+  @msg.say "successfully twittereded!"
 
 }.description = 'sends tweets as @basilthebot'

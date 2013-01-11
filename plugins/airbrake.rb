@@ -2,7 +2,7 @@ module Basil
   class Airbrake
     include Utils
 
-    def self.pretty_print(group, out = [])
+    def self.pretty_print(group, msg)
       most_recent_at = group["most-recent-notice-at"]["__content__"]
       notices_count  = group["notices-count"]["__content__"]
       error_id       = group["id"]["__content__"]
@@ -11,12 +11,10 @@ module Basil
 
       error_url = "https://#{Config.airbrake['account']}.airbrakeapp.com/errors/#{error_id}"
 
-      out << ""
-      out << " ##{error_id}(#{notices_count}) last seen:#{most_recent_at}"
-      out << " #{error_class}: #{error_message}"
-      out << " => #{error_url}"
-
-      out
+      msg.say ""
+      msg.say " ##{error_id}(#{notices_count}) last seen:#{most_recent_at}"
+      msg.say " #{error_class}: #{error_message}"
+      msg.say " => #{error_url}"
     end
 
     def initialize
@@ -47,10 +45,10 @@ Basil.respond_to(/^(show me )?airbrake( errors)?/i) {
 
   xml = Basil::Airbrake.new
 
-  says("5 most recent airbrake errors:") do |out|
-    xml.groups["group"][0..5].each do |group|
-      Basil::Airbrake.pretty_print(group, out)
-    end
+  @msg.reply "5 most recent airbrake errors:"
+
+  xml.groups["group"][0..5].each do |group|
+    Basil::Airbrake.pretty_print(group, @msg)
   end
 
 }.description = "shows the five most recent airbrake errors in production."

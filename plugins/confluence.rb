@@ -7,10 +7,10 @@ Basil.respond_to(/^(confluence|wiki) (.+)/) {
     result = xml['results']['result']
     result = result.first if result.is_a?(Array)
 
-    says result['link'].first['href']
+    @msg.say result['link'].first['href']
 
   rescue
-    says 'no results found.'
+    @msg.say 'no results found.'
   end
 
 }.description = 'searches confluence'

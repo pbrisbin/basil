@@ -2,7 +2,7 @@ Basil.respond_to('restart') {
 
   begin
     system('./bin/basil-service restart &')
-    says 'restarting...'
+    @msg.say 'restarting...'
   rescue
   end
 

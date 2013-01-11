@@ -4,12 +4,10 @@ Basil.respond_to(/^gem search (.+)/i) {
   gems = get_json("http://rubygems.org/api/v1/search.json?query=#{escape(@match_data[1])}")[0..4] rescue []
 
   if gems.empty?
-    says "no results found."
+    @msg.say "no results found."
   else
-    says do |out|
-      gems.each do |gem|
-        out << "#{gem['name']}: https://rubygems.org/gems/#{gem['name']}"
-      end
+    gems.each do |gem|
+      @msg.say "#{gem['name']}: https://rubygems.org/gems/#{gem['name']}"
     end
   end
 

@@ -4,6 +4,6 @@
 #
 Basil.respond_to(/^call me a (.*)/) {
 
-  says "fine, you're a #{@match_data[1]}."
+  @msg.say "fine, you're a #{@match_data[1]}."
 
 }

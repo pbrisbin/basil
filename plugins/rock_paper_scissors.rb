@@ -10,13 +10,13 @@ module Basil
       @a_threw = Choices.shuffle.first
       @b_threw = Choices.shuffle.first
 
-      out << "#{@a} threw #{@a_threw}"
-      out << "#{@b} threw #{@b_threw}"
+      @msg.say "#{@a} threw #{@a_threw}"
+      @msg.say "#{@b} threw #{@b_threw}"
 
       if winner = get_winner
-        out << "#{winner} wins!"
+        @msg.say "#{winner} wins!"
       else
-        out << "tie."
+        @msg.say "tie."
         throw_em!(out)
       end
     end
@@ -43,8 +43,6 @@ end
 
 Basil.respond_to(/^(rps|rock ?paper ?scissors) (\w+) (\w+)$/) {
 
-  says do |out|
-    Basil::RockPaperScissors.new(@match_data[2], @match_data[3]).throw_em!(out)
-  end
+  Basil::RockPaperScissors.new(@match_data[2], @match_data[3]).throw_em!(@msg)
 
 }.description = "plays out a fake game of rock paper scissors"
