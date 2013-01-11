@@ -14,10 +14,10 @@ module Basil
 
     def start
       Plugin.load!
-      Email.check if respond_to?(:broadcast_message)
 
       main_loop do |*args|
-        dispatch(*args)
+        msg = accept_message(*args)
+        msg.dispatch(self)
       end
     end
 
@@ -25,28 +25,15 @@ module Basil
       raise NotImplementedError, "#{self.class} must implement #{__method__}"
     end
 
-    def build_message(*args)
+    def accept_message(*args)
+      raise NotImplementedError, "#{self.class} must implement #{__method__}"
+    end
+
+    def send_message(msg)
       raise NotImplementedError, "#{self.class} must implement #{__method__}"
     end
 
     private
-
-    def dispatch(*args)
-      msg = build_message(*args) or raise ArgumentError, 'nil message dispatched'
-
-      ChatHistory.store_message(msg)
-
-      logger.info "Dispatching #{msg}"
-
-      Dispatch.process(msg).tap do |reply|
-        logger.info "Reply #{reply}" if reply
-      end
-
-    rescue => ex
-      logger.warn ex
-
-      nil
-    end
 
     def logger
       @logger ||= Loggers['server']
