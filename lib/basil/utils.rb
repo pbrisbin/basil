@@ -18,6 +18,10 @@ module Basil
       ChatHistory.clear(chat)
     end
 
+    def trim(str)
+      str.lines.map(&:strip).join("\n")
+    end
+
     def escape(str)
       require 'cgi'
       CGI::escape("#{str}".strip)

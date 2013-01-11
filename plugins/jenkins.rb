@@ -143,9 +143,11 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
 
   @msg.chat = Basil::Config.jenkins['broadcast_chat']
 
-  @msg.say "(headbang) #{build.name} ##{build.number} failed!"
-  @msg.say "#{build.fail_count} failure(s). Culprits identified as #{build.culprits}."
-  @msg.say "Please see #{build.url} for more details."
+  @msg.say trim(<<-EOM)
+    (headbang) #{build.name} ##{build.number} failed!
+    #{build.fail_count} failure(s). Culprits identified as #{build.culprits}.
+    Please see #{build.url} for more details.
+  EOM
 end
 
 Basil.respond_to('jenkins') {
@@ -158,8 +160,10 @@ Basil.respond_to(/^jenkins (\w+)/) {
 
   job = Jenkins::Job.new(@match_data[1])
 
-  @msg.say "#{job.name}: #{job.status}"
-  @msg.say job.health_report
+  @msg.say trim(<<-EOM)
+    #{job.name}: #{job.status}
+    #{job.health_report}
+  EOM
 
 }.description = 'retrieves info on a specific jenkins job'
 
@@ -173,8 +177,10 @@ Basil.respond_to(/^who broke (.+?)\??$/) {
 
   build = Jenkins::Build.new(job.name, job.builds.last)
 
-  @msg.say "The last completed build was #{build.number}"
-  @msg.say "Culprits are #{build.culprits}."
+  @msg.say trim(<<-EOM)
+    The last completed build was #{build.number}"
+    Culprits are #{build.culprits}.
+  EOM
 
 }.description = 'tells you the likely culprits for a broken build'
 
