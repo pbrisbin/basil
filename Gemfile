@@ -6,5 +6,4 @@ group :test do
   gem "fakeweb"
   gem "rspec"
   gem "simplecov"
-  gem "timecop"
 end
