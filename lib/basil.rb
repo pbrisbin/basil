@@ -11,6 +11,7 @@ module Basil
   autoload :Lock,        'basil/lock'
   autoload :Loggers,     'basil/loggers'
   autoload :Message,     'basil/message'
+  autoload :Options,     'basil/options'
   autoload :Plugin,      'basil/plugin'
   autoload :Server,      'basil/server'
   autoload :Skype,       'basil/skype'
@@ -25,15 +26,8 @@ module Basil
     delegate [:respond_to, :watch_for, :check_email] => Plugin
 
     def run(argv)
-      if argv.include?('--debug')
-        Loggers.level = 0 # DEBUG
-      end
-
-      if argv.include?('--cli')
-        Config.server = Cli.new
-      end
-
-      logger.debug "Basil #{VERSION}"
+      options = Options.new
+      options.parse(argv)
 
       Config.server.start
 
