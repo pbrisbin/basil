@@ -1,21 +1,14 @@
-# Basil - */'ba-zəl/*
-
 A skype bot.
 
-## Getting started
+## Installation
 
-~~~ { .bash }
-git clone https://github.com/pbrisbin/basil
-cd basil
-cp config/example.yml config/basil.yml
-bundle install
-bundle exec bin/basil
-~~~
+Basil is meant to be run from source. Ruby is interpreted, so there's 
+not much technical difference to this approach.
 
-You can also use `rake install` to install basil like any other gem. 
-However, he (currently) expects various support files to be in the 
-directory where you run him.
+It is recommended mainly because he expects `./plugins` and `./config` 
+to exist and running from within a clone of this repo is the simplest, 
+most transparent way to accomplish that.
 
-For additional info, please browse the [wiki][].
+To get started, please head over to the [wiki][].
 
 [wiki]: https://github.com/pbrisbin/basil/wiki
