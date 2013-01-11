@@ -1,11 +1,11 @@
 module Basil
   module Email
-    include Dispatchable
-
     # This class represents a parsed email. Headers are accessed like
     # array indices and body is provided as a method. The parsing is
     # naive, but it works for our purpose.
     class Mail
+      include Dispatchable
+
       attr_reader :body
 
       def self.parse(content)
