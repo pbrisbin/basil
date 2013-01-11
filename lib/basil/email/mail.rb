@@ -40,18 +40,18 @@ module Basil
         @headers[arg]
       end
 
-      def dispatch
-        reply = nil
-
-        Plugin.email_checkers.each do |plugin|
-          if plugin.regex =~ self['Subject']
+      # TODO: Mail is /kind of/ quacking like a Message here, but not
+      # quite. should think about DRYing this up somehow.
+      def dispatch(server)
+        Plugin.email_checkers.each do |p|
+          if p.regex =~ self['Subject']
             msg = Message.new(:to => Config.me, :from => self['From'], :text => body)
-            plugin.set_context(msg, $~)
-            reply = plugin.execute and break
+            msg.server = server
+
+            p.set_context(msg, $~)
+            p.execute
           end
         end
-
-        reply
       end
 
       def to_s

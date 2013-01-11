@@ -27,15 +27,16 @@ module Basil
       end
 
       it "can be dispatched" do
-        checker = Plugin.check_email(/a match/) { self }
+        server = mock
+        server.should_receive(:send_message).once
+
+        Plugin.check_email(/a match/) { @msg.say 'hi' }
 
         mail = Mail.new({'Subject' => 'a match', 'From' => 'me'}, 'a body')
-
-        mail.dispatch.should == checker
+        mail.dispatch(server)
 
         mail = Mail.new({'Subject' => 'no match', 'From' => 'me'}, 'a body')
-
-        mail.dispatch.should be_nil
+        mail.dispatch(server)
       end
     end
   end
