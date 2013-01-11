@@ -13,12 +13,16 @@ module Basil
     end
 
     def accept_message(message_id)
+      logger.debug "Accepting #{message_id}"
+
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
       chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
       private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
 
       to, text = parse_body(body)
       to = Config.me if !to && private_chat
+
+      logger.debug "to: #{to}, text: #{text}"
 
       Message.new(
         :from      => skype.get("CHATMESSAGE #{message_id} FROM_HANDLE"),
@@ -33,6 +37,8 @@ module Basil
     end
 
     def send_message(msg)
+      logger.debug "Sending #{msg}"
+
       prefix = msg.to && "#{msg.to.split(' ').first}, "
       skype.message_chat(msg.chat, "#{prefix}#{msg.text}")
     rescue ::Skype::Errors::GeneralError => ex
