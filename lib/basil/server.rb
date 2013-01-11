@@ -1,6 +1,6 @@
 module Basil
   class Server
-    # Redefines +#start+ to be wrapped in a lock file, ensuring no more
+    # Redefines #start to be wrapped in a lock file, ensuring no more
     # than one instance of your server can be run at a time
     def self.lock_start
       alias_method :original_start, :start
