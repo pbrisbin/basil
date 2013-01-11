@@ -3,13 +3,15 @@ require 'spec_helper'
 module Basil
   describe Config do
     before do
-      Config.invalidate
-
       @conf = { 'key_foo' => 'foo',
                 'key_bar' => 'bar',
                 'server_type' => :cli }
 
       File.stub(:read).and_return(@conf.to_yaml)
+    end
+
+    after do
+      Config.invalidate
     end
 
     it "has accessors from the config file" do
