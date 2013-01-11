@@ -1,7 +1,7 @@
 require 'log4r'
 
 module Basil
-  class Loggers
+  module Loggers
     LOGGER_NAMES = %w( main email server plugins dispatching http )
 
     class << self
@@ -30,6 +30,7 @@ module Basil
           logger.level = level
         end
       end
+
     end
   end
 end

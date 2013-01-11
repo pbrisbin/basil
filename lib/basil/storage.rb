@@ -6,6 +6,7 @@ module Basil
   # plugins' data.
   module Storage
     class << self
+
       def with_storage(&block)
         result = nil
 
@@ -21,6 +22,7 @@ module Basil
       def pstore
         @pstore ||= PStore.new(Config.pstore_file)
       end
+
     end
   end
 end
