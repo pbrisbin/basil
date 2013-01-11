@@ -13,7 +13,7 @@ module Basil
     end
 
     def accept_message(message_id)
-      logger.debug "Accepting #{message_id}"
+      logger.info "Accepting #{message_id}"
 
       body         = skype.get("CHATMESSAGE #{message_id} BODY")
       chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
@@ -37,7 +37,7 @@ module Basil
     end
 
     def send_message(msg)
-      logger.debug "Sending #{msg}"
+      logger.info "Sending \"#{msg.text}\" to #{msg.chat}"
 
       prefix = msg.to && "#{msg.to.split(' ').first}, "
       skype.message_chat(msg.chat, "#{prefix}#{msg.text}")
