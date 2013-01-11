@@ -1,6 +1,7 @@
 module Basil
-  class Lock
+  module Lock
     class << self
+
       def guard(&block)
         error if File.exists?(Config.lock_file)
 
@@ -15,10 +16,14 @@ module Basil
       end
 
       def error
-        raise "Lock file present at #{Config.lock_file}! If you're " +
-              "sure no other process is running, remove this file and " +
-              "try again."
+        raise <<-EOM
+
+          Lock file present at #{Config.lock_file}! If you're sure no
+          other process is running, remove this file and try again.
+
+        EOM
       end
+
     end
   end
 end
