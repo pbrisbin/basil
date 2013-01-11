@@ -2,45 +2,73 @@ require 'yaml'
 
 module Basil
   module Config
+    DEFAULTS = {
+      'me'                => 'basil',
+      'server_class'      => Skype,
+      'plugins_directory' => File.join(Dir.pwd, 'plugins'),
+      'pstore_file'       => File.join(Dir.pwd, 'basil.pstore'),
+      'config_file'       => File.join(Dir.pwd, 'config', 'basil.yml'),
+      'lock_file'         => File.join('', 'tmp', 'basil.lock'),
+      'email'             => {},
+      'extras'            => {}
+    }
+
     class << self
+      attr_writer(*DEFAULTS.keys)
 
       def method_missing(key, *)
-        yaml[key.to_s] if yaml
+        attribute(key) || extras["#{key}"]
+      end
+
+      def load!
+        return unless config_file && File.exists?(config_file)
+
+        yaml = YAML::load(File.read(config_file))
+
+        DEFAULTS.keys.each do |key|
+          if yaml.has_key?(key)
+            value = yaml.delete(key)
+            send("#{key}=", value)
+          end
+        end
+
+        self.extras = yaml
+
+      rescue => ex
+        Basil.logger.warn "Error loading #{config_file}:"
+        Basil.logger.warn ex
       end
 
       attr_writer :server
 
       def server
-        @server ||=
-          Basil.const_get("#{server_type}".capitalize).tap do |k|
-            # ensure we only instantiate Servers
-            raise NameError unless k < Server
-          end.new
-      rescue NameError
-        raise ArgumentError, "Invalid server type: #{server_type}"
+        @server ||= server_class.new
       end
 
-      # Temporarily hide the Config object's data. This is used during
-      # the eval plugin to prevent access to configured passwords.
-      def hide(&block)
-        @hidden = true
-
-        yield
-
-      ensure
-        @hidden = false
-      end
-
-      def invalidate
-        @yaml = nil
+      def check_email?
+        !( server.is_a?(Cli) || email.empty? )
       end
 
       private
 
-      def yaml
-        return {} if @hidden
+      def attribute(key)
+        ivar = :"@#{key}"
 
-        @yaml ||= YAML::load(File.read('config/basil.yml'))
+        if instance_variables.include?(ivar)
+          instance_variable_get(ivar)
+        else
+          DEFAULTS["#{key}"]
+        end
+      end
+
+      def hide(&block)
+        current = extras
+        self.extras = nil
+
+        yield
+
+      ensure
+        self.extras = current
       end
 
     end

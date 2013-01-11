@@ -1,27 +1,35 @@
-# Basil's identity; how he knows a message is directed to him in group
-# chats. Messages must be prefixed using "@me ", "me, " or similar.
-me: basil
+#########################################################################
+# Main basil configuration. Basil will use the defaults shown for any
+# values you don't specify.
+#########################################################################
 
-# Server type to start
-server_type: :cli # or :skype
+# Used to identify messages as to basil
+#me: basil
 
-# The directory from which plugins are loaded.
-plugins_directory: ./plugins
+# Plugin files are loaded from here
+#plugins_directory: ./plugins
 
-# Where basil will persist his data.
-pstore_file: ./basil.pstore
+# Storage puts its data here
+#pstore_file: ./basil.pstore
 
-# Where a locking server will store its lock file.
-lock_file: /tmp/basil.lock
+# Locking servers put their lock file here
+#lock_file: /tmp/basil.lock
 
-# Required only on OSX and ruby 1.9 for https requests to work (JIRA).
-# Install curl-ca-bundle via ports. The get_* utilities will use this
-# cert file for secure requests if the configuration option is present.
-# This may not be a requirement forever, so try without first.
+# Email will not be checked if not defined
+#email:
+  #interval: 30 # seconds
+  #server:   imap.gmail.com
+  #port:     993
+  #username: X
+  #password: X
+  #inbox:    INBOX
+
+# This may be required on OSX for HTTPS requests to work
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
 
 #########################################################################
-# Additional configuration specific to plugins.
+# Additional configuration specific to plugins. It is not guaranteed
+# that plugins will work without specifying values for these.
 #########################################################################
 
 jenkins:
@@ -47,14 +55,6 @@ airbrake:
   account: some_name
   project: some_number    # https://some_name.airbrakeapp.com/<project>/errors
   token:   some_long_hash # available in airbrake admin settings
-
-email:
-  interval: 30 # seconds
-  server:   imap.gmail.com
-  port:     993
-  username: X
-  password: X
-  inbox:    INBOX
 
 twitter:
   consumer_key:       xxx
