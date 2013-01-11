@@ -15,7 +15,7 @@ module Basil
     def start
       Plugin.load!
 
-      Email.check unless Config.server.is_a?(Cli)
+      Email.check if Config.check_email?
 
       main_loop do |*args|
         msg = accept_message(*args)

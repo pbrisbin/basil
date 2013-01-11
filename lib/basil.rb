@@ -29,6 +29,7 @@ module Basil
       options = Options.new
       options.parse(argv)
 
+      Config.load!
       Config.server.start
 
     rescue => ex
