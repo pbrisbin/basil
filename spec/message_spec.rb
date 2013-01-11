@@ -2,6 +2,12 @@ require 'spec_helper'
 require 'timecop'
 
 module Basil
+  describe 'Message as dispatchable' do
+    subject { Message.new(:from => 'x') }
+
+    it_behaves_like "a Dispatchable"
+  end
+
   describe 'Message construction' do
     it "should raise when from is not given" do
       lambda { Message.new(:to => 'you') }.should raise_error(ArgumentError)
@@ -67,54 +73,9 @@ module Basil
     end
   end
 
-  describe 'Message#dispatch' do
-    before do
-      Plugin.responders.clear
-      Plugin.watchers.clear
-
-      Plugin.respond_to(/a match/) { @msg.say 'responding' }
-      Plugin.watch_for(/a match/)  { @msg.say 'watching'   }
-    end
-
-    let(:server) do
-      Class.new do
-        attr_reader :responses
-
-        def send_message(msg)
-          @responses ||= []
-          @responses << msg.text
-        end
-
-        def clear
-          @responses = []
-        end
-      end.new
-    end
-
-    # This also tests Message#say
-    it "should use history, responders, and watchers" do
-      ChatHistory.should_receive(:store_message).exactly(3).times
-
-      msg = Message.new(:from => 'x', :text => 'a match')
-      msg.stub(:to_me?).and_return(true)
-      msg.dispatch(server)
-
-      # responder and watcher catch
-      server.responses.should == %w( responding watching )
-      server.clear
-
-      msg.stub(:to_me?).and_return(false)
-      msg.dispatch(server)
-
-      # just watcher
-      server.responses.should == %w( watching )
-      server.clear
-
-      msg.stub(:text).and_return('no match')
-      msg.dispatch(server)
-
-      # no body
-      server.responses.should be_empty
-    end
+  describe 'Message sending' do
+    it "can say things"
+    it "can reply to itself"
+    it "can forward itself"
   end
 end

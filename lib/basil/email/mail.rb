@@ -1,5 +1,7 @@
 module Basil
   module Email
+    include Dispatchable
+
     # This class represents a parsed email. Headers are accessed like
     # array indices and body is provided as a method. The parsing is
     # naive, but it works for our purpose.
@@ -40,18 +42,20 @@ module Basil
         @headers[arg]
       end
 
-      # TODO: Mail is /kind of/ quacking like a Message here, but not
-      # quite. should think about DRYing this up somehow.
-      def dispatch(server)
-        Plugin.email_checkers.each do |p|
-          if p.regex =~ self['Subject']
-            msg = Message.new(:to => Config.me, :from => self['From'], :text => body)
-            msg.server = server
+      def each_plugin(&block)
+        Plugin.email_checkers.each(&block)
+      end
 
-            p.set_context(msg, $~)
-            p.execute
-          end
-        end
+      def match?(plugin)
+        plugin.regex.match(self['Subject'])
+      end
+
+      def to_message
+        Message.new(
+          :to   => Config.me,
+          :from => self['From'],
+          :text => body
+        )
       end
 
       def to_s

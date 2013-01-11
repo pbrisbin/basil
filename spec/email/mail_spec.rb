@@ -3,7 +3,7 @@ require 'spec_helper'
 module Basil
   module Email
     describe Mail do
-      it "parses from simple emails" do
+      subject do
         content = [
           'Date: A date',
           'Subject: A subject',
@@ -16,27 +16,21 @@ module Basil
           'line body'
         ].join("\r\n") # CRLF
 
-        mail = Mail.parse(content)
-
-        mail['Date'].should    == 'A date'
-        mail['Subject'].should == 'A subject'
-        mail['To'].should      == 'A to address'
-        mail['From'].should    == 'A from address'
-        mail['Foo'].should     == 'A header with continuation'
-        mail.body.should       == "Some multi-\nline body"
+        described_class.parse(content)
       end
 
-      it "can be dispatched" do
-        server = mock
-        server.should_receive(:send_message).once
+      it_behaves_like "a Dispatchable"
 
-        Plugin.check_email(/a match/) { @msg.say 'hi' }
+      it "provides header access" do
+        subject['Date'].should    == 'A date'
+        subject['Subject'].should == 'A subject'
+        subject['To'].should      == 'A to address'
+        subject['From'].should    == 'A from address'
+        subject['Foo'].should     == 'A header with continuation'
+      end
 
-        mail = Mail.new({'Subject' => 'a match', 'From' => 'me'}, 'a body')
-        mail.dispatch(server)
-
-        mail = Mail.new({'Subject' => 'no match', 'From' => 'me'}, 'a body')
-        mail.dispatch(server)
+      it "has a body" do
+        subject.body.should == "Some multi-\nline body"
       end
     end
   end

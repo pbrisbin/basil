@@ -1,5 +1,7 @@
 module Basil
   class Message
+    include Dispatchable
+
     attr_reader :from, :from_name, :text, :time
     attr_accessor :to, :chat, :server
 
@@ -25,17 +27,17 @@ module Basil
       @time      = Time.now
     end
 
-    def to_me?
-      to && to.downcase == Config.me.downcase
+    def each_plugin(&block)
+      Plugin.responders.each(&block) if to_me?
+      Plugin.watchers.each(&block)
     end
 
-    def dispatch(server)
-      ChatHistory.store_message(self)
+    def match?(plugin)
+      plugin.regex.match(text)
+    end
 
-      self.server = server
-
-      dispatch_through(Plugin.responders) if to_me?
-      dispatch_through(Plugin.watchers)
+    def to_me?
+      to && to.downcase == Config.me.downcase
     end
 
     def say(text)
@@ -56,19 +58,12 @@ module Basil
       )
     end
 
-    def to_s
-      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: \"#{text}\" >"
+    def to_message
+      self
     end
 
-    private
-
-    def dispatch_through(plugins)
-      plugins.each do |p|
-        if p.regex =~ text
-          p.set_context(self, $~)
-          p.execute
-        end
-      end
+    def to_s
+      "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: \"#{text}\" >"
     end
 
   end
