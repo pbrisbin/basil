@@ -2,12 +2,14 @@ module Basil
   module Dispatchable
     def dispatch(server)
       msg = to_message
+
+      # we must store message before setting server, something about the
+      # Skype object doesn't agree with PStore
+      ChatHistory.store_message(msg) unless msg.chat.nil?
+
       msg.server = server
 
       logger.debug "Dispatching #{msg}"
-
-      ChatHistory.store_message(msg) unless msg.chat.nil?
-
       each_plugin do |plugin|
         begin
           if match_data = match?(plugin)
