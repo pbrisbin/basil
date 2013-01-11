@@ -1,85 +1,29 @@
 module Basil
   module Utils
+    # Simply returns the +chat+ attribute for the Message currently
+    # being handled.
+    def chat
+      @msg.chat
+    end
+
     # Accesses chat history
     def chat_history(options = {})
       chat = options.delete(:chat)
 
-      ChatHistory.get_messages(chat || @msg.chat, options)
+      ChatHistory.get_messages(chat || self.chat, options)
     end
 
     # Purges chat history
-    def purge_history!(chat = @msg.chat)
+    def purge_history!(chat = self.chat)
       ChatHistory.clear(chat)
-    end
-
-    #
-    # Handles both single and multi-line statements to no one in
-    # particular.
-    #
-    #   says "something"
-    #
-    #   says do |out|
-    #     out << "first line"
-    #     out << "second line"
-    #   end
-    #
-    # The two invocation styles can be combined to do a sort of Header
-    # and Lines thing when printing tabular data; the first argument
-    # will be the first line printed then the rest will be built from
-    # your block.
-    #
-    #   says "here's some data:" do |out|
-    #     data.each do |d|
-    #       out << d.to_s
-    #     end
-    #   end
-    #
-    def says(txt = nil, &block)
-      if block_given?
-        out = txt.nil? ? [] : [txt]
-
-        yield out
-
-        return says(out.join("\n")) unless out.empty?
-      elsif txt
-        return Message.new(:from => Config.me, :text => txt, :chat => @msg.chat)
-      end
-
-      nil
-    end
-
-    # Same usage and behavior as says but this will direct the message
-    # back to the person who sent the triggering message.
-    def replies(txt = nil, &block)
-      if block_given?
-        out = txt.nil? ? [] : [txt]
-
-        yield out
-
-        return replies(out.join("\n")) unless out.empty?
-      elsif txt
-        return Message.new(:to => @msg.from_name, :from => Config.me, :text => txt, :chat => @msg.chat)
-      end
-
-      nil
-    end
-
-    def forwards_to(new_to)
-      Message.from_message(@msg, :to => new_to, :from => Config.me, :from_name => Config.me)
-    end
-
-    # Set the chat attribute of the underlying message. This allows
-    # broadcasters to define what chat they're broadcasting to.
-    def set_chat(chat)
-      @msg.chat = chat if @msg
     end
 
     def escape(str)
       require 'cgi'
-      CGI::escape(str.strip)
+      CGI::escape("#{str}".strip)
     end
 
-    # See +Basil::HTTP.get+
+    # See Basil::HTTP.get
     def get_http(options)
       HTTP.get(options)
     end

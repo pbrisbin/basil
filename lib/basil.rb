@@ -6,7 +6,6 @@ module Basil
   autoload :ChatHistory, 'basil/chat_history'
   autoload :Cli,         'basil/cli'
   autoload :Config,      'basil/config'
-  autoload :Dispatch,    'basil/dispatch'
   autoload :Email,       'basil/email'
   autoload :HTTP,        'basil/http'
   autoload :Lock,        'basil/lock'
@@ -30,11 +29,11 @@ module Basil
         Loggers.level = 0 # DEBUG
       end
 
-      logger.debug "Basil #{VERSION}"
-
       if argv.include?('--cli')
         Config.server = Cli.new
       end
+
+      logger.debug "Basil #{VERSION}"
 
       Config.server.start
 

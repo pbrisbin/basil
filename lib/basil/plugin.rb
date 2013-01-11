@@ -63,6 +63,10 @@ module Basil
       @match_data = match_data
     end
 
+    def chat
+      @msg && @msg.chat
+    end
+
     def to_s
       "#<Plugin regex: #{regex.inspect}, description: #{description.inspect} >"
     end
