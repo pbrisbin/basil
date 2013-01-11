@@ -1,7 +1,7 @@
 module Basil
   class Server
-    # Redefine your start method to be wrapped in a lock file, ensuring
-    # no more than one instance of your server can be run at a time.
+    # Redefines +#start+ to be wrapped in a lock file, ensuring no more
+    # than one instance of your server can be run at a time
     def self.lock_start
       alias_method :original_start, :start
 
@@ -21,12 +21,10 @@ module Basil
       end
     end
 
-    # See Basil::Cli for a simple main_loop / build_message setup.
     def main_loop
       raise NotImplementedError, "#{self.class} must implement #{__method__}"
     end
 
-    # See Basil::Cli for a simple main_loop / build_message setup.
     def build_message(*args)
       raise NotImplementedError, "#{self.class} must implement #{__method__}"
     end

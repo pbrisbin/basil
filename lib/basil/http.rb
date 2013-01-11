@@ -1,6 +1,4 @@
 module Basil
-  # Handles simple and no-so-simple HTTP requests. Not used directly by
-  # Plugins, but indirectly by Utils#get_http and friends.
   module HTTP
     class << self
       #

@@ -1,8 +1,4 @@
 module Basil
-  # Utility functions that are useful across multiple plugins should
-  # reside here. They are mixed into the Plugin class. Functions here,
-  # and plugins in general, should avoid rescuing errors -- let them
-  # bubble up to be handled appropriately by the dispatcher.
   module Utils
     # Accesses chat history
     def chat_history(options = {})
@@ -74,7 +70,6 @@ module Basil
 
     # Set the chat attribute of the underlying message. This allows
     # broadcasters to define what chat they're broadcasting to.
-    # Eventually, maybe we'll allow cross-chat communication via basil.
     def set_chat(chat)
       @msg.chat = chat if @msg
     end
@@ -84,6 +79,7 @@ module Basil
       CGI::escape(str.strip)
     end
 
+    # See +Basil::HTTP.get+
     def get_http(options)
       HTTP.get(options)
     end

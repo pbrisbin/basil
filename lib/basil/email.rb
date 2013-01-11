@@ -4,9 +4,6 @@ require 'basil/email/mail'
 module Basil
   module Email
     class << self
-      # Check for email on the configured interval, if a mail is found
-      # it is run through each of the email checker plugins. Any replies
-      # returned will be handed to the server's broadcast_mail method.
       def check
         Thread.new do
           logger.debug "Email polling spawned"

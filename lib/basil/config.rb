@@ -20,8 +20,8 @@ module Basil
         raise ArgumentError, "Invalid server type: #{server_type}"
       end
 
-      # We need to temporarily hide the Config object during evaluation
-      # plugins since it can access it and see passwords, etc.
+      # Temporarily hide the Config object's data. This is used during
+      # the eval plugin to prevent access to configured passwords.
       def hide(&block)
         @hidden = true
 
@@ -31,8 +31,6 @@ module Basil
         @hidden = false
       end
 
-      # this is mostly to support testing, but perhaps it should be part
-      # of the reload plugin eventually.
       def invalidate
         @yaml = nil
       end

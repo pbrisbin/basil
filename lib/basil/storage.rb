@@ -1,9 +1,6 @@
 require "pstore"
 
 module Basil
-  # Basil's persistent storage is implemented through simple, unchecked
-  # use of a PStore file. Plugins should take care not to step on other
-  # plugins' data.
   module Storage
     class << self
 

@@ -1,10 +1,7 @@
 module Basil
-  # Service module which allows for accessing up to +LIM+ previous
-  # messages in any given chat. Servers must call store_message
-  # pre-dispatch for every message they see.
   module ChatHistory
     KEY = :chat_history
-    LIM = 100 # number of messages to keep per chat
+    LIM = 100
 
     class << self
       def store_message(message)
@@ -15,7 +12,7 @@ module Basil
       end
 
       # Messages are returned most recent first. Valid option keys are
-      # :from and :to which limit the results accordingly.
+      # +:from+ and +:to+ which limit the results accordingly.
       def get_messages(chat, options = {})
         with_history(chat) do |history|
           messages = history.dup

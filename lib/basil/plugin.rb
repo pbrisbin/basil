@@ -1,26 +1,20 @@
 module Basil
-  # The plugin class is used to encapsulate triggered actions. Plugin
-  # writers must use respond_to or watch_for to create an instance of
-  # Plugin with a singleton execute method.
   class Plugin
     include Utils
 
     private_class_method :new
 
-    # Create an instance of Plugin which will look for regex only in
-    # messages that are to basil.
+    # Look for regex only in messages that are to basil
     def self.respond_to(regex, &block)
       new(regex, &block).tap { |p| responders << p }
     end
 
-    # Create an instance of Plugin which will look for regex in any
-    # messages sent in the chat.
+    # Look for regex in any messages sent in the chat
     def self.watch_for(regex, &block)
       new(regex, &block).tap { |p| watchers << p }
     end
 
-    # Create an instance of Plugin which will look for regex in the
-    # subject of any emails basil receives.
+    # Look for regex in the subject of any emails basil receives
     def self.check_email(regex, &block)
       new(regex, &block).tap { |p| email_checkers << p }
     end
@@ -64,7 +58,6 @@ module Basil
       define_singleton_method(:execute, &block)
     end
 
-    # Set the appropriate instance variables for an execution context.
     def set_context(msg, match_data)
       @msg = msg
       @match_data = match_data

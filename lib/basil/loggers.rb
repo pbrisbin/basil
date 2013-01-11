@@ -19,9 +19,8 @@ module Basil
         end
       end
 
-      # Access for an invalid name returns the root logger which acts as
-      # a NullObject
       def [](name)
+        # an invalid name returns the root logger (a NullObject)
         Logger[name] || Logger.global
       end
 

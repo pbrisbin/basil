@@ -1,10 +1,6 @@
 module Basil
   class Message
-    # Who a Message is from and what it is are immutable
     attr_reader :from, :from_name, :text, :time
-
-    # Messages can be forwarded around by changing the to or chat
-    # attributes
     attr_accessor :to, :chat
 
     def self.from_message(message, options = {})
