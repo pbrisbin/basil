@@ -2,11 +2,8 @@
 # chats. Messages must be prefixed using "@me ", "me, " or similar.
 me: basil
 
-# Cli or Skype?
-server_type: :cli
-
-# Simple or Extended?
-dispatcher_type: :simple
+# Server type to start
+server_type: :cli # or :skype
 
 # The directory from which plugins are loaded.
 plugins_directory: ./plugins
@@ -31,7 +28,7 @@ jenkins:
   host:     jenkins.example.com
   port:     80
   user:     X
-  password: X
+  password: X # Api key in newer versions
   broadcast_chat: "Name of chat to hear about broken builds (name, not topic)"
 
 jira:
@@ -53,7 +50,7 @@ airbrake:
 
 email:
   interval: 30 # seconds
-  server:   imap.example.com
+  server:   imap.gmail.com
   port:     993
   username: X
   password: X
