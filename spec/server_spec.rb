@@ -22,7 +22,7 @@ module Basil
       Config.stub(:lock_file).and_return('/tmp/basil_test.lock')
     end
 
-    let(:server) do
+    subject do
       Class.new(Server) do
         def start
           # to ensure we created one
@@ -40,7 +40,7 @@ module Basil
     end
 
     it "should write and cleanup a lock file" do
-      lambda { server.start }.should_not raise_error
+      lambda { subject.start }.should_not raise_error
 
       File.exists?(Config.lock_file).should be_false
     end
@@ -48,7 +48,7 @@ module Basil
     it "should error and leave it if a lock file exists" do
       File.write(Config.lock_file, '');
 
-      lambda { server.start }.should raise_error
+      lambda { subject.start }.should raise_error
 
       File.exists?(Config.lock_file).should be_true
     end

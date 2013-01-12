@@ -5,15 +5,25 @@ end
 
 require 'basil'
 
-Basil::Loggers.level = 6 # OFF
+module Basil
+  Loggers.level = 6 # OFF
 
-shared_examples_for "a Dispatchable" do
-  it "must respond to template methods" do
-    subject.should respond_to(:match?)
-    subject.should respond_to(:each_plugin)
+  shared_examples_for "a Dispatchable" do
+    it "must respond to template methods" do
+      subject.should respond_to(:match?)
+      subject.should respond_to(:each_plugin)
+    end
+
+    it "must be coercible to Message" do
+      subject.to_message.should be_a(Message)
+    end
   end
 
-  it "must be coercible to Message" do
-    subject.to_message.should be_a(Basil::Message)
+  shared_examples_for "a Server" do
+    it "should respond to the template methods" do
+      subject.should respond_to(:main_loop)
+      subject.should respond_to(:accept_message)
+      subject.should respond_to(:send_message)
+    end
   end
 end
