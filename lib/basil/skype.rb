@@ -22,8 +22,6 @@ module Basil
       to, text = parse_body(body)
       to = Config.me if !to && private_chat
 
-      logger.debug "to: #{to}, text: #{text}"
-
       Message.new(
         :from      => skype.get("CHATMESSAGE #{message_id} FROM_HANDLE"),
         :from_name => skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME"),
