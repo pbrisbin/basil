@@ -49,6 +49,16 @@ module Basil
         !( server.is_a?(Cli) || email.empty? )
       end
 
+      def hide(&block)
+        current = extras
+        self.extras = {}
+
+        yield
+
+      ensure
+        self.extras = current
+      end
+
       private
 
       def attribute(key)
@@ -59,16 +69,6 @@ module Basil
         else
           DEFAULTS["#{key}"]
         end
-      end
-
-      def hide(&block)
-        current = extras
-        self.extras = nil
-
-        yield
-
-      ensure
-        self.extras = current
       end
 
     end
