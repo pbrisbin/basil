@@ -5,13 +5,9 @@ module Basil
     class << self
 
       def with_storage(&block)
-        result = nil
-
         pstore.transaction do
-          result = yield pstore
+          yield pstore
         end
-
-        result
       end
 
       private
