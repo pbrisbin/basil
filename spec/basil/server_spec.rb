@@ -15,42 +15,42 @@ module Basil
 
       server.start
     end
-  end
 
-  describe Server, 'with locked start' do
-    before do
-      Config.stub(:lock_file).and_return('/tmp/basil_test.lock')
-    end
+    context 'with locked start' do
+      subject do
+        Class.new(Server) do
+          def start
+            # to ensure we created one
+            raise unless File.exists?(Config.lock_file)
+          end
 
-    subject do
-      Class.new(Server) do
-        def start
-          # to ensure we created one
-          raise unless File.exists?(Config.lock_file)
-        end
-
-        lock_start
-      end.new
-    end
-
-    after do
-      if File.exists?(Config.lock_file)
-        File.unlink(Config.lock_file)
+          lock_start
+        end.new
       end
-    end
 
-    it "should write and cleanup a lock file" do
-      lambda { subject.start }.should_not raise_error
+      before do
+        Config.stub(:lock_file).and_return('/tmp/basil_test.lock')
+      end
 
-      File.exists?(Config.lock_file).should be_false
-    end
+      after do
+        if File.exists?(Config.lock_file)
+          File.unlink(Config.lock_file)
+        end
+      end
 
-    it "should error and leave it if a lock file exists" do
-      File.write(Config.lock_file, '');
+      it "should write and cleanup a lock file" do
+        lambda { subject.start }.should_not raise_error
 
-      lambda { subject.start }.should raise_error
+        File.exists?(Config.lock_file).should be_false
+      end
 
-      File.exists?(Config.lock_file).should be_true
+      it "should error and leave it if a lock file exists" do
+        File.write(Config.lock_file, '');
+
+        lambda { subject.start }.should raise_error
+
+        File.exists?(Config.lock_file).should be_true
+      end
     end
   end
 end

@@ -16,8 +16,6 @@ module Basil
   end
 
   describe DispatchableDouble do
-    subject { described_class.new }
-
     it_behaves_like "a Dispatchable"
   end
 
@@ -25,15 +23,11 @@ module Basil
     subject { DispatchableDouble.new }
 
     let(:message) do
-      double.tap do |message|
-        message.stub(:chat).and_return(nil)
-        message.stub(:server=)
-      end
+      double('message', :chat => nil, :server= => true)
     end
 
-    # illustrative aliases
-    let(:server) { double }
-    let(:plugin) { double }
+    let(:server) { double('server') }
+    let(:plugin) { double('plugin') }
 
     before do
       subject.stub(:to_message).and_return(message)

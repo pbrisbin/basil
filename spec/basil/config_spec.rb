@@ -7,7 +7,7 @@ module Basil
       Config.server_class.should == Skype
     end
 
-    it "have overridable defaults" do
+    it "should have overridable defaults" do
       Config.me = 'not basil'
       Config.me.should == 'not basil'
 

@@ -2,9 +2,7 @@ require 'spec_helper'
 
 module Basil
   describe Skype do
-    subject { described_class.new }
-
-    let(:skype) { double }
+    let(:skype) { double('skype') }
 
     before { subject.stub(:skype).and_return(skype) }
 
@@ -35,6 +33,7 @@ module Basil
     end
 
     it "knows when messages are to him in group chat" do
+      # catch-all for properties we don't care about
       skype.stub(:get).and_return('a property')
 
       skype.stub(:get).with("CHATMESSAGE 1 CHATNAME").and_return('chat')
@@ -49,13 +48,13 @@ module Basil
       to_me.each do |text|
         skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
         msg = subject.accept_message('1')
-        msg.to_me?.should be_true
+        msg.should be_to_me
       end
 
       not_to_me.each do |text|
         skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
         msg = subject.accept_message('1')
-        msg.to_me?.should be_false
+        msg.should_not be_to_me
       end
     end
 
@@ -69,11 +68,11 @@ module Basil
       ['any thing', 'at all'].each do |text|
         skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
         msg = subject.accept_message('1')
-        msg.to_me?.should be_true
+        msg.should be_to_me
       end
     end
 
-    it "sends a message via skype API" do
+    it "sends a formatted message via skype API" do
       skype.should_receive(:message_chat).with('chat', 'john, text')
 
       subject.send_message(
