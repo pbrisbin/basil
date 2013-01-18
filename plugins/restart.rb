@@ -1,7 +1,7 @@
 Basil.respond_to('restart') {
 
   begin
-    system('./bin/basil-service restart &')
+    system('bundle exec ./bin/basil restart &')
     @msg.say 'restarting...'
   rescue
   end

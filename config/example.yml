@@ -15,6 +15,12 @@
 # Locking servers put their lock file here
 #lock_file: /tmp/basil.lock
 
+# When run as daemon, where to send our output
+#log_file: tmp/basil.log
+
+# When run as daemon, where to place our pid file
+#pid_file: tmp/basil.pid
+
 # Email will not be checked if not defined
 #email:
   #interval: 30 # seconds

@@ -6,6 +6,7 @@ module Basil
   autoload :ChatHistory,  'basil/chat_history'
   autoload :Cli,          'basil/cli'
   autoload :Config,       'basil/config'
+  autoload :Daemon,       'basil/daemon'
   autoload :Dispatchable, 'basil/dispatchable'
   autoload :Email,        'basil/email'
   autoload :HTTP,         'basil/http'
@@ -31,7 +32,18 @@ module Basil
       options.parse(argv)
 
       Config.load!
-      Config.server.start
+
+      case argv.first
+      when 'start'
+        Daemon.start(false)
+      when 'stop'
+        Daemon.stop
+      when 'restart'
+        Daemon.stop
+        Daemon.start(false)
+      else
+        Daemon.start
+      end
 
     rescue => ex
       logger.fatal ex

@@ -9,6 +9,8 @@ module Basil
       'pstore_file'       => File.join(Dir.pwd, 'basil.pstore'),
       'config_file'       => File.join(Dir.pwd, 'config', 'basil.yml'),
       'lock_file'         => File.join('', 'tmp', 'basil.lock'),
+      'log_file'          => File.join('tmp', 'basil.log'),
+      'pid_file'          => File.join('tmp', 'basil.pid'),
       'email'             => {},
       'extras'            => {}
     }
@@ -45,8 +47,22 @@ module Basil
         @server ||= server_class.new
       end
 
+      attr_writer :background
+
+      def background?
+        @background && !cli?
+      end
+
+      def foreground?
+        !background?
+      end
+
       def check_email?
-        !( server.is_a?(Cli) || email.empty? )
+        !( cli? || email.empty? )
+      end
+
+      def cli?
+        server.is_a?(Cli)
       end
 
       def hide(&block)
