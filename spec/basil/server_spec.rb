@@ -2,55 +2,29 @@ require 'spec_helper'
 
 module Basil
   describe Server do
-    it "loads plugins and runs the main loop" do
-      server = Class.new(Server).new
+    subject { Class.new(Server).new }
 
+    it "loads plugins and runs the main loop" do
       Plugin.should_receive(:load!)
 
       msg = mock
-      msg.should_receive(:dispatch).with(server)
+      msg.should_receive(:dispatch).with(subject)
 
-      server.should_receive(:main_loop).and_yield('some', 'args')
-      server.should_receive(:accept_message).with('some' ,'args').and_return(msg)
+      subject.should_receive(:main_loop).and_yield('some', 'args')
+      subject.should_receive(:accept_message).with('some' ,'args').and_return(msg)
 
-      server.start
+      subject.start
     end
 
-    context 'with locked start' do
-      subject do
-        Class.new(Server) do
-          def start
-            # to ensure we created one
-            raise unless File.exists?(Config.lock_file)
-          end
+    it "uses Lock.guard when start is locked" do
+      subject.stub(:main_loop)
+      subject.stub(:accept_message)
 
-          lock_start
-        end.new
-      end
+      subject.class.lock_start
 
-      before do
-        Config.stub(:lock_file).and_return('/tmp/basil_test.lock')
-      end
+      Lock.should_receive(:guard).and_yield
 
-      after do
-        if File.exists?(Config.lock_file)
-          File.unlink(Config.lock_file)
-        end
-      end
-
-      it "should write and cleanup a lock file" do
-        lambda { subject.start }.should_not raise_error
-
-        File.exists?(Config.lock_file).should be_false
-      end
-
-      it "should error and leave it if a lock file exists" do
-        File.write(Config.lock_file, '');
-
-        lambda { subject.start }.should raise_error
-
-        File.exists?(Config.lock_file).should be_true
-      end
+      subject.start
     end
   end
 end
