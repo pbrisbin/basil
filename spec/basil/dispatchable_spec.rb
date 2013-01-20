@@ -23,36 +23,19 @@ module Basil
     subject { DispatchableDouble.new }
 
     let(:message) do
-      double('message', :chat => nil, :server= => true)
+      double('message', :chat => nil)
     end
 
-    let(:server) { double('server') }
     let(:plugin) { double('plugin') }
 
     before do
       subject.stub(:to_message).and_return(message)
     end
 
-    it "should store in chat history if chat is known" do
-      message.stub(:chat).and_return(:not_nil)
+    it "should store the object in chat history" do
+      ChatHistory.should_receive(:store).with(subject)
 
-      ChatHistory.should_receive(:store_message).with(message)
-
-      subject.dispatch(server)
-    end
-
-    it "should not store in chat if chat is not known" do
-      message.stub(:chat).and_return(nil)
-
-      ChatHistory.should_not_receive(:store_message)
-
-      subject.dispatch(server)
-    end
-
-    it "should assign the server to message pre-dispatch" do
-      message.should_receive(:server=).with(server)
-
-      subject.dispatch(server)
+      subject.dispatch
     end
 
     it "should call match for each plugin" do
@@ -60,17 +43,16 @@ module Basil
 
       subject.should_receive(:match?).with(plugin)
 
-      subject.dispatch(server)
+      subject.dispatch
     end
 
     it "should set context and execute on matches" do
       subject.stub(:each_plugin).and_yield(plugin)
       subject.stub(:match?).and_return('match data')
 
-      plugin.should_receive(:set_context).with(message, 'match data')
-      plugin.should_receive(:execute)
+      plugin.should_receive(:execute_on).with(subject, 'match data')
 
-      subject.dispatch(server)
+      subject.dispatch
     end
 
     it "should not execute on non-matches" do
@@ -80,7 +62,7 @@ module Basil
       plugin.should_not_receive(:set_context)
       plugin.should_not_receive(:execute)
 
-      subject.dispatch(server)
+      subject.dispatch
     end
 
   end

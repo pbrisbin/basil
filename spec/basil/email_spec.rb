@@ -28,7 +28,7 @@ module Basil
 
       # the handling
       mail = mock
-      mail.should_receive(:dispatch).with(Config.server)
+      mail.should_receive(:dispatch)
 
       Email::Mail.should_receive(:parse).with('message body').and_return(mail)
 

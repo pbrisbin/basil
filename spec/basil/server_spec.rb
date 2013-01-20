@@ -8,7 +8,7 @@ module Basil
       Plugin.should_receive(:load!)
 
       msg = mock
-      msg.should_receive(:dispatch).with(subject)
+      msg.should_receive(:dispatch)
 
       subject.should_receive(:main_loop).and_yield('some', 'args')
       subject.should_receive(:accept_message).with('some' ,'args').and_return(msg)

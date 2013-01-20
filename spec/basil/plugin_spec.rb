@@ -62,14 +62,22 @@ module Basil
       end
     end
 
-    describe '#set_context' do
-      let(:instance) { subject.respond_to(/x/) { } }
+    describe '#match?' do
+      it "compares its regex with the supplied text" do
+        instance = subject.respond_to(/(foo).*(bar)/) { }
+        instance.match?('foo and bar').captures.should == %w( foo bar )
+      end
+    end
 
-      it "sets the correct instance variables" do
-        instance.set_context('msg', 'match_data')
+    describe '#execute_on' do
+      it "sets the correct instance variables and calls execute" do
+        msg = double('msg')
+        msg.stub(:to_message).and_return(msg)
 
-        instance.instance_variable_get(:@msg).should == 'msg'
-        instance.instance_variable_get(:@match_data).should == 'match_data'
+        match_data = double('match_data')
+
+        instance = subject.respond_to(/x/) { [@msg, @match_data] }
+        instance.execute_on(msg, match_data).should == [msg, match_data]
       end
     end
   end

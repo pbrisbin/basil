@@ -33,7 +33,7 @@ module Basil
 
       def handle_message_id(imap, message_id)
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
-        mail.dispatch(Config.server) if mail
+        mail and mail.dispatch
       rescue Exception => ex
         logger.warn ex
       ensure

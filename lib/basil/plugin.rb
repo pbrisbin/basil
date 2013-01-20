@@ -58,9 +58,17 @@ module Basil
       define_singleton_method(:execute, &block)
     end
 
-    def set_context(msg, match_data)
-      @msg = msg
+    def match?(text)
+      regex.match(text)
+    end
+
+    def execute_on(obj, match_data)
+      @msg = obj.to_message
       @match_data = match_data
+
+      execute
+    rescue => ex
+      logger.warn ex
     end
 
     def to_s

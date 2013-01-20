@@ -7,7 +7,16 @@ end
 require 'basil'
 
 module Basil
+  # disable logging
   Loggers.level = 6 # OFF
+
+  # disable any real server
+  Config.server = :no_server
+
+  # mock storage
+  def Storage.with_storage(&block)
+    yield(@hash ||= {})
+  end
 
   shared_examples_for "a Dispatchable" do
     it "must respond to template methods" do

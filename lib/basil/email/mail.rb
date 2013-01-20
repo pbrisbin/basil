@@ -47,14 +47,15 @@ module Basil
       end
 
       def match?(plugin)
-        plugin.regex.match(self['Subject'])
+        plugin.match?(self['Subject'])
       end
 
       def to_message
         Message.new(
           :to   => Config.me,
           :from => self['From'],
-          :text => body
+          :text => body,
+          :chat => 'email'
         )
       end
 

@@ -60,7 +60,7 @@ module Basil
         end
       end
 
-      context 'with a server' do
+      context 'interacting with the server' do
         subject do
           described_class.new(
             :to        => 'to',
@@ -80,7 +80,7 @@ module Basil
         end
 
         before do
-          subject.server = server
+          Config.stub(:server).and_return(server)
         end
 
         it "can say things" do

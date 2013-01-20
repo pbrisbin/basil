@@ -3,17 +3,26 @@ require 'spec_helper'
 module Basil
   describe ChatHistory do
     before do
-      @store = {} # simple hash
-      Storage.stub(:with_storage).and_yield(@store)
-
-      # fake some conversations
       @msgs = [ Message.new(:to => 'jim', :from => 'bob', :from_name => 'Bob', :chat => 'chat_a'),
                 Message.new(:to => 'bob', :from => 'jim', :from_name => 'Jim', :chat => 'chat_a'),
                 Message.new(:to => 'jim', :from => 'bob', :from_name => 'Bob', :chat => 'chat_b'),
                 Message.new(:to => 'bob', :from => 'jim', :from_name => 'Jim', :chat => 'chat_b') ]
 
-      # store all our sample messages
       @msgs.each { |msg| ChatHistory.store_message(msg) }
+    end
+
+    after do
+      ChatHistory.clear_history('chat_a')
+      ChatHistory.clear_history('chat_b')
+    end
+
+    it "can store any object that is coercible to a message" do
+      msg = double('msg')
+      obj = double('obj', :to_message => msg)
+
+      ChatHistory.should_receive(:store_message).with(msg)
+
+      ChatHistory.store(obj)
     end
 
     it "can fetch messages for a chat" do

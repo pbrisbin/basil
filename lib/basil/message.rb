@@ -3,7 +3,7 @@ module Basil
     include Dispatchable
 
     attr_reader :from, :from_name, :text, :time
-    attr_accessor :to, :chat, :server
+    attr_accessor :to, :chat
 
     def self.from_message(message, options = {})
       args = {
@@ -33,7 +33,7 @@ module Basil
     end
 
     def match?(plugin)
-      plugin.regex.match(text)
+      plugin.match?(text)
     end
 
     def to_me?
@@ -41,19 +41,19 @@ module Basil
     end
 
     def say(text)
-      server && server.send_message(
+      server.send_message(
         Message.from_message(self, :to => nil, :text => text)
       )
     end
 
     def reply(text)
-      server && server.send_message(
+      server.send_message(
         Message.from_message(self, :to => self.from_name, :text => text)
       )
     end
 
     def forward(to)
-      server && server.send_message(
+      server.send_message(
         Message.from_message(self, :to => to)
       )
     end
@@ -64,6 +64,12 @@ module Basil
 
     def to_s
       "#<Message chat: #{chat.inspect}, to: #{to.inspect}, from: #{from}/#{from_name}, text: \"#{text}\" >"
+    end
+
+    private
+
+    def server
+      Config.server
     end
 
   end

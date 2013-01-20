@@ -19,7 +19,7 @@ module Basil
 
       main_loop do |*args|
         msg = accept_message(*args)
-        msg.dispatch(self)
+        msg and msg.dispatch
       end
     end
 

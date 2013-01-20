@@ -4,6 +4,10 @@ module Basil
     LIM = 100
 
     class << self
+      def store(obj)
+        store_message(obj.to_message)
+      end
+
       def store_message(message)
         with_history(message.chat) do |history|
           history.unshift(message)
