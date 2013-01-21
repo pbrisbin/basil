@@ -6,54 +6,55 @@ require 'fakefs/safe'
 require 'stringio'
 require 'timeout'
 
-module Basil
-  class SafeEval
-    def initialize(plugin)
-      @plugin = plugin
-    end
-
-    def evaluate(code)
-      FakeFS.activate!
-      $stdout = stdout = StringIO.new
-
-      cmd = %{
+Sandbox = Struct.new(:plugin, :msg, :code) do
+  def evaluate
+    result = sandboxed do
+      plugin.instance_eval(<<-EOC)
         FakeFS::FileSystem.clear
+
         $SAFE = 3
 
-        begin
-          #{code}
-        end
-      }
-
-      result = Thread.new { @plugin.instance_eval(cmd) }.value
-
-      [result, stdout.string]
-
-    rescue Exception
-      [nil, nil]
-    ensure
-      $stdout = STDOUT
-      FakeFS.deactivate!
+        begin; #{code} end
+      EOC
     end
+
+    str = @stdout.string
+
+    msg.say str if str != ''
+    msg.say "=> #{result.inspect}"
+
+  rescue Exception => ex
+    Basil.logger.warn ex
+  end
+
+  private
+
+  def sandboxed(&block)
+    setup
+
+    Basil::Config.hide do
+      Timeout::timeout(5) do
+        # thread required to isolate SAFE value
+        Thread.new { yield }.value
+      end
+    end
+  ensure
+    teardown
+  end
+
+  def setup
+    FakeFS.activate!
+    $stdout = @stdout = StringIO.new
+  end
+
+  def teardown
+    $stdout = STDOUT
+    FakeFS.deactivate!
   end
 end
 
 Basil.respond_to(/^eval (.*)/) {
 
-  require 'timeout'
-
-  retval = stdout = nil
-
-  Basil::Config.hide do
-    Timeout::timeout(5) do
-      e = Basil::SafeEval.new(self)
-      retval, stdout = e.evaluate(@match_data[1].strip)
-    end
-  end
-
-  if stdout # will be "" unless SyntaxError
-    @msg.say stdout if stdout != ""
-    @msg.say "=> #{retval.inspect}"
-  end
+  Sandbox.new(self, @msg, @match_data[1].strip).evaluate
 
 }.description = 'evaluates ruby expressions'
