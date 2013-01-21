@@ -132,8 +132,10 @@ Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
 
   @msg.chat = Basil::Config.jenkins['broadcast_chat']
 
-  @msg.say "(dance) #{build.name} is back to normal"
-  @msg.say "Thanks go to #{build.committers}!"
+  @msg.say trim(<<-EOM)
+    (sun) #{build.name} is back to normal!
+    Thanks go to #{build.committers} (ninja)
+  EOM
 end
 
 Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
@@ -144,8 +146,8 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
   @msg.chat = Basil::Config.jenkins['broadcast_chat']
 
   @msg.say trim(<<-EOM)
-    (headbang) #{build.name} ##{build.number} failed!
-    #{build.fail_count} failure(s). Culprits identified as #{build.culprits}.
+    (rain) #{build.name} ##{build.number} failed!
+    #{build.fail_count} failure(s). Culprits identified as #{build.culprits}
     Please see #{build.url} for more details.
   EOM
 end
@@ -189,4 +191,3 @@ Basil.respond_to(/^build (\w+)/) {
   @msg.say Jenkins::Job.new(@match_data[1]).build!
 
 }.description = 'triggers a build for the specified job'
-
