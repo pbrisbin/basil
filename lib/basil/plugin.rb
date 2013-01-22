@@ -44,8 +44,6 @@ module Basil
       end
     end
 
-
-    attr_reader :regex
     attr_accessor :description
 
     def initialize(regex, &block)
@@ -70,6 +68,10 @@ module Basil
     def to_s
       "#<Plugin regex: #{regex.inspect}, description: #{description.inspect} >"
     end
+
+    private
+
+    attr_reader :regex
 
     def logger
       @logger ||= Loggers['plugins']
