@@ -30,7 +30,7 @@ module Basil
     context 'registration' do
       let(:responder) { subject.respond_to(/regex/)   { self } }
       let(:watcher)   { subject.watch_for(/regex/)    { self } }
-      let(:checker)   { subject.check_email("string") { self } }
+      let(:checker)   { subject.check_email(/regex/) { self } }
 
       before do
         subject.responders.clear
@@ -50,11 +50,6 @@ module Basil
         checker.execute.should   == checker
       end
 
-      it "handles regex or string" do
-        responder.regex.should == /regex/
-        checker.regex.should   == /^string$/
-      end
-
       it "has an accessible description" do
         responder.description.should be_nil
         responder.description = 'A description'
@@ -67,17 +62,34 @@ module Basil
         instance = subject.respond_to(/(foo).*(bar)/) { }
         instance.match?('foo and bar').captures.should == %w( foo bar )
       end
+
+      it "considers strings as anchored regex" do
+        instance = subject.respond_to('string') { }
+        instance.match?('a string here').should be_false
+        instance.match?('string').should be_true
+      end
     end
 
     describe '#execute_on' do
-      it "sets the correct instance variables and calls execute" do
-        msg = double('msg')
-        msg.stub(:to_message).and_return(msg)
+      let(:obj) { double('obj') }
+      let(:msg) { double('msg') }
 
-        match_data = double('match_data')
+      before do
+        obj.stub(:to_message).and_return(msg)
 
-        instance = subject.respond_to(/x/) { [@msg, @match_data] }
-        instance.execute_on(msg, match_data).should == [msg, match_data]
+        @instance = subject.respond_to(/x/) { [@msg, @match_data] }
+      end
+
+      it "does nothing on non-matches" do
+        obj.should_receive(:match?).with(@instance).and_return(nil)
+
+        @instance.execute_on(obj).should be_nil
+      end
+
+      it "executes with correct instance variables on matches" do
+        obj.should_receive(:match?).with(@instance).and_return(:not_nil)
+
+        @instance.execute_on(obj).should == [msg, :not_nil]
       end
     end
   end

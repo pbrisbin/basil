@@ -56,13 +56,13 @@ module Basil
       regex.match(text)
     end
 
-    def execute_on(obj, match_data)
+    def execute_on(obj)
       @msg = obj.to_message
-      @match_data = match_data
+      @match_data = obj.match?(self) or return
+
+      logger.debug "Executing #{self} (matched: #{@match_data})"
 
       execute
-    rescue => ex
-      logger.warn ex
     end
 
     def to_s
@@ -76,5 +76,6 @@ module Basil
     def logger
       @logger ||= Loggers['plugins']
     end
+
   end
 end

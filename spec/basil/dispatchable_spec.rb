@@ -22,15 +22,7 @@ module Basil
   describe Dispatchable do
     subject { DispatchableDouble.new }
 
-    let(:message) do
-      double('message', :chat => nil)
-    end
-
-    let(:plugin) { double('plugin') }
-
-    before do
-      subject.stub(:to_message).and_return(message)
-    end
+    before { ChatHistory.stub(:store) }
 
     it "should store the object in chat history" do
       ChatHistory.should_receive(:store).with(subject)
@@ -38,31 +30,38 @@ module Basil
       subject.dispatch
     end
 
-    it "should call match for each plugin" do
-      subject.stub(:each_plugin).and_yield(plugin)
+    it "should handle errors during dispatching" do
+      subject.stub(:each_plugin).and_raise
 
-      subject.should_receive(:match?).with(plugin)
-
-      subject.dispatch
+      expect { subject.dispatch }.to_not raise_error
     end
 
-    it "should set context and execute on matches" do
-      subject.stub(:each_plugin).and_yield(plugin)
-      subject.stub(:match?).and_return('match data')
+    context "with registered plugins" do
+      let(:plugin1) { double('Plugin 1') }
+      let(:plugin2) { double('Plugin 2') }
+      let(:plugin3) { double('Plugin 3') }
 
-      plugin.should_receive(:execute_on).with(subject, 'match data')
+      before do
+        subject.stub(:each_plugin).and_yield(plugin1)
+                                  .and_yield(plugin2)
+                                  .and_yield(plugin3)
+      end
 
-      subject.dispatch
-    end
+      it "should execute each plugin on itself" do
+        plugin1.should_receive(:execute_on).with(subject)
+        plugin2.should_receive(:execute_on).with(subject)
+        plugin3.should_receive(:execute_on).with(subject)
 
-    it "should not execute on non-matches" do
-      subject.stub(:each_plugin).and_yield(plugin)
-      subject.stub(:match?).and_return(nil)
+        subject.dispatch
+      end
 
-      plugin.should_not_receive(:set_context)
-      plugin.should_not_receive(:execute)
+      it "should handle errors during execution" do
+        plugin1.should_receive(:execute_on).with(subject)
+        plugin2.should_receive(:execute_on).with(subject).and_raise
+        plugin3.should_receive(:execute_on).with(subject)
 
-      subject.dispatch
+        expect { subject.dispatch }.to_not raise_error
+      end
     end
 
   end

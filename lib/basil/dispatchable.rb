@@ -6,9 +6,10 @@ module Basil
       logger.debug "Dispatching #{self}"
 
       each_plugin do |plugin|
-        if match_data = match?(plugin)
-          logger.debug "Executing #{plugin} (matched: #{match_data})"
-          plugin.execute_on(self, match_data)
+        begin
+          plugin.execute_on(self)
+        rescue => ex
+          logger.warn ex
         end
       end
     rescue => ex
