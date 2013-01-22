@@ -38,16 +38,12 @@ module Basil
         Dir.glob("#{dir}/*").sort.each do |f|
           begin load(f)
           rescue Exception => ex
-            logger.warn ex
-            next
+            Basil.logger.warn ex
           end
         end
       end
     end
 
-    def self.logger
-      @logger ||= Loggers['plugins']
-    end
 
     attr_reader :regex
     attr_accessor :description
@@ -76,7 +72,7 @@ module Basil
     end
 
     def logger
-      self.class.logger
+      @logger ||= Loggers['plugins']
     end
   end
 end
