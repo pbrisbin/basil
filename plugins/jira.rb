@@ -62,7 +62,7 @@ Basil.watch_for(/\w+-\d+/) {
     store[:jira_timeouts] ||= {}
 
     found.each do |id|
-      timeout = store[:jira_timeouts][id] rescue nil
+      timeout = store[:jira_timeouts][id]
 
       if !timeout || Time.now > timeout
         tickets << id
@@ -100,20 +100,17 @@ Basil.watch_for(/\w+-\d+/) {
 
 Basil.respond_to(/^jira search (.+)/i) {
 
-  begin
-    jql  = escape('summary ~ "?" OR description ~ "?" OR comment ~ "?"'.gsub('?', @match_data[1].strip))
-    json = Basil::JiraApi.new("/search?jql=#{jql}")
+  jql  = escape('summary ~ "?" OR description ~ "?" OR comment ~ "?"'.gsub('?', @match_data[1].strip))
+  json = Basil::JiraApi.new("/search?jql=#{jql}")
 
-    issues = json.issues
-    len    = issues.length
-
-    @msg.reply 'Search results (first 10):'
+  if (issues = json.issues) && issues.any?
+    @msg.reply 'First 10 results:'
 
     issues[0..10].each do |issue|
       ticket = Basil::JiraTicket.new(issue['key'])
       @msg.say ticket.description if ticket.found?
     end
-  rescue
+  else
     @msg.reply "no results found."
   end
 
