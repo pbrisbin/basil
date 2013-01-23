@@ -11,71 +11,95 @@ module Basil
       #     options['username'] - optional
       #     options['password'] - optional
       #
+      # This method handles mostly params sanitization and logging, with
+      # the heavy lifting done by a Request instance.
+      #
       def get(options)
-        logger.debug "GET"
-        log_options(options)
+        if options.is_a?(String) # simple url
+          options = from_url(options)
+        end
 
-        resp = case options
-               when Hash   then complex_get(options)
-               when String then simple_get(options)
-               else raise ArgumentError, "get method accepts only Hash or String"
-               end
+        logger.debug 'GET'
+        logger.debug mask(options)
 
-        unless resp.is_a?(Net::HTTPOK)
+        request  = Request.new(options)
+        response = request.get
+
+        unless response.is_a?(Net::HTTPOK)
           logger.warn 'Non-200 HTTP Response'
           logger.warn resp
         end
 
-        resp
+        response
       end
 
       private
 
-      def simple_get(url)
-        require_net_http(url =~ /^https/)
+      def from_url(url)
+        uri = URI.parse(url)
 
-        Net::HTTP.get_response(URI.parse(url))
+        {}.tap do |options|
+          options['host'] = uri.host
+          options['port'] = uri.port
+          options['path'] = uri.path
+          options['path'] << "?#{uri.query}" if uri.query
+        end
       end
 
-      def complex_get(options)
-        host     = options.fetch('host') { raise ArgumentError, "options['host'] is required" }
-        port     = options.fetch('port', 80)
-        path     = options.fetch('path', '/')
-        username = options['user']
-        password = options['password']
-        secure   = port == 443
+      def mask(options)
+        if options.has_key?('password')
+          options.merge('password' => 'xxx')
+        else
+          options
+        end
+      end
 
-        require_net_http(secure)
+      def logger
+        @logger ||= Loggers['http']
+      end
+    end
+
+    class Request
+      def initialize(options)
+        @host = options.fetch('host') { raise ArgumentError, "options['host'] is required" }
+        @port = options.fetch('port', 80)
+        @username = options['user']
+        @password = options['password']
+
+        # surprisingly, URI.parse can give you an empty path which is
+        # not valid for Net::HTTP. sigh.
+        @path = options['path']
+        @path = '/' if path.nil? || path.empty?
+      end
+
+      def get
+        require(secure? ? 'net/https' : 'net/http')
 
         net = Net::HTTP.new(host, port)
 
-        if secure
+        if secure?
           net.use_ssl = true
           net.ca_file = Config.https_cert_file # OSX fix
         end
 
         net.start do |http|
           req = Net::HTTP::Get.new(path)
-          req.basic_auth(username, password) if username || password
+          req.basic_auth(username, password) if authenticate?
 
           http.request(req)
         end
       end
 
-      def require_net_http(secure)
-        require(secure ? 'net/https' : 'net/http')
+      def secure?
+        port == 443
       end
 
-      def log_options(options)
-        if options.is_a?(Hash) && options.has_key?('password')
-          logger.debug options.merge('password' => 'xxx')
-        else
-          logger.debug options
-        end
-      end
+      private
 
-      def logger
-        @logger ||= Loggers['http']
+      attr_reader :host, :port, :path, :username, :password
+
+      def authenticate?
+        !!( username || password )
       end
     end
   end
