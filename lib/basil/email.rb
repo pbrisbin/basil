@@ -44,19 +44,27 @@ module Basil
       end
 
       def with_imap(config = Config.email, &block)
+        imap = connect_to_imap(config)
+
+        yield imap
+
+      ensure
+        disconnect(imap) if imap
+      end
+
+      def connect_to_imap(config)
         logger.debug 'Logging into IMAP'
         imap = Net::IMAP.new(config['server'], config['port'], true)
         imap.login(config['username'], config['password'])
         imap.select(config['inbox'])
 
-        yield imap
+        imap
+      end
 
-      ensure
-        if imap
-          imap.logout()
-          imap.disconnect()
-          logger.debug 'Disconnected from IMAP'
-        end
+      def disconnect(imap)
+        imap.logout
+        imap.disconnect
+        logger.debug 'Disconnected from IMAP'
       end
 
       def poll_email?
