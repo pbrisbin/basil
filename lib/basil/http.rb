@@ -27,7 +27,7 @@ module Basil
 
         unless response.is_a?(Net::HTTPOK)
           logger.warn 'Non-200 HTTP Response'
-          logger.warn resp
+          logger.warn response
         end
 
         response
