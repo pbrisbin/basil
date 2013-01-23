@@ -31,12 +31,6 @@ module Basil
           end
         end
 
-        it "sets up logging to the log-file" do
-          Loggers.should_receive(:output=).with(Config.log_file)
-
-          subject.start
-        end
-
         it "writes a pid file" do
           Process.stub(:pid).and_return(123)
 
@@ -48,9 +42,9 @@ module Basil
           subject.start
         end
 
-        it "closes file descriptors" do
+        it "redirects IO to the configured log file" do
           STDIN.should_receive(:reopen).with("/dev/null")
-          STDOUT.should_receive(:reopen).with("/dev/null")
+          STDOUT.should_receive(:reopen).with(Config.log_file, 'a')
           STDERR.should_receive(:reopen).with(STDOUT)
 
           subject.start

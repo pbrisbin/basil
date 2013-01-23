@@ -8,8 +8,7 @@ module Basil
       include Log4r
 
       def init!
-        outputter = StdoutOutputter.new('stdout',
-                                        :formatter => formatter)
+        outputter = StdoutOutputter.new('stdout')
 
         Logger.global.level = INFO
 
@@ -28,23 +27,6 @@ module Basil
         Logger.each do |_,logger|
           logger.level = level
         end
-      end
-
-      def output=(file)
-        outputter = FileOutputter.new("file:#{file}",
-                                      :formatter => formatter,
-                                      :filename  => file,
-                                      :tunc      => false)
-
-        Logger.each do |_,logger|
-          logger.outputters = [outputter]
-        end
-      end
-
-      private
-
-      def formatter
-        @formatter ||= BasicFormatter.new
       end
 
     end

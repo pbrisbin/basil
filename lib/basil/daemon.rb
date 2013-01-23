@@ -20,7 +20,7 @@ module Basil
 
       def fork_process
         fork do
-          Loggers.output = Config.log_file
+          redirect_io
 
           logger.info "=== Started: #{Process.pid} ==="
 
@@ -28,22 +28,33 @@ module Basil
             fh.puts "#{Process.pid}"
           end
 
-          close_io
-
           Config.server.start
         end
       end
 
-      def close_io
-        [STDIN, STDOUT].each do |io|
-          begin io.reopen("/dev/null")
+      def redirect_io
+        begin
+          STDIN.reopen('/dev/null')
+        rescue Exception
+        end
+
+        begin
+          STDOUT.reopen(Config.log_file, 'a')
+          STDOUT.sync = true
+        rescue Exception => ex
+          logger.warn ex
+          logger.warn 'Closing stdout entirely'
+
+          begin STDOUT.reopen('/dev/null')
           rescue Exception
           end
         end
 
-        STDERR.reopen(STDOUT)
-        STDERR.sync = true
-      rescue Exception
+        begin
+          STDERR.reopen(STDOUT)
+          STDERR.sync = true
+        rescue Exception
+        end
       end
 
       def logger
