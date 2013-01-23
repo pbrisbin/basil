@@ -23,19 +23,9 @@ module Basil
       end
 
       def load!
-        return unless config_file && File.exists?(config_file)
-
-        yaml = YAML::load(File.read(config_file))
-
-        DEFAULTS.keys.each do |key|
-          if yaml.has_key?(key)
-            value = yaml.delete(key)
-            send("#{key}=", value)
-          end
+        if config_file && File.exists?(config_file)
+          set_attributes(YAML::load(File.read(config_file)))
         end
-
-        self.extras = yaml
-
       rescue => ex
         Basil.logger.warn "Error loading #{config_file}:"
         Basil.logger.warn ex
@@ -76,6 +66,18 @@ module Basil
       end
 
       private
+
+      def set_attributes(hsh)
+        DEFAULTS.keys.each do |key|
+          if hsh.has_key?(key)
+            value = hsh.delete(key)
+            send("#{key}=", value)
+          end
+        end
+
+        # leftovers go into #extra
+        self.extras = hsh
+      end
 
       def attribute(key)
         ivar = :"@#{key}"
