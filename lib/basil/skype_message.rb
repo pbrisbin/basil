@@ -1,6 +1,14 @@
 module Basil
   class SkypeMessage
-    BODY_MASK = /^(?:@(\w+)[,;:]?\s+|(\w+)[,;:]\s+)?(.*)/
+    # We can assume this always matches since the first group is
+    # optional and the second group is effectively +.*+
+    BODY_MASK =
+      /
+        ^( @(?<to>\w+)[,;:]?\s+ | # @name style
+            (?<to>\w+)[,;:]\s+    # using punctuation
+         )?
+         (?<text>.*)$             # rest of message
+      /x
 
     attr_reader :chatname,
                 :from_handle,
@@ -18,17 +26,17 @@ module Basil
     end
 
     def to
-      captures[0] || captures[1]
+      matched_body[:to]
     end
 
     def text
-      captures.last
+      matched_body[:text]
     end
 
     private
 
-    def captures
-      @captures ||= BODY_MASK.match(adjusted_body).captures
+    def matched_body
+      @matched_body ||= BODY_MASK.match(adjusted_body)
     end
 
     def adjusted_body
