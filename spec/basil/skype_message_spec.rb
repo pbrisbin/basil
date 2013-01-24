@@ -31,10 +31,6 @@ module Basil
         skype.stub(:get).with("CHAT chatname MEMBERS").and_return('one two')
       end
 
-      it "sets private_chat to true" do
-        accept('xyz').private_chat?.should be_true
-      end
-
       it "sees everything as to me" do
         ['plain message', 'to, someone else'].each do |text|
           msg = accept(text)
@@ -55,10 +51,6 @@ module Basil
     context "when not in private chat" do
       before do
         skype.stub(:get).with("CHAT chatname MEMBERS").and_return('one two three')
-      end
-
-      it "sets private_chat to false" do
-        accept('xyz').private_chat?.should be_false
       end
 
       it "parses BODY correctly for typical TO and TEXT components" do

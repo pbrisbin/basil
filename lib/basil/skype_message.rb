@@ -13,9 +13,7 @@ module Basil
     attr_reader :chatname,
                 :from_handle,
                 :from_dispname,
-                :body, :private_chat
-
-    alias :private_chat? :private_chat
+                :body
 
     def initialize(skype, message_id)
       @chatname      = skype.get("CHATMESSAGE #{message_id} CHATNAME")
@@ -34,6 +32,10 @@ module Basil
     end
 
     private
+
+    def private_chat?
+      @private_chat
+    end
 
     def matched_body
       @matched_body ||= BODY_MASK.match(adjusted_body)
