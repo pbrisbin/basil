@@ -17,6 +17,7 @@ module Basil
   autoload :Plugin,       'basil/plugin'
   autoload :Server,       'basil/server'
   autoload :Skype,        'basil/skype'
+  autoload :SkypeMessage, 'basil/skype_message'
   autoload :Storage,      'basil/storage'
   autoload :Utils,        'basil/utils'
   autoload :VERSION,      'basil/version'

@@ -16,60 +16,23 @@ module Basil
       subject.main_loop
     end
 
-    it "accepts a message via skype API" do
-      skype.should_receive(:get).with("CHATMESSAGE 1 BODY").and_return('text')
-      skype.should_receive(:get).with("CHATMESSAGE 1 CHATNAME").and_return('chat')
-      skype.should_receive(:get).with("CHATMESSAGE 1 FROM_HANDLE").and_return('from')
-      skype.should_receive(:get).with("CHATMESSAGE 1 FROM_DISPNAME").and_return('from name')
-      skype.should_receive(:get).with("CHAT chat MEMBERS").and_return('me you him')
+    it "builds a Message from the SkypeMessage" do
+      skype_message = double('skype_message',
+                             :from_handle   => 'from',
+                             :from_dispname => 'from_name',
+                             :to            => 'to',
+                             :chatname      => 'chat',
+                             :text          => 'text')
 
-      msg = subject.accept_message('1')
+      SkypeMessage.should_receive(:new).with(skype, 1).and_return(skype_message)
 
-      msg.to.should be_nil
-      msg.from.should == 'from'
-      msg.from_name.should == 'from name'
-      msg.text.should == 'text'
-      msg.chat.should == 'chat'
-    end
+      msg = subject.accept_message(1)
 
-    it "knows when messages are to him in group chat" do
-      # catch-all for properties we don't care about
-      skype.stub(:get).and_return('a property')
-
-      skype.stub(:get).with("CHATMESSAGE 1 CHATNAME").and_return('chat')
-      skype.stub(:get).with("CHAT chat MEMBERS").and_return('me you him')
-
-      Config.stub(:me).and_return('me')
-
-      to_me = ['> me ...', '@me ...', '!...', 'me, ...', 'me: ...']
-
-      not_to_me = ['@variable', 'some text', 'you, ...']
-
-      to_me.each do |text|
-        skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
-        msg = subject.accept_message('1')
-        msg.should be_to_me
-      end
-
-      not_to_me.each do |text|
-        skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
-        msg = subject.accept_message('1')
-        msg.should_not be_to_me
-      end
-    end
-
-    it "sees all messages as to him in private chat" do
-      # catch-all for properties we don't care about
-      skype.stub(:get).and_return('a property')
-
-      skype.stub(:get).with("CHATMESSAGE 1 CHATNAME").and_return('chat')
-      skype.stub(:get).with("CHAT chat MEMBERS").and_return('me you')
-
-      ['any thing', 'at all'].each do |text|
-        skype.stub(:get).with("CHATMESSAGE 1 BODY").and_return(text)
-        msg = subject.accept_message('1')
-        msg.should be_to_me
-      end
+      msg.from.should      == 'from'
+      msg.from_name.should == 'from_name'
+      msg.to.should        == 'to'
+      msg.chat.should      == 'chat'
+      msg.text.should      == 'text'
     end
 
     it "sends a formatted message via skype API" do

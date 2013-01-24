@@ -15,19 +15,14 @@ module Basil
     def accept_message(message_id)
       logger.info "Accepting #{message_id}"
 
-      body         = skype.get("CHATMESSAGE #{message_id} BODY")
-      chatname     = skype.get("CHATMESSAGE #{message_id} CHATNAME")
-      private_chat = skype.get("CHAT #{chatname} MEMBERS").split(' ').length == 2
-
-      to, text = parse_body(body)
-      to = Config.me if !to && private_chat
+      msg = SkypeMessage.new(skype, message_id)
 
       Message.new(
-        :from      => skype.get("CHATMESSAGE #{message_id} FROM_HANDLE"),
-        :from_name => skype.get("CHATMESSAGE #{message_id} FROM_DISPNAME"),
-        :to        => to,
-        :chat      => chatname,
-        :text      => text
+        :from      => msg.from_handle,
+        :from_name => msg.from_dispname,
+        :to        => msg.to,
+        :chat      => msg.chatname,
+        :text      => msg.text
       )
 
     rescue ::Skype::Errors::GeneralError => ex
@@ -47,16 +42,6 @@ module Basil
 
     def skype
       @skype ||= ::Skype.new(Config.me)
-    end
-
-    def parse_body(body)
-      case body
-      when /^! *(.*)/           ; [Config.me, $1]
-      when /^> *(.*)/           ; [Config.me, "eval #{$1}"]
-      when /^@(\w+)[,;:]? +(.*)/; [$1, $2]
-      when /^(\w+)[,;:] +(.*)/  ; [$1, $2]
-      else [nil, body]
-      end
     end
 
   end
