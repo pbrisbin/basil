@@ -94,6 +94,13 @@ module Basil
         msg.to.should == Config.me
         msg.text.should == 'eval some code'
       end
+
+      it "handles plain messages" do
+        msg = accept('some text')
+
+        msg.to.should be_nil
+        msg.text.should == 'some text'
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 module Basil
   class SkypeMessage
-    BODY_MASK = /^(?:@(\w+)[,;:]?\s+|(\w+)[,;:]\s+)(.*)/
+    BODY_MASK = /^(?:@(\w+)[,;:]?\s+|(\w+)[,;:]\s+)?(.*)/
 
     attr_reader :chatname,
                 :from_handle,
