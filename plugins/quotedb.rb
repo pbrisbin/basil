@@ -1,55 +1,68 @@
-module Basil
-  class QuoteDb
-    KEY ||= :quotedb_grabs
+class QuoteDb
+  KEY ||= :quotedb_grabs
 
-    def self.quote(name, random = false)
-      ret = nil
+  def initialize(plugin)
+    @plugin = plugin
+  end
 
-      Storage.with_storage do |store|
-        store[KEY] ||= []
-
-        grabs = store[KEY].select { |msg| msg[:who] =~ /#{name}/i }
-
-        unless grabs.empty?
-          msg = if random && grabs.length > 1
-                  grabs.shuffle.first
-                else
-                  grabs.last
-                end
-
-          ret = "<#{msg[:who]}> #{msg[:what]}"
-        end
+  def grab(name)
+    if msg = @plugin.chat_history(:from => name).first
+      with_quotes do |quotes|
+        quotes << { :who => msg.from_name, :what => msg.text }
       end
+    end
+  end
 
-      ret
+  def quote(name)
+    Quote.new(quotes_for(name).last)
+  end
+
+  def random_quote(name)
+    Quote.new(quotes_for(name).sample)
+  end
+
+  private
+
+  def quotes_for(name)
+    with_quotes do |quotes|
+      quotes.select do
+        |msg| msg[:who] =~ /#{name}/i
+      end
+    end
+  end
+
+  def with_quotes(&block)
+    Basil::Storage.with_storage do |store|
+      yield(store[KEY] ||= [])
+    end
+  end
+
+  class Quote
+    def initialize(options)
+      @who  = options[:who]
+      @what = options[:what]
+    end
+
+    def to_s
+      "<#@who> #@what"
     end
   end
 end
 
-# grabs the last thing the named person said and stores it
 Basil.respond_to(/^grab (.+)/) do
 
-  if msg = chat_history(:from => @match_data[1]).first
-    Basil::Storage.with_storage do |store|
-      quote = { :who => msg.from_name, :what => msg.text }
-
-      store[Basil::QuoteDb::KEY] ||= []
-      store[Basil::QuoteDb::KEY] << quote
-    end
-
-    @msg.say 'Ta-da!'
-  end
+  @msg.say 'Ta-da!' if QuoteDb.new(self).grab(@match_data[1])
 
 end
 
-# replies with the last quote grabbed for the named person
 Basil.respond_to(/^q(uote)? (.+)/) do
-  quote = Basil::QuoteDb.quote(@match_data[2])
-  quote && @msg.say(quote)
+
+  @msg.say QuoteDb.new(self).quote(@match_data[2])
+
 end
 
-# replies with a random quote grabbed for the named person
 Basil.respond_to(/^rq(uote)? (.+)/) do
-  quote = Basil::QuoteDb.quote(@match_data[2], true)
-  quote && @msg.say(quote)
+
+  @msg.say QuoteDb.new(self).random_quote(@match_data[2])
+
 end
