@@ -29,14 +29,9 @@ Basil::Plugin.respond_to(/^\w+$/) {
     fact[:requested] += 1 if fact
   end
 
-  if fact
-    case fact[:action]
-    when 'reply' then @msg.reply fact[:fact]
-    when 'say'   then @msg.say   fact[:fact]
-    else nil
-    end
-  else
-    nil
+  case (fact || {})[:action]
+  when 'reply' then @msg.reply fact[:fact]
+  when 'say'   then @msg.say   fact[:fact]
   end
 
 }
