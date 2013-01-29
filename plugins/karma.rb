@@ -1,39 +1,61 @@
+class Karma
+  KEY = :karma_tracker
+
+  def initialize(word)
+    @word = word
+  end
+
+  def increment!
+    with_values { |v| v[word] += 1 }
+  end
+
+  def decrement!
+    with_values { |v| v[word] -= 1 }
+  end
+
+  def value
+    @value ||= with_values { |v| v[word] }
+  end
+
+  def to_s
+    if value == 0
+      "nuetral karma"
+    elsif value > 0
+      "positive karma (+#{value})"
+    else
+      "negative karma (#{value})"
+    end
+  end
+
+  private
+
+  attr_reader :word
+
+  def with_values(&block)
+    Basil::Storage.with_storage do |store|
+      yield(store[KEY] ||= {})
+    end
+  end
+end
+
 # when foo-- or foo++ is mentioned in conversation, foo's karma is
 # decremented or incremented.
 Basil.watch_for(/(\w+)(--|\+\+)($|[!?.,:; ])/) {
 
-  k  = @match_data[1]
-  op = @match_data[2]
+  karma = Karma.new(@match_data[1])
 
-  Basil::Storage.with_storage do |store|
-    store[:karma_tracker]    ||= {}
-    store[:karma_tracker][k] ||= 0
-
-    case op
-    when '--' then store[:karma_tracker][k] -= 1
-    when '++' then store[:karma_tracker][k] += 1
-    end
+  case @match_data[2]
+  when '++' then karma.increment!
+  when '--' then karma.decrement!
   end
 
 }
 
 Basil.respond_to(/^karma (\w+)/) {
 
-  k = @match_data[1]
-  karma = 0
+  word  = @match_data[1]
+  karma = Karma.new(word)
 
-  Basil::Storage.with_storage do |store|
-    karma = store[:karma_tracker][k] || 0
-  end
-
-  msg = if karma == 0
-          "nuetral karma"
-        elsif karma > 0
-          "positive karma (+#{karma})"
-        else
-          "negative karma (#{karma})"
-        end
-
-  @msg.reply "#{k} currently has #{msg}"
+  @msg.reply "#{word} currently has #{karma}"
 
 }.description = "report a word's current karma"
