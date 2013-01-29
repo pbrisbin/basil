@@ -1,3 +1,17 @@
+class Factoids
+  KEY = :factoids
+
+  def self.all(&block)
+    Basil::Storage.with_storage do |store|
+      yield(store[KEY] ||= {})
+    end
+  end
+
+  def self.get(key)
+    all { |facts| facts[key] }
+  end
+end
+
 # allows canned-response plugins to be added run-time by anyone
 Basil.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
 
@@ -5,14 +19,15 @@ Basil.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
   action = @match_data[2]
   fact   = @match_data[3]
 
-  Basil::Storage.with_storage do |store|
-    store[:factoids] ||= {}
-    store[:factoids][key] = { :action    => action,
-                              :fact      => fact,
-                              :created   => Time.now,
-                              :by        => @msg.from_name,
-                              :requested => 0,
-                              :locked    => false } # TODO:
+  Factoids.all do |facts|
+    facts[key] = {
+      :action    => action,
+      :fact      => fact,
+      :created   => Time.now,
+      :by        => @msg.from_name,
+      :requested => 0,
+      :locked    => false # TODO
+    }
   end
 
   @msg.say 'Ta-da!'
@@ -21,43 +36,32 @@ Basil.respond_to(/^(\w+) is <(reply|say)>(.+)/) {
 
 Basil::Plugin.respond_to(/^\w+$/) {
 
-  fact = nil
+  key = @match_data[0]
 
-  Basil::Storage.with_storage do |store|
-    store[:factoids] ||= {}
-    fact = store[:factoids][@match_data[0]]
-    fact[:requested] += 1 if fact
-  end
-
-  case (fact || {})[:action]
-  when 'reply' then @msg.reply fact[:fact]
-  when 'say'   then @msg.say   fact[:fact]
+  Factoids.all do |facts|
+    if fact = facts[key]
+      @msg.send(fact[:action], fact[:fact])
+      fact[:requested] += 1
+    end
   end
 
 }
 
 Basil.respond_to(/^factinfo (\w+)$/) {
 
-  key  = @match_data[1]
-  fact = nil
+  key = @match_data[1]
 
-  Basil::Storage.with_storage do |store|
-    store[:factoids] ||= {}
-    fact = store[:factoids][key]
-  end
-
-  if fact
+  if fact = Factoids.get(key)
     @msg.say "fact #{key}: created #{fact[:created]} by #{fact[:by]}, requested #{fact[:requested]} time(s)."
     @msg.say "<#{fact[:action]}> #{fact[:fact]}"
   end
 
 }.description = 'give information about a factoid'
 
-Basil.respond_to(/^(del|rm) ?factoid (\w+)$/) {
+Basil.respond_to(/^(del|rm) ?fact(oid)? (\w+)$/) {
 
-  Basil::Storage.with_storage do |store|
-    store[:factoids] ||= {}
-    store[:factoids].delete(@match_data[2])
+  Factoids.all do |facts|
+    facts.delete(@match_data[3])
   end
 
   @msg.say 'Ta-da!'
