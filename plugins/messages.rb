@@ -1,13 +1,60 @@
+module Messages
+  class << self
+
+    def leave(to, from, message)
+      with_messages do |messages|
+        messages << {
+          :time     => Time.now,
+          :to       => to,
+          :from     => from,
+          :message  => message,
+          :notified => false
+        }
+      end
+    end
+
+    def check(name)
+      with_messages do |messages|
+        my_messages = messages.select do |message|
+          name =~ /#{message[:to]}/i
+        end
+
+        my_messages.each do |message|
+          messages.delete(message)
+        end
+
+        my_messages
+      end
+    end
+
+    def any?(name)
+      with_messages do |messages|
+        any = false
+
+        messages.each do |message|
+          if !message[:notified] && name =~ /#{message[:to]}/i
+            any = message[:notified] = true
+          end
+        end
+
+        any
+      end
+    end
+
+    private
+
+    def with_messages
+      Basil::Storage.with_storage do |store|
+        yield(store[:tell_messages] ||= [])
+      end
+    end
+
+  end
+end
+
 Basil.respond_to(/^tell ([^:]*): (.+)/) {
 
-  to   = @match_data[1]
-  from = @msg.from_name
-  msg  = @match_data[2]
-
-  Basil::Storage.with_storage do |store|
-    store[:tell_messages] ||= []
-    store[:tell_messages] << { :time => Time.now, :to => to, :from => from, :message => msg }
-  end
+  Messages.leave(@match_data[1], @msg.from_name, @match_data[2])
 
   @msg.reply "consider it noted."
 
@@ -15,57 +62,27 @@ Basil.respond_to(/^tell ([^:]*): (.+)/) {
 
 Basil.respond_to(/^(do i have any |any )?messages\??$/i) {
 
-  Basil::Storage.with_storage do |store|
-    store[:tell_messages] ||= []
-    store[:tell_notified] ||= {}
+  messages = Messages.check(@msg.from_name)
 
-    msgs = store[:tell_messages].select { |msg| @msg.from_name =~ /#{msg[:to]}/i }
+  if messages.any?
+    @msg.reply 'your messages:'
 
-    if msgs.empty?
-      @msg.reply "sorry, I have no messages for you."
-    else
-      store[:tell_notified][@msg.from] = false
-
-      @msg.reply 'your messages:'
-
-      msgs.each do |msg|
-        @msg.say "#{msg[:time].strftime("On %D, at %r")}, #{msg[:from]} wrote:"
-        @msg.say '> ' + msg[:message]
-        @msg.say ''
-
-        # remove the message
-        store[:tell_messages].delete(msg)
-      end
+    messages.each do |msg|
+      @msg.say trim(<<-EOM)
+        #{msg[:time].strftime("On %D, at %r")}, #{msg[:from]} wrote:
+        > #{msg[:message]}
+      EOM
     end
+  else
+    @msg.reply 'no messages.'
   end
 
 }.description = "See if anyone's left you a message"
 
 Basil.watch_for(/.*/) {
 
-  msgs = notified = nil
-
-  Basil::Storage.with_storage do |store|
-    store[:tell_messages] ||= []
-    store[:tell_notified] ||= {}
-
-    msgs = store[:tell_messages].select { |msg| @msg.from_name =~ /#{msg[:to]}/i }
-    notified = store[:tell_notified][@msg.from]
-  end
-
-  if !msgs.nil? && !msgs.empty? && !notified
-    Basil::Storage.with_storage do |store|
-      store[:tell_notified][@msg.from] = true
-    end
-
-    len = msgs.length
-
-    # plularize correctly
-    if len == 1
-      @msg.reply "you have #{len} message, say 'messages?' to me to see it."
-    else
-      @msg.reply "you have #{len} messages, say 'messages?' to me to see them."
-    end
+  if Messages.any?(@msg.from_name)
+    @msg.reply "someone's left you a message. say 'messages?' to me to check them."
   end
 
 }
