@@ -5,10 +5,10 @@ module Basil
     DEFAULTS = {
       'me'                => 'basil',
       'server_class'      => Skype,
-      'plugins_directory' => File.join(Dir.pwd, 'plugins'),
-      'pstore_file'       => File.join(Dir.pwd, 'basil.pstore'),
-      'config_file'       => File.join(Dir.pwd, 'config', 'basil.yml'),
-      'lock_file'         => File.join('', 'tmp', 'basil.lock'),
+      'lock_file'         => File.join('', 'tmp', 'basil.lock'), # NB: /tmp
+      'plugins_directory' => File.join('plugins'),
+      'pstore_file'       => File.join('basil.pstore'),
+      'config_file'       => File.join('config', 'basil.yml'),
       'log_file'          => File.join('tmp', 'basil.log'),
       'pid_file'          => File.join('tmp', 'basil.pid'),
       'email'             => {},
