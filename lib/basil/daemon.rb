@@ -40,7 +40,7 @@ module Basil
           STDOUT.sync = true
         end
 
-        if ex
+        if ex && ex.is_a?(Exception)
           logger.warn ex
           logger.warn 'Closing stdout entirely'
 
