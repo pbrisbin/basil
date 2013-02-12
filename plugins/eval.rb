@@ -24,7 +24,6 @@ Sandbox = Struct.new(:plugin, :msg, :code) do
     msg.say "=> #{result.inspect}"
 
   rescue Exception => ex
-    msg.say "Error: #{ex}"
     Basil.logger.warn ex
   end
 
