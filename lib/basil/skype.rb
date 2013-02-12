@@ -33,7 +33,10 @@ module Basil
       logger.info "Sending \"#{msg.text}\" to #{msg.chat}"
 
       prefix = msg.to && "#{msg.to.split(' ').first}, "
+
+      skype.connect unless skype.connected?
       skype.message_chat(msg.chat, "#{prefix}#{msg.text}")
+
     rescue ::Skype::Errors::GeneralError => ex
       logger.error ex; nil
     end

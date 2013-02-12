@@ -35,16 +35,42 @@ module Basil
       msg.text.should      == 'text'
     end
 
-    it "sends a formatted message via skype API" do
-      skype.should_receive(:message_chat).with('chat', 'john, text')
-
-      subject.send_message(
+    context "#send_message" do
+      let(:message) do
         Message.new(
           :to   => 'john smith',
           :from => 'x',
           :text => 'text',
           :chat => 'chat'
-      ))
+        )
+      end
+
+      before do
+        skype.stub(:connect)
+        skype.stub(:connected?)
+        skype.stub(:message_chat)
+      end
+
+      it "connects when not connected" do
+        skype.stub(:connected?).and_return(false)
+        skype.should_receive(:connect)
+
+        subject.send_message(message)
+      end
+
+      it "does not connect if already connected" do
+        skype.stub(:connected?).and_return(true)
+        skype.should_not_receive(:connect)
+
+        subject.send_message(message)
+      end
+
+      it "sends a formatted message" do
+        skype.should_receive(:message_chat).with('chat', 'john, text')
+
+        subject.send_message(message)
+      end
+
     end
   end
 end
