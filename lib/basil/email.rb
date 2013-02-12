@@ -1,82 +1,52 @@
 require 'net/imap'
 require 'basil/email/mail'
+require 'basil/email/worker'
 
 module Basil
   module Email
     class << self
-      def check
-        Thread.new do
-          logger.debug "Email polling spawned"
 
-          loop do
-            poll_email
+      attr_reader :thread
 
-            break unless poll_email?
+      def check(once = false)
+        @thread = spawn_timer_thread(once)
 
-            sleep(Config.email['interval'] || 30)
-          end
-        end
+        logger.info "Spawned email monitor #{thread}"
       end
 
       private
 
-      def poll_email
-        with_imap do |imap|
-          imap.search(['NOT', 'DELETED']).each do |message_id|
-            handle_message_id(imap, message_id)
+      def spawn_timer_thread(once)
+        Thread.new do
+          loop do
+            pid = fork_worker
+
+            logger.debug "Spawned worker with PID #{pid} to check mail"
+
+            break if once
+
+            logger.debug "Sleeping thread for #{interval} seconds"
+
+            sleep(interval)
           end
         end
-
-      rescue Exception => ex
-        logger.error ex
       end
 
-      def handle_message_id(imap, message_id)
-        mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
-        mail and mail.dispatch
-      rescue Exception => ex
-        logger.warn ex
-      ensure
-        # we always, always delete the message. this stops malformed mails
-        # from causing recurring problems and prevents any duplicate
-        # processing. only risk is a dropped email here or there.
-        imap.store(message_id, "+FLAGS", [:Deleted]) rescue $!
+      def fork_worker
+        fork do
+          worker = Worker.new
+          worker.run
+        end
       end
 
-      def with_imap(config = Config.email, &block)
-        imap = connect_to_imap(config)
-
-        yield imap
-
-      ensure
-        disconnect(imap) if imap
-      end
-
-      def connect_to_imap(config)
-        logger.debug 'Logging into IMAP'
-        imap = Net::IMAP.new(config['server'], config['port'], true)
-        imap.login(config['username'], config['password'])
-        imap.select(config['inbox'])
-
-        imap
-      end
-
-      def disconnect(imap)
-        imap.logout
-        imap.disconnect
-        logger.debug 'Disconnected from IMAP'
-      end
-
-      def poll_email?
-        # right now we just use this to prevent looping during testing,
-        # eventually this might be used to allow an in-chat command to
-        # shut down the polling (or something)
-        true
+      def interval
+        Config.email['interval'] || 30
       end
 
       def logger
         @logger ||= Loggers['email']
       end
+
     end
   end
 end
