@@ -33,28 +33,30 @@ module Basil
       end
 
       def redirect_io
-        begin
-          STDIN.reopen('/dev/null')
-        rescue Exception
-        end
+        quietly { STDIN.reopen('/dev/null') }
 
-        begin
+        ex = quietly do
           STDOUT.reopen(Config.log_file, 'a')
           STDOUT.sync = true
-        rescue Exception => ex
+        end
+
+        if ex
           logger.warn ex
           logger.warn 'Closing stdout entirely'
 
-          begin STDOUT.reopen('/dev/null')
-          rescue Exception
-          end
+          quietly { STDOUT.reopen('/dev/null') }
         end
 
-        begin
+        quietly do
           STDERR.reopen(STDOUT)
           STDERR.sync = true
-        rescue Exception
         end
+      end
+
+      def quietly(&block)
+        yield
+      rescue Exception => ex
+        ex
       end
 
       def logger
