@@ -11,7 +11,7 @@ module Basil
           end
         end
       rescue => ex
-        logger.warn ex
+        logger.error ex
       end
 
       private
@@ -21,7 +21,7 @@ module Basil
         mail and mail.dispatch
         logger.debug "Handled message #{message_id}"
       rescue => ex
-        logger.warn ex
+        logger.error ex
       ensure
         delete_message_id(imap, message_id)
       end
@@ -30,7 +30,7 @@ module Basil
         imap.store(message_id, "+FLAGS", [:Deleted])
         logger.debug "Deleted message #{message_id}"
       rescue => ex
-        logger.warn ex
+        logger.error ex
       end
 
       def with_imap(config = Config.email, &block)

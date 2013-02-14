@@ -28,9 +28,8 @@ module Basil
       }
 
       Timer.new(options) do
-        logger.warn "#{pid}: timed out"
+        logger.error "killing #{pid} (timed out)"
         system("kill -9 #{pid}")
-        logger.debug "#{pid}: killed"
       end
     end
 
