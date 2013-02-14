@@ -19,8 +19,10 @@ module Basil
   autoload :Skype,        'basil/skype'
   autoload :SkypeMessage, 'basil/skype_message'
   autoload :Storage,      'basil/storage'
+  autoload :Timer,        'basil/timer'
   autoload :Utils,        'basil/utils'
   autoload :VERSION,      'basil/version'
+  autoload :Worker,       'basil/worker'
 
   Loggers.init!
 
