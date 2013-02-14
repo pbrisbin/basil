@@ -37,6 +37,8 @@ module Basil
       skype.connect unless skype.connected?
       skype.message_chat(msg.chat, "#{prefix}#{msg.text}")
 
+    rescue ::DBus::InvalidPacketException => ex
+      logger.error ex; nil # TODO: find out why this happens
     rescue ::Skype::Errors::GeneralError => ex
       logger.error ex; nil
     end
