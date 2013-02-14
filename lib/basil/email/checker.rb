@@ -1,9 +1,12 @@
+require 'net/imap'
+
 module Basil
   module Email
     class Checker
       def run
         with_imap do |imap|
           imap.search(['NOT', 'DELETED']).each do |message_id|
+            logger.debug "Found message #{message_id}"
             handle_message_id(imap, message_id)
           end
         end
@@ -14,9 +17,9 @@ module Basil
       private
 
       def handle_message_id(imap, message_id)
-        logger.debug "Handling message with ID #{message_id}"
         mail = Mail.parse(imap.fetch(message_id, 'RFC822').first.attr['RFC822'])
         mail and mail.dispatch
+        logger.debug "Handled message #{message_id}"
       rescue => ex
         logger.warn ex
       ensure
@@ -25,7 +28,7 @@ module Basil
 
       def delete_message_id(imap, message_id)
         imap.store(message_id, "+FLAGS", [:Deleted])
-        logger.debug "Message #{message_id} deleted"
+        logger.debug "Deleted message #{message_id}"
       rescue => ex
         logger.warn ex
       end
