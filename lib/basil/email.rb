@@ -19,9 +19,7 @@ module Basil
       def spawn_timer_thread(once)
         Thread.new do
           loop do
-            pid = fork_worker
-
-            logger.debug "Spawned worker with PID #{pid} to check mail"
+            fork_worker
 
             break if once
 
@@ -33,10 +31,28 @@ module Basil
       end
 
       def fork_worker
-        fork do
+        pid = Process.fork do
           worker = Worker.new
           worker.run
         end
+
+        logger.debug "Spawned worker with PID #{pid} to check mail"
+
+        babysit(pid)
+
+      rescue => ex
+        logger.warn ex
+      end
+
+      # wait for our child, then kill them
+      def babysit(pid)
+        Timeout.timeout(30) do
+          Process.wait(pid)
+          logger.debug "Worker terminated. Status: #{$?.exitstatus}"
+        end
+      rescue Timeout::Error
+        logger.warn "Killing worker with PID #{pid} (timeout)"
+        logger.debug `kill -9 #{pid} 2>&1`
       end
 
       def interval
