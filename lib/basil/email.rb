@@ -1,7 +1,6 @@
 require 'net/imap'
-require 'timeout'
 require 'basil/email/mail'
-require 'basil/email/worker'
+require 'basil/email/checker'
 
 module Basil
   module Email

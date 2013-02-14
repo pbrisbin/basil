@@ -1,6 +1,6 @@
 module Basil
   module Email
-    class Worker
+    class Checker
       def run
         with_imap do |imap|
           imap.search(['NOT', 'DELETED']).each do |message_id|

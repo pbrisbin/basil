@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module Basil
   module Email
-    describe Worker do
+    describe Checker do
       let(:imap) { double('imap') }
 
       let(:attrs) do
