@@ -36,6 +36,9 @@
 #########################################################################
 # Additional configuration specific to plugins. It is not guaranteed
 # that plugins will work without specifying values for these.
+#
+# Note that you can add whatever keys you want here and access their
+# values from your own plugins simply with value = Basil::Config.key
 #########################################################################
 
 jenkins:
