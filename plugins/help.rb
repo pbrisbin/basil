@@ -1,13 +1,11 @@
 Basil.respond_to('help') {
 
   Basil::Plugin.responders.each do |p|
-    next unless p.description
-    @msg.say "#{p.regex.inspect} => #{p.description}."
+    @msg.say p.help_text if p.has_help?
   end
 
   Basil::Plugin.watchers.each do |p|
-    next unless p.description
-    @msg.say "#{p.regex.inspect} => #{p.description}."
+    @msg.say p.help_text if p.has_help?
   end
 
 }.description = "lists the bot's triggers"

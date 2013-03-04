@@ -69,6 +69,14 @@ module Basil
       "#<Plugin regex: #{regex.inspect}, description: #{description.inspect} >"
     end
 
+    def has_help?
+      !!description
+    end
+
+    def help_text
+      "#{regex.inspect} => #{description}."
+    end
+
     private
 
     attr_reader :regex
