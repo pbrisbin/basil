@@ -2,6 +2,13 @@ require 'forwardable'
 
 Signal.trap('INT') { puts 'killed.'; exit 1 }
 
+at_exit do
+  if (ex = $!) && !ex.is_a?(SystemExit)
+    Basil.logger.debug "Exiting due to unhandled exception"
+    Basil.logger.debug ex
+  end
+end
+
 module Basil
   autoload :ChatHistory,  'basil/chat_history'
   autoload :Cli,          'basil/cli'
