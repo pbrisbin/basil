@@ -8,7 +8,7 @@ module Basil
             (?<to>\w+)[,;:]\s+    # using punctuation
          )?
          (?<text>.*)$             # rest of message
-      /x
+      /mx
 
     attr_reader :chatname,
                 :from_handle,
