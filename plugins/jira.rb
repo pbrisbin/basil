@@ -51,7 +51,8 @@ module Basil
 end
 
 Basil.watch_for(/\w+-\d+/) {
-  tickets = []
+  tickets   = []
+  responses = []
 
   # people might mention more than one ticket in a message
   found = @msg.text.scan(/\w+-\d+/).uniq
@@ -71,31 +72,31 @@ Basil.watch_for(/\w+-\d+/) {
     end
   end
 
-  if tickets.any?
-    tickets.each do |id|
-      ticket = Basil::JiraTicket.new(id)
+  tickets.each do |id|
+    ticket = Basil::JiraTicket.new(id)
 
-      if ticket.found?
-        url   = ticket.url
-        title = ticket.title
+    if ticket.found?
+      url   = ticket.url
+      title = ticket.title
 
-        # don't spam information that's already present in the
-        # triggering message
-        url_present   = @msg.text.include?(url)
-        title_present = @msg.text.include?(title)
+      # don't spam information that's already present in the
+      # triggering message
+      url_present   = @msg.text.include?(url)
+      title_present = @msg.text.include?(title)
 
-        unless url_present && title_present
-          if url_present
-            @msg.say "#{id} : #{title}"
-          elsif title_present
-            @msg.say "#{url}"
-          else
-            @msg.say "#{ticket.description}"
-          end
+      unless url_present && title_present
+        if url_present
+          responses << "#{id} : #{title}"
+        elsif title_present
+          responses << "#{url}"
+        else
+          responses << "#{ticket.description}"
         end
       end
     end
   end
+
+  @msg.say responses.join("\n") if responses.any?
 }
 
 Basil.respond_to(/^jira search (.+)/i) {
