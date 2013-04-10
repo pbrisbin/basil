@@ -122,6 +122,14 @@ module Jenkins
     def path
       "/job/#{name}/#{number}/"
     end
+
+    def chat
+      chats = Basil::Config.jenkins.fetch('broadcast_chats', {})
+
+      chats.fetch(name) do
+        Basil::Config.jenkins['broadcast_chat']
+      end
+    end
   end
 end
 
@@ -130,7 +138,7 @@ Basil.check_email(/jenkins build is back to normal : (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  @msg.chat = Basil::Config.jenkins['broadcast_chat']
+  @msg.chat = build.chat
 
   @msg.say trim(<<-EOM)
     (sun) #{build.name} is back to normal!
@@ -143,7 +151,7 @@ Basil.check_email(/build failed in Jenkins: (\w+) #(\d+)/i) do
 
   build = Jenkins::Build.new(name, number)
 
-  @msg.chat = Basil::Config.jenkins['broadcast_chat']
+  @msg.chat = build.chat
 
   @msg.say trim(<<-EOM)
     (rain) #{build.name} ##{build.number} failed!

@@ -47,7 +47,10 @@ jenkins:
   port:     80
   user:     X
   password: X # Api key in newer versions
-  broadcast_chat: "Name of chat to hear about broken builds (name, not topic)"
+  broadcast_chat: "chat to hear about broken builds (name, not topic)"
+  broadcast_chats:
+    some-job:    "chat to hear about broken builds for 'some-job'"
+    another-job: "chat to hear about broken builds for 'another-job'"
 
 jira:
   host:     jira.example.com
