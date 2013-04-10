@@ -44,7 +44,11 @@ module Basil
 
       def connect_to_imap(config)
         logger.debug "Connecting to IMAP"
-        imap = Net::IMAP.new(config['server'], config['port'], true)
+        imap = Net::IMAP.new(
+          config['server'],
+          config['port'],
+          config.fetch('verify', true)
+        )
         imap.login(config['username'], config['password'])
         imap.select(config['inbox'])
 

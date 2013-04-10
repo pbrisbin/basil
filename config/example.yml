@@ -29,6 +29,7 @@
   #username: X
   #password: X
   #inbox:    INBOX
+  #verify:   true
 
 # This may be required on OSX for HTTPS requests to work
 #https_cert_file: /opt/local/share/curl/curl-ca-bundle.crt
